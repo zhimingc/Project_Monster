@@ -20,12 +20,31 @@ public class GridManager : MonoBehaviour {
     return grid[x][y];
   }
 
-  public bool CheckIfLegalMove(GridScript grid, Vector2[] layout)
+  // checks if the grid is full
+  public bool IfGridFull()
   {
+    for (int x = 0; x < grid.Count; ++x)
+    {
+      for (int y = 0; y < grid[x].Count; ++y)
+      {
+        if (grid[x][y].GetComponent<GridScript>().IsGridFull())
+        {
+          return true;
+        }
+      }
+    }
+
+    // no grids are full
+    return false;
+  }
+
+  public bool CheckIfLegalMove(GridScript singleGrid, Vector2[] layout)
+  {
+    Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
+
     for (int i = 0; i < layout.Length; ++i)
     {
       // checking bounds
-      Vector2 gridCoordinates = new Vector2(grid.coordinates[0], grid.coordinates[1]);
       Vector2 destGrid = gridCoordinates + layout[i];
 
       // Outside of grid
@@ -37,6 +56,41 @@ public class GridManager : MonoBehaviour {
     }
 
     return true;
+  }
+
+  // Adds an entire ingredient block to the grid; assumes legal
+  public void AddIngredientBlockToGrid(GridScript singleGrid, IngredientBlock block)
+  {
+    Vector2[] layout = block.layout;
+    Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
+    singleGrid.AddIngredientToStack(block.ingredients[0].GetComponent<IngredientScript>());
+
+    // Plus 1 because index 0 is the center
+    for (int i = 0; i < layout.Length; ++i)
+    {
+      Vector2 destGrid = gridCoordinates + layout[i];
+
+      // Call add ingredient
+      GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
+      curGrid.AddIngredientToStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+    }
+  }
+
+  public void RemoveIngredientBlockFromGrid(GridScript singleGrid, IngredientBlock block)
+  {
+    Vector2[] layout = block.layout;
+    Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
+    singleGrid.RemoveIngredientFromStack(block.ingredients[0].GetComponent<IngredientScript>());
+
+    // Plus 1 because index 0 is the center
+    for (int i = 0; i < layout.Length; ++i)
+    {
+      Vector2 destGrid = gridCoordinates + layout[i];
+
+      // Call add ingredient
+      GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
+      curGrid.RemoveIngredientFromStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+    }
   }
 
   public void ConstructLevel()

@@ -5,49 +5,35 @@ using UnityEngine;
 public enum INGREDIENT_TYPE 
 { 
   BREAD, 
-  MEAT, 
-  LETTUCE, 
-  NUM_INGREDIENTS 
-};
-
-public class Connection 
-{ 
-  public Ingredient[] ingredient; 
-  public GameObject connector; 
-  public bool visited = false; 
-}
-
-[System.Serializable]
-public class Ingredient 
-{ 
-  public Ingredient(INGREDIENT_TYPE _type, GameObject _obj, Vector3 _size) 
-  { 
-    type = _type; 
-    obj = _obj; 
-    obj.transform.localScale = _size; 
-    IngredientFactory.InitializeIngredient(this); 
-  } 
- 
-  public INGREDIENT_TYPE type; 
-  public GameObject obj; 
-  public List<Connection> connects = new List<Connection>(); 
+  MEAT,
+  LETTUCE,
+  CHEESE,
+  //NUM_INGREDIENTS,
+  EATER,
+  EMPTY,
 };
 
 static public class IngredientFactory
 {
-  static public void InitializeIngredient(Ingredient ingredient) 
+  static public void InitializeIngredient(GameObject ingredient, INGREDIENT_TYPE type) 
   { 
-    switch (ingredient.type) 
+    switch (type) 
     { 
       case INGREDIENT_TYPE.BREAD: 
-        ingredient.obj.GetComponent<SpriteRenderer>().color = new Color(165/255.0f, 42/255.0f, 42/255.0f); 
+        ingredient.GetComponent<SpriteRenderer>().color = new Color(105/255.0f, 12/255.0f, 12/255.0f); 
         break; 
       case INGREDIENT_TYPE.LETTUCE: 
-        ingredient.obj.GetComponent<SpriteRenderer>().color = Color.green; 
+        ingredient.GetComponent<SpriteRenderer>().color = Color.green; 
         break; 
       case INGREDIENT_TYPE.MEAT: 
-        ingredient.obj.GetComponent<SpriteRenderer>().color = Color.red; 
-        break; 
+        ingredient.GetComponent<SpriteRenderer>().color = Color.red; 
+        break;
+      case INGREDIENT_TYPE.CHEESE:
+        ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
+        break;
+      case INGREDIENT_TYPE.EATER:
+        ingredient.GetComponent<SpriteRenderer>().color = Color.black;
+        break;
     } 
   }
 };

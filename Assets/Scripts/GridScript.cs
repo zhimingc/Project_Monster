@@ -11,29 +11,43 @@ public class GridScript : MonoBehaviour {
   private List<GameObject> stackObjs;
   private PlayerScript playerScript;
   private GridManager gridMan;
+  private INGREDIENT_TYPE tmpHold; // Holds ingredient for eater
+  private int maxIngredients;      // maximum ingredients the grid can hold
+
+  void Awake()
+  {
+    playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
+    gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
+    tmpHold = INGREDIENT_TYPE.EMPTY;
+    maxIngredients = 5;
+  }
 
 	// Use this for initialization
 	void Start () {
-    playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
-    gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
-
     // Generate ingredient stack game objs
     GenerateIngredientMold();
+
+    UpdateStackDisplay();
   }
 	
 	void GenerateIngredientMold()
   {
     stackObjs = new List<GameObject>();
 
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < maxIngredients; ++i)
     {
       GameObject ingredient = Instantiate(ingredientSide);
-      ingredient.transform.position = transform.position + new Vector3(0, -0.75f + i * 0.5f, 0);
+      Vector3 localScale = transform.localScale;
+      localScale = Vector3.Scale(localScale, new Vector3(0.8f, 0.08f, 1.0f));
+      ingredient.transform.localScale = localScale;
+
+      ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
+      
       stackObjs.Add(ingredient);
     }
   }
 
-  void OnMouseOver()
+  void OnMouseEnter()
   {
     // Update the grid if an ingredient block is being dragged
     if (playerScript.blockBeingDragged != null)
@@ -42,20 +56,89 @@ public class GridScript : MonoBehaviour {
 
       // Stop grid from moving
       playerScript.blockBeingDragged.GetComponent<IngredientBlock>().beingDragged = false;
+      playerScript.blockBeingDragged.ToggleIngredients(false);
 
       // Update grid with move
       playerScript.blockBeingDragged.SetBlockPosition(transform.position);
+      playerScript.SetHoveredGrid(this);
+      gridMan.AddIngredientBlockToGrid(this, playerScript.blockBeingDragged);
+
+      //AddIngredientToStack(playerScript.blockBeingDragged.ingredients[0].GetComponent<IngredientScript>());
+    }
+  }
+
+  public void AddIngredientToStack(IngredientScript ingredient)
+  {
+    // Change behaviour depending on ingredient type
+    switch(ingredient.type)
+    {
+      // Eats the top ingredient
+      case INGREDIENT_TYPE.EATER:
+        if (ingredientStack.Count == 0) break;
+        tmpHold = ingredientStack[ingredientStack.Count - 1];
+        ingredientStack.RemoveAt(ingredientStack.Count - 1);
+        break;
+      default:
+        ingredientStack.Add(ingredient.type);
+        break;
+    }
+
+    UpdateStackDisplay();
+  }
+
+  public void RemoveIngredientFromStack(IngredientScript ingredient)
+  {
+    // Change behaviour depending on ingredient type
+    switch (ingredient.type)
+    {
+      // Eats the top ingredient
+      case INGREDIENT_TYPE.EATER:
+        // Only adds back ingredient if something was removed
+        if (tmpHold != INGREDIENT_TYPE.EMPTY)
+        {
+          ingredientStack.Add(tmpHold);
+          tmpHold = INGREDIENT_TYPE.EMPTY;
+        }
+        break;
+      default:
+        ingredientStack.RemoveAt(ingredientStack.Count - 1);
+        break;
+    }
+
+    UpdateStackDisplay();
+  }
+
+  void UpdateStackDisplay()
+  {
+    for (int i = 0; i < stackObjs.Count; ++i)
+    {
+      stackObjs[i].GetComponent<SpriteRenderer>().color = Color.grey;
+
+      // Change color depending on ingredient type
+      if (i < ingredientStack.Count)
+      {
+        IngredientFactory.InitializeIngredient(stackObjs[i], ingredientStack[i]);
+      }
     }
   }
 
   void OnMouseExit()
   {
     // Update the grid if an ingredient block is being dragged
-    if (playerScript.blockBeingDragged != null)
+    if (playerScript.blockBeingDragged != null && playerScript.hoveredGrid == this)
     {
+      playerScript.SetHoveredGrid(null);
+
       // Stop grid from moving
       playerScript.blockBeingDragged.GetComponent<IngredientBlock>().beingDragged = true;
+      playerScript.blockBeingDragged.ToggleIngredients(true);
+      gridMan.RemoveIngredientBlockFromGrid(this, playerScript.blockBeingDragged);
     }
+  }
+
+  public bool IsGridFull()
+  {
+    return ingredientStack.Count >= maxIngredients;
   }
 
   public bool CheckIfLegalMove()
@@ -69,10 +152,12 @@ public class GridScript : MonoBehaviour {
   public void ClearStack()
   {
     ingredientStack.Clear();
+    UpdateStackDisplay();
   }
 
-  public void AddToStack(INGREDIENT_TYPE type)
+  // Reset any grid data if player mouse up
+  public void ResetHoveredGrid()
   {
-    ingredientStack.Add(type);
+    tmpHold = INGREDIENT_TYPE.EMPTY;
   }
 }

@@ -1,0 +1,58 @@
+Initialize engine version: 5.6.1f1 (2860b30f0b54)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 860M (ID=0x1392)
+    Vendor:   NVIDIA
+    VRAM:     2019 MB
+    Driver:   22.21.13.8233
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.040 seconds
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 3.536704 ms
+[Singleton] An instance of GameManager is needed in the scene, so '(singleton) GameManager (UnityEngine.GameObject)' was created with DontDestroyOnLoad.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 10.591295 ms
+
+Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 343.
+Total: 0.937846 ms (FindLiveObjects: 0.132145 ms CreateObjectMapping: 0.086386 ms MarkObjects: 0.705202 ms  DeleteObjects: 0.011974 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.975052 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 343.
+Total: 0.446471 ms (FindLiveObjects: 0.040627 ms CreateObjectMapping: 0.030363 ms MarkObjects: 0.368638 ms  DeleteObjects: 0.006414 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.963506 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 343.
+Total: 0.483249 ms (FindLiveObjects: 0.073984 ms CreateObjectMapping: 0.034640 ms MarkObjects: 0.366927 ms  DeleteObjects: 0.006414 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.833499 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 343.
+Total: 0.389165 ms (FindLiveObjects: 0.038488 ms CreateObjectMapping: 0.029935 ms MarkObjects: 0.313470 ms  DeleteObjects: 0.006842 ms)
+
+Setting up 4 worker threads for Enlighten.
+  Thread -> id: 2f74 -> priority: 1 
+  Thread -> id: 388c -> priority: 1 
+  Thread -> id: c0c -> priority: 1 
+  Thread -> id: 2ea4 -> priority: 1 

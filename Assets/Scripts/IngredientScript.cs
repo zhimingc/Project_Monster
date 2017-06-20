@@ -4,8 +4,18 @@ using UnityEngine;
 
 public class IngredientScript : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+  public INGREDIENT_TYPE type;
+  //public List<Connection> connects = new List<Connection>();
+
+  public void InitializeIngredientScript(INGREDIENT_TYPE _type, Vector3 _size)
+  {
+    type = _type;
+    transform.localScale = _size;
+    IngredientFactory.InitializeIngredient(gameObject, type);
+  }
+
+  // Use this for initialization
+  void Start () {
 		
 	}
 	
