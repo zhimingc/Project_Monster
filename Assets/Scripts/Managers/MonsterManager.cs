@@ -28,6 +28,7 @@ public class Request
 
   public List<INGREDIENT_TYPE> ingredients;
   public SAUCE_TYPE sauce;
+  public GRID_TYPE gridType;
 };
 
 public class MonsterManager : MonoBehaviour {
@@ -115,9 +116,12 @@ public class MonsterManager : MonoBehaviour {
       {
         GridScript gs = grid[x][y].GetComponent<GridScript>();
 
+        // Check if grid request is met
+        if (req.gridType != gs.gridType) continue;
+        
         // Check if sauce request is met
         if (req.sauce != gs.sauceType) continue;
-
+        
         // Check if ingredients request is met
         if (req.ingredients.Count != gs.ingredientStack.Count) continue;
         bool same = true;
@@ -174,10 +178,16 @@ public class MonsterManager : MonoBehaviour {
     int addTopBread = Random.Range(0, rp.topBreadProbability);
     if (addTopBread == 0) req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
-    // Add sauce
+    // Add sauce if it is lunch or dinner time
     if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
     {
       req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+    }
+
+    // Add grid type if it is dinner time
+    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.DINNER))
+    {
+      req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
     }
 
     return req;

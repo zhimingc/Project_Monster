@@ -6,7 +6,8 @@ public class GridScript : MonoBehaviour {
 
   public GameObject ingredientSide;
   public List<INGREDIENT_TYPE> ingredientStack;
-  public SAUCE_TYPE sauceType;
+  public SAUCE_TYPE sauceType;  // lunch mechanic
+  public GRID_TYPE gridType;    // dinner mechanic
   public int[] coordinates;
 
   private List<GameObject> stackObjs;
@@ -41,7 +42,7 @@ public class GridScript : MonoBehaviour {
     {
       GameObject ingredient = Instantiate(ingredientSide);
       Vector3 localScale = transform.localScale;
-      localScale = Vector3.Scale(localScale, new Vector3(0.8f, 0.08f, 1.0f));
+      localScale = Vector3.Scale(localScale, new Vector3(0.6f, 0.08f, 1.0f));
       ingredient.transform.localScale = localScale;
 
       ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
@@ -118,6 +119,12 @@ public class GridScript : MonoBehaviour {
     UpdateStackDisplay();
   }
 
+  public void ToggleGridType(GRID_TYPE type)
+  {
+    gridType = type;
+    UpdateStackDisplay();
+  }
+
   void UpdateStackDisplay()
   {
     for (int i = 0; i < stackObjs.Count; ++i)
@@ -133,6 +140,9 @@ public class GridScript : MonoBehaviour {
 
     // Update sauce feedback for grid
     IngredientFactory.InitializeSauce(gameObject, sauceType);
+
+    // Update grid type feedback
+    IngredientFactory.InitializeGrid(gameObject, gridType);
   }
 
   void OnMouseExit()

@@ -22,8 +22,31 @@ public enum SAUCE_TYPE
   EMPTY
 }
 
+public enum GRID_TYPE
+{
+  PLATE,
+  BOWL,
+  NUM_GRID
+}
+
 static public class IngredientFactory
 {
+  static public void InitializeGrid(GameObject grid, GRID_TYPE type)
+  {
+    Sprite gridSprite = Resources.Load<Sprite>("Sprites/block_split_old");
+
+    switch (type)
+    {
+      case GRID_TYPE.PLATE:
+        grid.GetComponent<SpriteRenderer>().sprite = gridSprite;
+        break;
+      case GRID_TYPE.BOWL:
+        gridSprite = Resources.Load<Sprite>("Sprites/block_circle");
+        grid.GetComponent<SpriteRenderer>().sprite = gridSprite;
+        break;
+    }
+  }
+
   static public void InitializeSauce(GameObject ingredient, SAUCE_TYPE type)
   {
     switch (type)

@@ -70,6 +70,16 @@ public class GameManager : Singleton<GameManager>
 
     // Check for day change
     dayMan.CheckForShiftChange();
+    
+    // Change blocks for dinner shift
+    if (dayMan.IsOrPastShift(DAY_STATE.DINNER))
+    {
+      gridMan.ToggleDinnerShiftGrids(true);
+    }
+    else
+    {
+      gridMan.ToggleDinnerShiftGrids(false);
+    }
   }
 
   public void SetGameState(GAME_STATE state)

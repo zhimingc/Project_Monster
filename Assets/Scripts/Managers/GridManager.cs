@@ -103,6 +103,13 @@ public class GridManager : MonoBehaviour {
     ConstructGrid(gridSizes[0], gridSizes[1]);
   }
 
+  public void ToggleDinnerShiftGrids(bool flag)
+  {
+    GRID_TYPE type = flag ? GRID_TYPE.BOWL : GRID_TYPE.PLATE;
+    grid[0][0].GetComponent<GridScript>().ToggleGridType(type);
+    grid[1][1].GetComponent<GridScript>().ToggleGridType(type);
+  }
+
   void ConstructGrid(int gridX, int gridY)
   {
     int halfGridX = gridX / 2;

@@ -37,6 +37,9 @@ public class MonsterRequest : MonoBehaviour {
 
     // Set display according to sauce type
     IngredientFactory.InitializeSauce(gameObject, req.sauce);
+
+    // Set display according to grid type
+    IngredientFactory.InitializeGrid(gameObject, req.gridType);
   }
 
   public void InitStack()
@@ -49,7 +52,7 @@ public class MonsterRequest : MonoBehaviour {
       Vector3 localScale = transform.localScale;
       localScale = Vector3.Scale(localScale, new Vector3(0.8f, 0.08f, 1.0f));
       sideObj.transform.localScale = localScale;
-      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
+      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 4.0f + i * localScale.y * 2.0f, 0);
       sideObj.transform.SetParent(transform);
       sideObj.GetComponent<SpriteRenderer>().color = Color.grey;
 
