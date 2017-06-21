@@ -6,12 +6,14 @@ public class GridScript : MonoBehaviour {
 
   public GameObject ingredientSide;
   public List<INGREDIENT_TYPE> ingredientStack;
+  public SAUCE_TYPE sauceType;
   public int[] coordinates;
 
   private List<GameObject> stackObjs;
   private PlayerScript playerScript;
   private GridManager gridMan;
   private INGREDIENT_TYPE tmpHold; // Holds ingredient for eater
+  private SAUCE_TYPE tmpSauce;     // Holds sauce type when hovering new sauce
   private int maxIngredients;      // maximum ingredients the grid can hold
 
   void Awake()
@@ -19,6 +21,7 @@ public class GridScript : MonoBehaviour {
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
     gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
     tmpHold = INGREDIENT_TYPE.EMPTY;
+    sauceType = SAUCE_TYPE.EMPTY;
     maxIngredients = 5;
   }
 
@@ -62,8 +65,6 @@ public class GridScript : MonoBehaviour {
       playerScript.blockBeingDragged.SetBlockPosition(transform.position);
       playerScript.SetHoveredGrid(this);
       gridMan.AddIngredientBlockToGrid(this, playerScript.blockBeingDragged);
-
-      //AddIngredientToStack(playerScript.blockBeingDragged.ingredients[0].GetComponent<IngredientScript>());
     }
   }
 
@@ -72,6 +73,11 @@ public class GridScript : MonoBehaviour {
     // Change behaviour depending on ingredient type
     switch(ingredient.type)
     {
+      // Adds sauce to the grid
+      case INGREDIENT_TYPE.SAUCE:
+        tmpSauce = sauceType;
+        sauceType = ingredient.sauceType;
+        break;
       // Eats the top ingredient
       case INGREDIENT_TYPE.EATER:
         if (ingredientStack.Count == 0) break;
@@ -83,6 +89,7 @@ public class GridScript : MonoBehaviour {
         break;
     }
 
+    // Visual feedback for grid
     UpdateStackDisplay();
   }
 
@@ -91,6 +98,9 @@ public class GridScript : MonoBehaviour {
     // Change behaviour depending on ingredient type
     switch (ingredient.type)
     {
+      case INGREDIENT_TYPE.SAUCE:
+        sauceType = tmpSauce;
+        break;
       // Eats the top ingredient
       case INGREDIENT_TYPE.EATER:
         // Only adds back ingredient if something was removed
@@ -120,6 +130,9 @@ public class GridScript : MonoBehaviour {
         IngredientFactory.InitializeIngredient(stackObjs[i], ingredientStack[i]);
       }
     }
+
+    // Update sauce feedback for grid
+    IngredientFactory.InitializeSauce(gameObject, sauceType);
   }
 
   void OnMouseExit()
@@ -159,5 +172,6 @@ public class GridScript : MonoBehaviour {
   public void ResetHoveredGrid()
   {
     tmpHold = INGREDIENT_TYPE.EMPTY;
+    tmpSauce = SAUCE_TYPE.EMPTY;
   }
 }

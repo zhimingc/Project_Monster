@@ -20,21 +20,27 @@ public class GameManager : Singleton<GameManager>
   public bool levelCompleted;
   public int currentLevel;
 
-  // For ui controls
+  public ScoreManager scoreMan;
+  public DayManager dayMan;
+
   private UIManager uiMan;
-  //private ScoreManager scoreMan;
   private GridManager gridMan;
   private MonsterManager monsterMan;
 
   void Awake()
   {
+    scoreMan = new ScoreManager();
     InitializeManagers();
-    //scoreMan = gameObject.AddComponent<ScoreManager>();
+
+    // Delegate which gets called ever time a scene loads
+    SceneManager.sceneLoaded += OnSceneLoaded;
   }
 
   void InitializeManagers()
   {
     currentLevel = 0;
+    scoreMan.InitScore();
+    dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
     uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
     gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
     monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
@@ -49,8 +55,21 @@ public class GameManager : Singleton<GameManager>
       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // HACK
+    // Update to display score
+    scoreMan.DisplayScore();
+  }
+
+  private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+  {
     InitializeManagers();
+  }
+
+  public void AddScore(int amt)
+  {
+    scoreMan.AddScore(amt);
+
+    // Check for day change
+    dayMan.CheckForShiftChange();
   }
 
   public void SetGameState(GAME_STATE state)

@@ -20,7 +20,9 @@ public class IngredientManager : MonoBehaviour {
   private int ingredientTracker;
   private int ingredientFlipflop;
   private int ingredientCountdown; // Spawns bread until countdown is up
+  private int maxCountdown;
   private int ingredientCountup;   // For specific ingredients spawn, e.g. eater
+  private int sauceFlipflop;       // Switches between all sauce types
 
   // Ingredient block layouts 
   private int maxLayout = 2; 
@@ -41,9 +43,11 @@ public class IngredientManager : MonoBehaviour {
     // Init for sequential ingredient gen.
     ingredientTracker = 0;
     ingredientFlipflop = 1;
-    ingredientCountdown = 1;
+    maxCountdown = 1;
+    ingredientCountdown = maxCountdown;
     ingredientCountup = 0;
     ++numberOfIngredients;  // Because random range excludes max value
+    sauceFlipflop = 1;
 
     // Start with 3 blocks
     while (viewableAmt-- > 0)
@@ -92,14 +96,21 @@ public class IngredientManager : MonoBehaviour {
     // Get queued type 
     ++ingredientCountup;
 
-    // spawns an eater every X turns
-    if (ingredientCountup % 7 == 0)
+    SAUCE_TYPE sauceTracker = SAUCE_TYPE.EMPTY;
+    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH) &&
+      ingredientCountup % 6 == 0)
     {
+      ingredientTracker = (int)INGREDIENT_TYPE.SAUCE;
+      sauceTracker = (SAUCE_TYPE) ((++sauceFlipflop) % (int)SAUCE_TYPE.NUM_SAUCE);
+    }
+    else if (ingredientCountup % 7 == 0)
+    {
+      // spawns an eater every X turns
       ingredientTracker = (int)INGREDIENT_TYPE.EATER;
     }
     else if (ingredientCountdown-- <= 0)
     {
-      ingredientCountdown = 1;
+      ingredientCountdown = maxCountdown;
       ingredientTracker = ingredientFlipflop;
       ingredientFlipflop = ++ingredientFlipflop % numberOfIngredients;
       if (ingredientFlipflop == 0) ++ingredientFlipflop;
@@ -108,26 +119,27 @@ public class IngredientManager : MonoBehaviour {
     {
       ingredientTracker = 0;
     }
-    //ingredientTracker = ++ingredientTracker % (int)INGREDIENT_TYPE.NUM_INGREDIENTS;
     INGREDIENT_TYPE type = (INGREDIENT_TYPE)ingredientTracker;
+    SAUCE_TYPE sauce = sauceTracker;
 
     // Get random layout 
     int layout = Random.Range(0, blockLayouts.Length);
 
     // Generate ingredient 
-    return GenerateIngredient(type, layout);
+    return GenerateIngredient(type, sauce, layout);
   }
 
   GameObject RandomizeIngredient() 
   { 
     // Get random type 
-    INGREDIENT_TYPE type = (INGREDIENT_TYPE)Random.Range(0, numberOfIngredients); 
- 
+    INGREDIENT_TYPE type = (INGREDIENT_TYPE)Random.Range(0, numberOfIngredients);
+    SAUCE_TYPE sauce = SAUCE_TYPE.EMPTY;
+
     // Get random layout 
     int layout = Random.Range(0, blockLayouts.Length); 
  
     // Generate ingredient 
-    return GenerateIngredient(type, layout); 
+    return GenerateIngredient(type, sauce, layout); 
   }
 
   void AddIngredientToList(GameObject ingredient) 
@@ -151,7 +163,7 @@ public class IngredientManager : MonoBehaviour {
     }
   }
 
-  GameObject GenerateIngredient(INGREDIENT_TYPE type, int layout) 
+  GameObject GenerateIngredient(INGREDIENT_TYPE type, SAUCE_TYPE sauce, int layout) 
   { 
     GameObject parent = Instantiate(block); 
     IngredientBlock blockScript = parent.GetComponent<IngredientBlock>();
@@ -165,7 +177,7 @@ public class IngredientManager : MonoBehaviour {
  
     // Create core of ingredient 
     GameObject ingredientObj = Instantiate(center, transform.position, Quaternion.identity);
-    ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, ingredientSize);
+    ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, ingredientSize);
     ingredientObj.transform.SetParent(parent.transform); 
     blockScript.AddIngredient(ingredientObj); 
  
@@ -174,7 +186,7 @@ public class IngredientManager : MonoBehaviour {
     {  
       // Create ingredients within connection 
       GameObject newIngredient = Instantiate(center, transform.position, Quaternion.identity);
-      newIngredient.GetComponent<IngredientScript>().InitializeIngredientScript(type, ingredientSize);
+      newIngredient.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, ingredientSize);
  
       // Initialize new ingredient 
       Vector3 offset = Vector2.Scale(vec, ingredientSize + new Vector2(spacing, spacing));

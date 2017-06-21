@@ -5,7 +5,7 @@ using UnityEngine;
 public class MonsterRequest : MonoBehaviour {
 
   public GameObject ingredientObj;
-  public List<INGREDIENT_TYPE> request;
+  public Request request;
 
   private List<GameObject> ingredientStackObjs;
 
@@ -19,7 +19,7 @@ public class MonsterRequest : MonoBehaviour {
 		
 	}
 
-  public void SetRequest(List<INGREDIENT_TYPE> req)
+  public void SetRequest(Request req)
   {
     request = req;
 
@@ -30,10 +30,13 @@ public class MonsterRequest : MonoBehaviour {
     }
 
     // Set the display according to ingredient
-    for (int i = 0; i < req.Count; ++i)
+    for (int i = 0; i < req.ingredients.Count; ++i)
     {
-      IngredientFactory.InitializeIngredient(ingredientStackObjs[i], req[i]);
+      IngredientFactory.InitializeIngredient(ingredientStackObjs[i], req.ingredients[i]);
     }
+
+    // Set display according to sauce type
+    IngredientFactory.InitializeSauce(gameObject, req.sauce);
   }
 
   public void InitStack()

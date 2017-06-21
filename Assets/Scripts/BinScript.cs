@@ -6,12 +6,12 @@ using UnityEngine.UI;
 public class BinScript : MonoBehaviour {
 
   private PlayerScript playerScript;
-  private IngredientManager ingredientMan;
+  //private IngredientManager ingredientMan;
 
 	// Use this for initialization
 	void Start () {
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
-    ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
+    //ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
     GetComponent<SpriteRenderer>().color = Color.white;
   }
 

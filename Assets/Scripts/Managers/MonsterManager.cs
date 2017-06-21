@@ -14,22 +14,36 @@ public class RequestParameters
 
   public int[] ingCountRange;
   public int topBreadProbability;
+  public bool isTimerOn;
+};
+
+[System.Serializable]
+public class Request
+{
+  public Request()
+  {
+    ingredients = new List<INGREDIENT_TYPE>();
+    sauce = SAUCE_TYPE.EMPTY;
+  }
+
+  public List<INGREDIENT_TYPE> ingredients;
+  public SAUCE_TYPE sauce;
 };
 
 public class MonsterManager : MonoBehaviour {
 
+  public RequestParameters rp = new RequestParameters();
   public List<MonsterRequest> requestBoxes;
   public float maxTimer, minTimer;
   public int speedUpInterval;
 
   // Hack
-  public int score = 0;
+  //public int score = 0;
 
   private float currentTimer;
   private GameObject timerDisplay;
   private Vector3 timerPos, timerScale;
   private IngredientManager ingredientMan;
-  private RequestParameters rp = new RequestParameters();
 
   void Awake()
   {
@@ -49,26 +63,31 @@ public class MonsterManager : MonoBehaviour {
     // Init request boxes
     foreach (MonsterRequest box in requestBoxes)
     {
-      List<INGREDIENT_TYPE> req = GenerateRandomRequest();
+      Request req = GenerateRandomRequest();
 
       box.InitStack();
       box.SetRequest(req);
     }
 
     // Init request timer
+    if (!rp.isTimerOn)
+    {
+      GameObject.Find("timer_text").GetComponent<Text>().enabled = false;
+      timerDisplay.GetComponent<SpriteRenderer>().enabled = false;
+    }
     ResetRequestTimer();
   }
 	
 	// Update is called once per frame
 	void Update () {
     // Timer for requests
-    UpdateRequestTimer();
+    if (rp.isTimerOn) UpdateRequestTimer();
 
     if (Input.GetKeyDown(KeyCode.R))
     {
       foreach (MonsterRequest box in requestBoxes)
       {
-        List<INGREDIENT_TYPE> req = GenerateRandomRequest();
+        Request req = GenerateRandomRequest();
         box.SetRequest(req);
       }
     }
@@ -88,7 +107,7 @@ public class MonsterManager : MonoBehaviour {
 
   public void CheckRequestsMet(List<List<GameObject>> grid)
   {
-    List<INGREDIENT_TYPE> req = requestBoxes[0].GetComponent<MonsterRequest>().request;
+    Request req = requestBoxes[0].GetComponent<MonsterRequest>().request;
 
     for (int x = 0; x < grid.Count; ++x)
     {
@@ -96,12 +115,15 @@ public class MonsterManager : MonoBehaviour {
       {
         GridScript gs = grid[x][y].GetComponent<GridScript>();
 
-        // Check if request is met
-        if (req.Count != gs.ingredientStack.Count) continue;
+        // Check if sauce request is met
+        if (req.sauce != gs.sauceType) continue;
+
+        // Check if ingredients request is met
+        if (req.ingredients.Count != gs.ingredientStack.Count) continue;
         bool same = true;
-        for (int i = 0; i < req.Count; ++i)
+        for (int i = 0; i < req.ingredients.Count; ++i)
         {
-          if (req[i] != gs.ingredientStack[i]) same = false;
+          if (req.ingredients[i] != gs.ingredientStack[i]) same = false;
         }
         if (!same) continue;
 
@@ -109,8 +131,8 @@ public class MonsterManager : MonoBehaviour {
         gs.ClearStack();
         AdvanceRequests();
 
-        // HACK to increase score
-        GameObject.Find("score").GetComponent<Text>().text = (++score).ToString();
+        // Increase score
+        GameManager.Instance.AddScore(1);
 
         // Continue recursively to check for any other completes
         CheckRequestsMet(grid);
@@ -132,30 +154,38 @@ public class MonsterManager : MonoBehaviour {
     ResetRequestTimer();
   }
 
-  List<INGREDIENT_TYPE> GenerateRandomRequest()
+  Request GenerateRandomRequest()
   {
-    List<INGREDIENT_TYPE> retList = new List<INGREDIENT_TYPE>();
+    Request req = new Request();
 
     // Add bot bread
-    retList.Add(INGREDIENT_TYPE.BREAD);
+    req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
+    // Add ingredients
     int numIngredients = Random.Range(rp.ingCountRange[0], rp.ingCountRange[1]);
     for (int i = 0; i < numIngredients; ++i)
     {
       // Start from 1 to exclude BREAD
       INGREDIENT_TYPE randIngredient = (INGREDIENT_TYPE)Random.Range(1, ingredientMan.numberOfIngredients);
-      retList.Add(randIngredient);
+      req.ingredients.Add(randIngredient);
     }
 
+    // Add top bread by chance
     int addTopBread = Random.Range(0, rp.topBreadProbability);
-    // Add top bread
-    if (addTopBread == 0) retList.Add(INGREDIENT_TYPE.BREAD);
+    if (addTopBread == 0) req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
-    return retList;
+    // Add sauce
+    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
+    {
+      req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+    }
+
+    return req;
   }
 
   void ResetRequestTimer()
   {
+    int score = GameManager.Instance.scoreMan.score;
     if (score > 0 && score % speedUpInterval == 0)
     {
       maxTimer -= 5.0f;
