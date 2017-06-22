@@ -19,6 +19,7 @@ public class GameManager : Singleton<GameManager>
   public GAME_STATE gameState;
   public bool levelCompleted;
   public int currentLevel;
+  public int turnCounter;
 
   public ScoreManager scoreMan;
   public DayManager dayMan;
@@ -29,6 +30,7 @@ public class GameManager : Singleton<GameManager>
 
   void Awake()
   {
+    turnCounter = 0;
     scoreMan = new ScoreManager();
     InitializeManagers();
 
@@ -64,13 +66,19 @@ public class GameManager : Singleton<GameManager>
     InitializeManagers();
   }
 
+  public void IncrementTurnCounter()
+  {
+    ++turnCounter;
+  }
+
   public void AddScore(int amt)
   {
     scoreMan.AddScore(amt);
 
     // Check for day change
     dayMan.CheckForShiftChange();
-    
+    dayMan.UpdateProgressBar();
+
     // Change blocks for dinner shift
     if (dayMan.IsOrPastShift(DAY_STATE.DINNER))
     {

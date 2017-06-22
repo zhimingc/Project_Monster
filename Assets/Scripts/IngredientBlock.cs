@@ -81,15 +81,23 @@ public class IngredientBlock : MonoBehaviour {
       beingDragged = false;
 
       // return to idle scale when in queue 
-      transform.localScale = idleScale;
+      //transform.localScale = idleScale;
+      ToggleScale();
       GetComponent<SpriteRenderer>().enabled = true;
     }
     else
     {
       // Ingredient block is used up and deleted from Q
       ingredientMan.RemoveFromIngredientQ(gameObject);
+      Destroy(gameObject);
     }
 
+  }
+
+  public void ToggleScale()
+  {
+    if (transform.localScale == idleScale) transform.localScale = draggedScale;
+    else transform.localScale = idleScale;
   }
 
   void StartDrag()
@@ -103,7 +111,8 @@ public class IngredientBlock : MonoBehaviour {
     playerScript.SetPlayerState(PLAYER_STATE.DRAGGING);
 
     // Original scale when dragging
-    transform.localScale = draggedScale;
+    //transform.localScale = draggedScale;
+    ToggleScale();
   }
 
   void OnMouseOver() 

@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class IngredientDistribution
+{
+  public int[] layoutDistribution = new int[] { 50, 75, 100 };
+}
+
 public class IngredientManager : MonoBehaviour {
 
   public GameObject block, center, connector; 
   public List<GameObject> ingredientList;
   public int numberOfIngredients;
+  public IngredientDistribution distribution;
 
   private float spacing; 
   private Vector2 gridBlockSize;
@@ -36,7 +43,7 @@ public class IngredientManager : MonoBehaviour {
  
 
   // Use this for initialization 
-  void Start () { 
+  void Awake () { 
     spacing = GameObject.Find("grid_manager").GetComponent<GridManager>().spacing;
     gridBlockSize = GameObject.Find("grid_manager").GetComponent<GridManager>().gridBlockSize;
 
@@ -48,19 +55,24 @@ public class IngredientManager : MonoBehaviour {
     ingredientCountup = 0;
     ++numberOfIngredients;  // Because random range excludes max value
     sauceFlipflop = 1;
+  }
 
+  void Start()
+  {
     // Start with 3 blocks
     while (viewableAmt-- > 0)
     {
       AddToIngredientQ();
     }
+
+    GameManager.Instance.turnCounter = 0;
   }
 	
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown(KeyCode.Z)) 
     { 
-      GameObject newIngredient = RandomizeIngredient(); 
+      GameObject newIngredient = SequentialIngredient(); 
       AddIngredientToList(newIngredient); 
     }
 	}
@@ -77,7 +89,6 @@ public class IngredientManager : MonoBehaviour {
   public void RemoveFromIngredientQ(GameObject block)
   {
     ingredientList.Remove(block);
-    Destroy(block);
 
     // Automatically add an ingredient to the queue after removing
     AddToIngredientQ();
@@ -94,11 +105,13 @@ public class IngredientManager : MonoBehaviour {
   GameObject SequentialIngredient()
   {
     // Get queued type 
-    ++ingredientCountup;
+    //++ingredientCountup;
+    GameManager.Instance.IncrementTurnCounter();
+    ingredientCountup = GameManager.Instance.turnCounter;
 
     SAUCE_TYPE sauceTracker = SAUCE_TYPE.EMPTY;
     if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH) &&
-      ingredientCountup % 6 == 0)
+      ingredientCountup % 5 == 0)
     {
       ingredientTracker = (int)INGREDIENT_TYPE.SAUCE;
       sauceTracker = (SAUCE_TYPE) ((++sauceFlipflop) % (int)SAUCE_TYPE.NUM_SAUCE);
@@ -123,10 +136,10 @@ public class IngredientManager : MonoBehaviour {
     SAUCE_TYPE sauce = sauceTracker;
 
     // Get random layout 
-    int layout = Random.Range(0, blockLayouts.Length);
+    int layout = GenerateLayout();
 
     // Generate ingredient 
-    return GenerateIngredient(type, sauce, layout);
+    return GenerateIngredient(type, sauce, layout, transform);
   }
 
   GameObject RandomizeIngredient() 
@@ -139,7 +152,7 @@ public class IngredientManager : MonoBehaviour {
     int layout = Random.Range(0, blockLayouts.Length); 
  
     // Generate ingredient 
-    return GenerateIngredient(type, sauce, layout); 
+    return GenerateIngredient(type, sauce, layout, transform); 
   }
 
   void AddIngredientToList(GameObject ingredient) 
@@ -163,7 +176,21 @@ public class IngredientManager : MonoBehaviour {
     }
   }
 
-  GameObject GenerateIngredient(INGREDIENT_TYPE type, SAUCE_TYPE sauce, int layout) 
+  public int GenerateLayout()
+  {
+    // Get random layout 
+    int layoutRoll = Random.Range(0, 101);
+    int layout = 0;
+    for (layout = 0; layout < blockLayouts.Length; ++layout)
+    {
+      if (layoutRoll <= distribution.layoutDistribution[layout])
+        break;
+    }
+
+    return layout;
+  }
+
+  public GameObject GenerateIngredient(INGREDIENT_TYPE type, SAUCE_TYPE sauce, int layout, Transform t) 
   { 
     GameObject parent = Instantiate(block); 
     IngredientBlock blockScript = parent.GetComponent<IngredientBlock>();
@@ -173,10 +200,10 @@ public class IngredientManager : MonoBehaviour {
     Vector2 ingredientSize = gridBlockSize;
     Vector2 newScale = (ingredientSize + new Vector2(spacing, spacing)) * maxLayout; 
     parent.transform.localScale = newScale; 
-    parent.transform.position = transform.position + new Vector3(newScale.x, -newScale.y, 0.0f) / (maxLayout * 2.0f); 
+    parent.transform.position = t.position + new Vector3(newScale.x, -newScale.y, 0.0f) / (maxLayout * 2.0f); 
  
     // Create core of ingredient 
-    GameObject ingredientObj = Instantiate(center, transform.position, Quaternion.identity);
+    GameObject ingredientObj = Instantiate(center, t.position, Quaternion.identity);
     ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, ingredientSize);
     ingredientObj.transform.SetParent(parent.transform); 
     blockScript.AddIngredient(ingredientObj); 
@@ -185,7 +212,7 @@ public class IngredientManager : MonoBehaviour {
     foreach (Vector2 vec in blockLayouts[layout]) 
     {  
       // Create ingredients within connection 
-      GameObject newIngredient = Instantiate(center, transform.position, Quaternion.identity);
+      GameObject newIngredient = Instantiate(center, t.position, Quaternion.identity);
       newIngredient.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, ingredientSize);
  
       // Initialize new ingredient 

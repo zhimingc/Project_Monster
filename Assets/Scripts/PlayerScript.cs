@@ -8,6 +8,8 @@ public enum PLAYER_STATE
   DRAGGING
 };
 
+public delegate void MouseUpBehaviour();
+
 public class PlayerScript : MonoBehaviour {
 
   public IngredientBlock blockBeingDragged;
@@ -17,6 +19,7 @@ public class PlayerScript : MonoBehaviour {
   private GridManager gridMan;
   private MonsterManager monsterMan;
   private bool deleteIngredientFlag;
+  private MouseUpBehaviour mouseUpDelegate;
 
   void Awake()
   {
@@ -28,7 +31,9 @@ public class PlayerScript : MonoBehaviour {
 	void Start () {
     blockBeingDragged = null;
     hoveredGrid = null;
-	}
+    mouseUpDelegate = DefaultMouseUpDel;
+
+  }
 	
   public void DragIngredientBlock(IngredientBlock block)
   {
@@ -82,6 +87,19 @@ public class PlayerScript : MonoBehaviour {
     deleteIngredientFlag = flag;
   }
 
+  public void SetMouseUpDel(MouseUpBehaviour del)
+  {
+    mouseUpDelegate = del;
+  }
+
+  public void ResetMouseUpDel()
+  {
+    mouseUpDelegate = DefaultMouseUpDel;  // reset mouse up behaviour
+  }
+
+  void DefaultMouseUpDel()
+  {}
+
   void UpdateIngredientBlock()
   {
     // When an ingredient block is being dragged
@@ -90,7 +108,9 @@ public class PlayerScript : MonoBehaviour {
     {
       IngredientBlock blockScript = blockBeingDragged.GetComponent<IngredientBlock>();
       blockScript.StopDrag(deleteIngredientFlag);
+      mouseUpDelegate();
       blockBeingDragged = null;
+      ResetMouseUpDel();
 
       SetPlayerState(PLAYER_STATE.IDLE);
     }

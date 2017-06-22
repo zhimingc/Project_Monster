@@ -8,28 +8,44 @@ public enum DAY_STATE
   BREAKFAST,
   LUNCH,
   DINNER,
+  WIN,
   NUM_SHIFTS
 };
 
 public class DayManager : MonoBehaviour {
 
   public DAY_STATE dayState;
-  public GameObject dayFeedback;
+  public GameObject dayFeedback, progressBar;
   public int[] shiftIntervals;
+
+  private float initialProgressSize;
 
 	// Use this for initialization
 	void Start () {
     dayState = DAY_STATE.BREAKFAST;
     dayFeedback = GameObject.Find("shift_text");
 
+    initialProgressSize = progressBar.transform.localScale.x;
+    UpdateProgressBar();
+    CheckForShiftChange();
+
   }
-	
+
+  public void UpdateProgressBar()
+  {
+    float progressScaler = (float)GameManager.Instance.scoreMan.score / shiftIntervals[2];
+    if (progressScaler >= 1.0f) progressScaler = 1.0f;
+    float progressSize = (progressScaler) * initialProgressSize;
+    progressBar.transform.localScale = new Vector3(progressSize, 0.25f, 1.0f);
+    progressBar.transform.position = new Vector3(-initialProgressSize / 2.0f + progressSize / 2.0f, 7.5f, 0.0f);
+  }
+
 	public void CheckForShiftChange()
   {
     int score = GameManager.Instance.scoreMan.score;
     for (int i = 0; i < (int)DAY_STATE.NUM_SHIFTS; ++i)
     {
-      if (score < shiftIntervals[i])
+      if (i >= shiftIntervals.Length || score < shiftIntervals[i])
       {
         // Change the feedback text to reflect shift
         dayState = ((DAY_STATE)i);
