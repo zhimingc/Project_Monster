@@ -89,7 +89,8 @@ public class PlayerScript : MonoBehaviour {
 
   public void SetMouseUpDel(MouseUpBehaviour del)
   {
-    mouseUpDelegate = del;
+    if (mouseUpDelegate == DefaultMouseUpDel)
+      mouseUpDelegate = del;
   }
 
   public void ResetMouseUpDel()

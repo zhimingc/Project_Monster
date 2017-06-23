@@ -15,7 +15,7 @@ public enum DAY_STATE
 public class DayManager : MonoBehaviour {
 
   public DAY_STATE dayState;
-  public GameObject dayFeedback, progressBar;
+  public GameObject dayFeedback, progressBar, sauces;
   public int[] shiftIntervals;
 
   private float initialProgressSize;
@@ -50,13 +50,25 @@ public class DayManager : MonoBehaviour {
         // Change the feedback text to reflect shift
         dayState = ((DAY_STATE)i);
         dayFeedback.GetComponent<Text>().text = dayState.ToString();
-        return;
+        break;
       }
+    }
+
+    if (IsOrPastShift(DAY_STATE.LUNCH))
+    {
+      sauces.SetActive(true);
     }
   }
 
   public bool IsOrPastShift(DAY_STATE shift)
   {
     return (int)dayState >= (int)shift;
+  }
+
+  public bool FutureShiftCheck(DAY_STATE shift)
+  {
+    if (shift <= 0) return true;
+    int shiftNum = shiftIntervals[(int)shift - 1];
+    return GameManager.Instance.scoreMan.score + 3 >= shiftNum;
   }
 }

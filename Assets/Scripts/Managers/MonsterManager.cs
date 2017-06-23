@@ -179,13 +179,13 @@ public class MonsterManager : MonoBehaviour {
     if (addTopBread == 0) req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
     // Add sauce if it is lunch or dinner time
-    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
+    if (GameManager.Instance.dayMan.FutureShiftCheck(DAY_STATE.LUNCH))
     {
       req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
     }
 
     // Add grid type if it is dinner time
-    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.DINNER))
+    if (GameManager.Instance.dayMan.FutureShiftCheck(DAY_STATE.DINNER))
     {
       req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
     }

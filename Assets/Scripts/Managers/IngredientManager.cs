@@ -110,13 +110,13 @@ public class IngredientManager : MonoBehaviour {
     ingredientCountup = GameManager.Instance.turnCounter;
 
     SAUCE_TYPE sauceTracker = SAUCE_TYPE.EMPTY;
-    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH) &&
-      ingredientCountup % 5 == 0)
-    {
-      ingredientTracker = (int)INGREDIENT_TYPE.SAUCE;
-      sauceTracker = (SAUCE_TYPE) ((++sauceFlipflop) % (int)SAUCE_TYPE.NUM_SAUCE);
-    }
-    else if (ingredientCountup % 7 == 0)
+    //if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH) &&
+    //  ingredientCountup % 5 == 0)
+    //{
+    //  ingredientTracker = (int)INGREDIENT_TYPE.SAUCE;
+    //  sauceTracker = (SAUCE_TYPE) ((++sauceFlipflop) % (int)SAUCE_TYPE.NUM_SAUCE);
+    //}
+    if (ingredientCountup % 7 == 0)
     {
       // spawns an eater every X turns
       ingredientTracker = (int)INGREDIENT_TYPE.EATER;

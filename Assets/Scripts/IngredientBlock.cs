@@ -88,7 +88,8 @@ public class IngredientBlock : MonoBehaviour {
     else
     {
       // Ingredient block is used up and deleted from Q
-      ingredientMan.RemoveFromIngredientQ(gameObject);
+      if (ingredients[0].GetComponent<IngredientScript>().type != INGREDIENT_TYPE.SAUCE)
+        ingredientMan.RemoveFromIngredientQ(gameObject);
       Destroy(gameObject);
     }
 
@@ -100,7 +101,7 @@ public class IngredientBlock : MonoBehaviour {
     else transform.localScale = idleScale;
   }
 
-  void StartDrag()
+  public void StartDrag()
   {
     oldPos = transform.position;
     beingDragged = true;
