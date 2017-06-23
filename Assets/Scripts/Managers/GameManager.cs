@@ -28,11 +28,17 @@ public class GameManager : Singleton<GameManager>
   private GridManager gridMan;
   private MonsterManager monsterMan;
 
+  private bool startWithHelp;
+
   void Awake()
   {
     turnCounter = 0;
     scoreMan = new ScoreManager();
+    startWithHelp = true;
+
+    // Init for when scene loads
     InitializeManagers();
+    if (startWithHelp) ToggleHelpScreen();
 
     // Delegate which gets called ever time a scene loads
     SceneManager.sceneLoaded += OnSceneLoaded;
@@ -51,18 +57,43 @@ public class GameManager : Singleton<GameManager>
   void Update()
   {
     // Debug
+    if (Input.anyKeyDown)
+    {
+      if (Input.GetKeyDown(KeyCode.H))
+      {
+        ToggleHelpScreen();
+      }
+      else if (uiMan.helpText.enabled == true)
+      {
+        uiMan.ToggleHelpText(false);
+        gridMan.ToggleGrid(true);
+      }
+    }
     if (Input.GetKeyDown(KeyCode.R))
     {
       // Resets level
       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+    if (Input.GetKeyDown(KeyCode.Escape))
+    {
+      Application.Quit();
+    }
+
 
     // Update to display score
     scoreMan.DisplayScore();
   }
 
+  void ToggleHelpScreen()
+  {
+    bool flag = uiMan.helpText.enabled;
+    uiMan.ToggleHelpText(!flag);
+    gridMan.ToggleGrid(flag);
+  }
+
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
   {
+    if (startWithHelp) ToggleHelpScreen();
     InitializeManagers();
   }
 

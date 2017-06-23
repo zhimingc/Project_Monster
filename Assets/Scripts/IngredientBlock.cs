@@ -5,7 +5,7 @@ using UnityEngine;
 public class IngredientBlock : MonoBehaviour {
 
   public List<GameObject> ingredients;
-  public bool beingDragged;
+  public bool beingDragged, isUsable;
   public Vector2[] layout;
 
   private Vector3 oldPos;
@@ -23,6 +23,7 @@ public class IngredientBlock : MonoBehaviour {
 
   // Use this for initialization
 	void Start () {
+    isUsable = true;
     beingDragged = false;
     draggedScale = transform.localScale;
 
@@ -126,7 +127,8 @@ public class IngredientBlock : MonoBehaviour {
 
   public void ToggleUsability(bool flag)
   {
-    if (flag == true)
+    isUsable = flag;
+    if (isUsable == true)
     {
       GetComponent<BoxCollider2D>().enabled = true;
       GetComponent<SpriteRenderer>().enabled = true;

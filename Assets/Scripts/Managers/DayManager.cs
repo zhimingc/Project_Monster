@@ -49,7 +49,8 @@ public class DayManager : MonoBehaviour {
       {
         // Change the feedback text to reflect shift
         dayState = ((DAY_STATE)i);
-        dayFeedback.GetComponent<Text>().text = dayState.ToString();
+        string dayText = dayState.ToString();
+        dayFeedback.GetComponent<Text>().text = dayText;
         break;
       }
     }

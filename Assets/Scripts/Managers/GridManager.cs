@@ -20,6 +20,17 @@ public class GridManager : MonoBehaviour {
     return grid[x][y];
   }
 
+  public void ToggleGrid(bool flag)
+  {
+    for (int x = 0; x < grid.Count; ++x)
+    {
+      for (int y = 0; y < grid[x].Count; ++y)
+      {
+        grid[x][y].SetActive(flag);
+      }
+    }
+  }
+
   // checks if the grid is full
   public bool IfGridFull()
   {

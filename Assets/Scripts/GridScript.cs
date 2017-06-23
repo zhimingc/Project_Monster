@@ -17,6 +17,9 @@ public class GridScript : MonoBehaviour {
   private SAUCE_TYPE tmpSauce;     // Holds sauce type when hovering new sauce
   private int maxIngredients;      // maximum ingredients the grid can hold
 
+  // feedback
+  private ParticleSystem psObj;
+
   void Awake()
   {
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
@@ -24,6 +27,8 @@ public class GridScript : MonoBehaviour {
     tmpHold = INGREDIENT_TYPE.EMPTY;
     sauceType = SAUCE_TYPE.EMPTY;
     maxIngredients = 5;
+
+    psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
   }
 
 	// Use this for initialization
@@ -32,9 +37,12 @@ public class GridScript : MonoBehaviour {
     GenerateIngredientMold();
 
     UpdateStackDisplay();
+
+    // reposition particle system obj
+    psObj.transform.position = transform.position;
   }
-	
-	void GenerateIngredientMold()
+
+  void GenerateIngredientMold()
   {
     stackObjs = new List<GameObject>();
 
@@ -46,7 +54,7 @@ public class GridScript : MonoBehaviour {
       ingredient.transform.localScale = localScale;
 
       ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
-      
+      ingredient.transform.SetParent(transform);
       stackObjs.Add(ingredient);
     }
   }
@@ -176,6 +184,9 @@ public class GridScript : MonoBehaviour {
   {
     ingredientStack.Clear();
     UpdateStackDisplay();
+
+    // emit particles when eaten
+    psObj.Play();
   }
 
   // Reset any grid data if player mouse up

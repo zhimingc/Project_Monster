@@ -31,7 +31,7 @@ public class BinScript : MonoBehaviour {
   {
     if (canThrowAway)
     {
-      GetComponent<SpriteRenderer>().color = Color.white;
+      GetComponent<SpriteRenderer>().color = Color.green;
     }
     else
     {

@@ -64,7 +64,11 @@ public class SauceScript : MonoBehaviour {
 
   void UpdateCooldown()
   {
-    if (sauceObj == null) isCoolingDown = true; 
+    if (!isCoolingDown && sauceObj == null)
+    {
+      isCoolingDown = true;
+      curCooldown = GameManager.Instance.turnCounter;
+    }
 
     if (isCoolingDown)
     {
@@ -92,7 +96,8 @@ public class SauceScript : MonoBehaviour {
     }
     else
     {
-      GetComponent<SpriteRenderer>().color = Color.white;
+      GetComponent<SpriteRenderer>().color = Color.green;
+      sauceObj.GetComponent<SpriteRenderer>().color = Color.green;
     }
   }
 
