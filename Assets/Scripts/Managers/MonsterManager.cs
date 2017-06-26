@@ -134,6 +134,7 @@ public class MonsterManager : MonoBehaviour {
         // request has been met
         gs.ClearStack();
         AdvanceRequests();
+        GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
 
         // Increase score
         GameManager.Instance.AddScore(1);

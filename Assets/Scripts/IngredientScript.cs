@@ -14,11 +14,33 @@ public class IngredientScript : MonoBehaviour {
     sauceType = sauce;
     transform.localScale = _size;
     IngredientFactory.InitializeIngredient(gameObject, type, sauce);
+    LoadIngredientSprite();
     if (sauce != SAUCE_TYPE.EMPTY)
     {
       Sprite sauceSprite = Resources.Load<Sprite>("Sprites/bottle_empty");
       GetComponent<SpriteRenderer>().sprite = sauceSprite;
       transform.localEulerAngles = new Vector3(0, 0, 45.0f);
+    }
+  }
+
+  void LoadIngredientSprite()
+  {
+    Sprite sprite = null;
+
+    switch (type)
+    {
+      case INGREDIENT_TYPE.MEAT:
+        sprite = Resources.Load<Sprite>("Sprites/ham");
+        GetComponent<SpriteRenderer>().sprite = sprite;
+        GetComponent<SpriteRenderer>().color = Color.white;
+        break;
+      case INGREDIENT_TYPE.BREAD:
+        sprite = Resources.Load<Sprite>("Sprites/bread_dark");
+        GetComponent<SpriteRenderer>().sprite = sprite;
+        GetComponent<SpriteRenderer>().color = Color.white;
+        break;
+      case INGREDIENT_TYPE.EATER:
+        break;
     }
   }
 

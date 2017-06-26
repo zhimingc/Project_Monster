@@ -32,9 +32,8 @@ public class GameManager : Singleton<GameManager>
 
   void Awake()
   {
-    turnCounter = 0;
-    scoreMan = new ScoreManager();
     startWithHelp = true;
+    scoreMan = new ScoreManager();
 
     // Init for when scene loads
     InitializeManagers();
@@ -46,6 +45,7 @@ public class GameManager : Singleton<GameManager>
 
   void InitializeManagers()
   {
+    turnCounter = 0;
     currentLevel = 0;
     scoreMan.InitScore();
     dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
@@ -93,8 +93,8 @@ public class GameManager : Singleton<GameManager>
 
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
   {
-    if (startWithHelp) ToggleHelpScreen();
     InitializeManagers();
+    if (startWithHelp) ToggleHelpScreen();
   }
 
   public void IncrementTurnCounter()

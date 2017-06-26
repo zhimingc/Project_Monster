@@ -49,9 +49,11 @@ public class GridManager : MonoBehaviour {
     return false;
   }
 
-  public bool CheckIfLegalMove(GridScript singleGrid, Vector2[] layout)
+  public bool CheckIfLegalMove(GridScript singleGrid, IngredientBlock block)
   {
+    Vector2[] layout = block.layout;
     Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
+    bool canFit = true; 
 
     for (int i = 0; i < layout.Length; ++i)
     {
@@ -62,11 +64,31 @@ public class GridManager : MonoBehaviour {
       if (destGrid.x < 0.0f || destGrid.x >= gridSizeX ||
         destGrid.y < 0.0f || destGrid.y >= gridSizeY)
       {
-        return false;
+        canFit = false;
+      }
+      else
+      {
+        canFit = true;
+        block.isReverseLayout = false;
+        break;
+      }
+
+      // check reverse layout
+      destGrid = gridCoordinates - layout[i];
+      if (destGrid.x < 0.0f || destGrid.x >= gridSizeX ||
+        destGrid.y < 0.0f || destGrid.y >= gridSizeY)
+      {
+        canFit = false;
+      }
+      else
+      {
+        canFit = true;
+        block.isReverseLayout = true;
+        break;
       }
     }
 
-    return true;
+    return canFit;
   }
 
   // Adds an entire ingredient block to the grid; assumes legal
@@ -79,7 +101,8 @@ public class GridManager : MonoBehaviour {
     // Plus 1 because index 0 is the center
     for (int i = 0; i < layout.Length; ++i)
     {
-      Vector2 destGrid = gridCoordinates + layout[i];
+      Vector2 layoutDir = block.isReverseLayout ? -layout[i] : layout[i];
+      Vector2 destGrid = gridCoordinates + layoutDir;
 
       // Call add ingredient
       GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
@@ -96,7 +119,8 @@ public class GridManager : MonoBehaviour {
     // Plus 1 because index 0 is the center
     for (int i = 0; i < layout.Length; ++i)
     {
-      Vector2 destGrid = gridCoordinates + layout[i];
+      Vector2 layoutDir = block.isReverseLayout ? -layout[i] : layout[i];
+      Vector2 destGrid = gridCoordinates + layoutDir;
 
       // Call add ingredient
       GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();

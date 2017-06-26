@@ -7,16 +7,21 @@ public class IngredientBlock : MonoBehaviour {
   public List<GameObject> ingredients;
   public bool beingDragged, isUsable;
   public Vector2[] layout;
+  public Vector3 oldPos;
+  public bool isReverseLayout;
 
-  private Vector3 oldPos;
   private PlayerScript playerScript;
   private IngredientManager ingredientMan;
 
   // UI for being dragged
   private Vector3 draggedScale, idleScale;
+  private bool isBigScale;
+  private LTDescr moveDescr;
 
   void Awake()
   {
+    isReverseLayout = false;
+    isBigScale = false;
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
   }
@@ -70,7 +75,10 @@ public class IngredientBlock : MonoBehaviour {
     Vector3 vecToMove = pos - ingredients[0].transform.position;
 
     // Move parent such that mouse aligns with core ingredient
+    Vector3 dest = transform.position + vecToMove;
+    //LeanTween.move(gameObject, dest, 0.1f).setEase(LeanTweenType.easeOutQuad);
     transform.position += vecToMove;
+    transform.position = pos;
   }
 
   public void StopDrag(bool deleteIngredient)
@@ -78,7 +86,8 @@ public class IngredientBlock : MonoBehaviour {
     if (deleteIngredient == false)
     {
       GetComponent<BoxCollider2D>().enabled = true;
-      transform.position = oldPos;
+      //transform.position = oldPos;
+      ReturnToOrigin();
       beingDragged = false;
 
       // return to idle scale when in queue 
@@ -96,15 +105,30 @@ public class IngredientBlock : MonoBehaviour {
 
   }
 
+  void ReturnToOrigin()
+  {
+    if (moveDescr != null) LeanTween.cancel(moveDescr.id);
+    moveDescr = LeanTween.move(gameObject, oldPos, 0.25f).setEase(LeanTweenType.easeOutQuad);
+  }
+
   public void ToggleScale()
   {
-    if (transform.localScale == idleScale) transform.localScale = draggedScale;
-    else transform.localScale = idleScale;
+    if (!isBigScale)
+    {
+      isBigScale = true;
+      transform.localScale = idleScale;
+      LeanTween.scale(gameObject, draggedScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
+    }
+    else
+    {
+      isBigScale = false;
+      transform.localScale = draggedScale;
+      LeanTween.scale(gameObject, idleScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
+    }
   }
 
   public void StartDrag()
   {
-    oldPos = transform.position;
     beingDragged = true;
     GetComponent<BoxCollider2D>().enabled = false;
 

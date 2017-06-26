@@ -177,7 +177,7 @@ public class GridScript : MonoBehaviour {
     IngredientBlock block = playerScript.blockBeingDragged;
     Vector2[] layout = block.layout;
 
-    return gridMan.CheckIfLegalMove(this, layout);
+    return gridMan.CheckIfLegalMove(this, block);
   }
 
   public void ClearStack()

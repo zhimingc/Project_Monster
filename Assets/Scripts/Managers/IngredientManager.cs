@@ -29,7 +29,7 @@ public class IngredientManager : MonoBehaviour {
   private int ingredientCountdown; // Spawns bread until countdown is up
   private int maxCountdown;
   private int ingredientCountup;   // For specific ingredients spawn, e.g. eater
-  private int sauceFlipflop;       // Switches between all sauce types
+  //private int sauceFlipflop;       // Switches between all sauce types
 
   // Ingredient block layouts 
   private int maxLayout = 2; 
@@ -54,7 +54,7 @@ public class IngredientManager : MonoBehaviour {
     ingredientCountdown = maxCountdown;
     ingredientCountup = 0;
     ++numberOfIngredients;  // Because random range excludes max value
-    sauceFlipflop = 1;
+    //sauceFlipflop = 1;
   }
 
   void Start()
@@ -173,6 +173,8 @@ public class IngredientManager : MonoBehaviour {
       //pos.y = transform.position.y + (c * (-gridBlockSize.y - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
       pos.y = transform.position.y + (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
       ingredientList[i].transform.position = pos;
+      ingredientList[i].GetComponent<IngredientBlock>().oldPos = pos;
+
     }
   }
 
