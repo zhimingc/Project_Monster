@@ -10,18 +10,19 @@ public class IngredientDistribution
 
 public class IngredientManager : MonoBehaviour {
 
+  public bool isSpawnHorizontal;
   public GameObject block, center, connector; 
   public List<GameObject> ingredientList;
   public int numberOfIngredients;
   public IngredientDistribution distribution;
+  public float idleScaling = 0.5f; // scale of block when in queue
 
   private float spacing; 
   private Vector2 gridBlockSize;
 
   // ingredient queue properties
   private int usableAmt = 4;
-  private int viewableAmt = 6;
-  private float idleScaling = 0.5f; // scale of block when in queue
+  private int viewableAmt = 5;
 
   // For scripted ingredient generation
   private int ingredientTracker;
@@ -170,8 +171,15 @@ public class IngredientManager : MonoBehaviour {
     for (int i = ingredientList.Count - 1, c = 0; i >= 0; --i, ++c)
     {
       Vector3 pos = ingredientList[i].transform.position;
-      //pos.y = transform.position.y + (c * (-gridBlockSize.y - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
-      pos.y = transform.position.y + (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
+
+      if (isSpawnHorizontal)
+      {
+        pos.x = transform.position.x + (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.x * idleScaling) / 2.0f);
+      }
+      else
+      {
+        pos.y = transform.position.y + (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
+      }
       ingredientList[i].transform.position = pos;
       ingredientList[i].GetComponent<IngredientBlock>().oldPos = pos;
 

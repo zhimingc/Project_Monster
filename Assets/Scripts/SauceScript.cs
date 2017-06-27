@@ -8,17 +8,19 @@ public class SauceScript : MonoBehaviour {
   public bool isCoolingDown;
   public SAUCE_TYPE sauceType;
   public GameObject sauceObj;
-  public int maxCooldown, curCooldown;
+  public int curCooldown;
   public Text cooldownText;
 
+  private int maxCooldown;
   private IngredientManager ingredientMan;
   private PlayerScript playerScript;
 
   // Use this for initialization
-  void OnEnable()
+  void Start()
   {
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
+    maxCooldown = GetComponentInParent<SauceManager>().maxCooldown;
 
     GenerateSauce();
     isCoolingDown = false;
@@ -107,6 +109,10 @@ public class SauceScript : MonoBehaviour {
     int layout = ingredientMan.GenerateLayout();
     sauceObj = ingredientMan.GenerateIngredient(INGREDIENT_TYPE.SAUCE, sauceType, layout, transform);
     sauceObj.transform.position = transform.position;
+    sauceObj.GetComponent<IngredientBlock>().SetIdleScale(new Vector3(1.0f, 1.0f, 1.0f));
+    sauceObj.GetComponent<IngredientBlock>().oldPos = transform.position;
+    sauceObj.transform.parent = transform;
+
     sauceObj.GetComponent<BoxCollider2D>().enabled = false;
   }
 

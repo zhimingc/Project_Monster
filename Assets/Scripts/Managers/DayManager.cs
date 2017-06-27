@@ -18,12 +18,14 @@ public class DayManager : MonoBehaviour {
   public GameObject dayFeedback, progressBar, sauces;
   public int[] shiftIntervals;
 
+  private MonsterManager monsterMan;
   private float initialProgressSize;
 
 	// Use this for initialization
 	void Start () {
     dayState = DAY_STATE.BREAKFAST;
     dayFeedback = GameObject.Find("shift_text");
+    monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
 
     initialProgressSize = progressBar.transform.localScale.x;
     UpdateProgressBar();
@@ -40,24 +42,47 @@ public class DayManager : MonoBehaviour {
     progressBar.transform.position = new Vector3(-initialProgressSize / 2.0f + progressSize / 2.0f, 7.5f, 0.0f);
   }
 
+  void ShiftTrigger(DAY_STATE shift)
+  {
+    switch (shift)
+    {
+      case DAY_STATE.LUNCH:
+        monsterMan.AddSauceToAllRequests();
+        break;
+      case DAY_STATE.DINNER:
+        break;
+    }
+  }
+
 	public void CheckForShiftChange()
   {
     int score = GameManager.Instance.scoreMan.score;
-    for (int i = 0; i < (int)DAY_STATE.NUM_SHIFTS; ++i)
+    if ((int)dayState < shiftIntervals.Length && score >= shiftIntervals[(int)dayState])
     {
-      if (i >= shiftIntervals.Length || score < shiftIntervals[i])
+      for (int i = 0; i < (int)DAY_STATE.NUM_SHIFTS; ++i)
       {
-        // Change the feedback text to reflect shift
-        dayState = ((DAY_STATE)i);
-        string dayText = dayState.ToString();
-        dayFeedback.GetComponent<Text>().text = dayText;
-        break;
+        if ((int)dayState == i) continue;
+
+        if (i >= shiftIntervals.Length || score < shiftIntervals[i])
+        {
+          // Change the feedback text to reflect shift
+          dayState = ((DAY_STATE)i);
+          ShiftTrigger(dayState);
+
+          string dayText = dayState.ToString();
+          dayFeedback.GetComponent<Text>().text = dayText;
+          break;
+        }
       }
     }
-
+    
     if (IsOrPastShift(DAY_STATE.LUNCH))
     {
       sauces.SetActive(true);
+    }
+    else
+    {
+      sauces.SetActive(false);
     }
   }
 

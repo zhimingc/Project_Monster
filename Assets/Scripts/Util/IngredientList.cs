@@ -18,6 +18,7 @@ public enum SAUCE_TYPE
 {
   SOYSAUCE,
   MUSTARD,
+  WASABI,
   NUM_SAUCE,
   EMPTY
 }
@@ -57,25 +58,32 @@ static public class IngredientFactory
       case SAUCE_TYPE.MUSTARD:
         ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
         break;
+      case SAUCE_TYPE.WASABI:
+        ingredient.GetComponent<SpriteRenderer>().color = Color.green;
+        break;
       case SAUCE_TYPE.EMPTY:
         ingredient.GetComponent<SpriteRenderer>().color = Color.white;
         break;
     }
   }
 
-  static public void InitializeIngredient(GameObject ingredient, 
+  static public void InitializeIngredientTop(GameObject ingredient, 
     INGREDIENT_TYPE type, SAUCE_TYPE sauce = SAUCE_TYPE.EMPTY) 
-  { 
+  {
+    Sprite sprite = null;
+
     switch (type) 
     { 
-      case INGREDIENT_TYPE.BREAD: 
-        ingredient.GetComponent<SpriteRenderer>().color = new Color(105/255.0f, 12/255.0f, 12/255.0f); 
+      case INGREDIENT_TYPE.BREAD:
+        sprite = Resources.Load<Sprite>("Sprites/bread_dark");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         break; 
       case INGREDIENT_TYPE.LETTUCE: 
         ingredient.GetComponent<SpriteRenderer>().color = Color.green; 
         break; 
-      case INGREDIENT_TYPE.MEAT: 
-        ingredient.GetComponent<SpriteRenderer>().color = Color.red; 
+      case INGREDIENT_TYPE.MEAT:
+        sprite = Resources.Load<Sprite>("Sprites/ham");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         break;
       case INGREDIENT_TYPE.CHEESE:
         ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
@@ -88,5 +96,42 @@ static public class IngredientFactory
         break;
     } 
   }
+
+
+
+  static public void InitializeIngredientSide(GameObject ingredient,
+  INGREDIENT_TYPE type, SAUCE_TYPE sauce = SAUCE_TYPE.EMPTY)
+  {
+    Sprite sprite = null;
+
+    switch (type)
+    {
+      case INGREDIENT_TYPE.BREAD:
+        sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_bot");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        break;
+      case INGREDIENT_TYPE.LETTUCE:
+        ingredient.GetComponent<SpriteRenderer>().color = Color.green;
+        break;
+      case INGREDIENT_TYPE.MEAT:
+        sprite = Resources.Load<Sprite>("Sprites/ham_side");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        break;
+      case INGREDIENT_TYPE.CHEESE:
+        ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
+        break;
+      case INGREDIENT_TYPE.EATER:
+        ingredient.GetComponent<SpriteRenderer>().color = Color.black;
+        break;
+      case INGREDIENT_TYPE.SAUCE:
+        InitializeSauce(ingredient, sauce);
+        break;
+      case INGREDIENT_TYPE.EMPTY:
+        sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        break;
+    }
+  }
+
 };
 

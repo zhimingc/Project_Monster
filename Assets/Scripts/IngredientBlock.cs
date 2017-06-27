@@ -49,6 +49,11 @@ public class IngredientBlock : MonoBehaviour {
     idleScale = transform.localScale * scaling;
   }
 
+  public void SetIdleScale(Vector3 scaling)
+  {
+    idleScale = scaling;
+  }
+
   public void AddIngredient(GameObject ingredient) 
   { 
     ingredients.Add(ingredient); 
@@ -113,15 +118,15 @@ public class IngredientBlock : MonoBehaviour {
 
   public void ToggleScale()
   {
-    if (!isBigScale)
+    if (beingDragged)
     {
-      isBigScale = true;
+      //isBigScale = true;
       transform.localScale = idleScale;
       LeanTween.scale(gameObject, draggedScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
     }
     else
     {
-      isBigScale = false;
+      //isBigScale = false;
       transform.localScale = draggedScale;
       LeanTween.scale(gameObject, idleScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
     }

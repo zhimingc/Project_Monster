@@ -50,13 +50,18 @@ public class GridScript : MonoBehaviour {
     {
       GameObject ingredient = Instantiate(ingredientSide);
       Vector3 localScale = transform.localScale;
-      localScale = Vector3.Scale(localScale, new Vector3(0.6f, 0.08f, 1.0f));
+      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.4f, 1.0f));
       ingredient.transform.localScale = localScale;
 
-      ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
+      //ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
+      ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.25f + i * localScale.y / 2.0f, 0);
+
       ingredient.transform.SetParent(transform);
       stackObjs.Add(ingredient);
     }
+
+    // Deactivate the top ingredient
+    stackObjs[stackObjs.Count - 1].GetComponent<SpriteRenderer>().enabled = false;
   }
 
   void OnMouseEnter()
@@ -137,12 +142,19 @@ public class GridScript : MonoBehaviour {
   {
     for (int i = 0; i < stackObjs.Count; ++i)
     {
-      stackObjs[i].GetComponent<SpriteRenderer>().color = Color.grey;
+      Sprite sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
+      stackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
 
       // Change color depending on ingredient type
       if (i < ingredientStack.Count)
       {
-        IngredientFactory.InitializeIngredient(stackObjs[i], ingredientStack[i]);
+        IngredientFactory.InitializeIngredientSide(stackObjs[i], ingredientStack[i]);
+
+        if (i != 0 && ingredientStack[i] == INGREDIENT_TYPE.BREAD)
+        {
+          sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_top");
+          stackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
+        }
       }
     }
 

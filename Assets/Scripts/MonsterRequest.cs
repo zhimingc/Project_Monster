@@ -26,13 +26,20 @@ public class MonsterRequest : MonoBehaviour {
     // reset ingredient stack obj
     for (int i = 0; i < ingredientStackObjs.Count; ++i)
     {
-      ingredientStackObjs[i].GetComponent<SpriteRenderer>().color = Color.grey;
+      Sprite sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
+      ingredientStackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
     }
 
     // Set the display according to ingredient
     for (int i = 0; i < req.ingredients.Count; ++i)
     {
-      IngredientFactory.InitializeIngredient(ingredientStackObjs[i], req.ingredients[i]);
+      IngredientFactory.InitializeIngredientSide(ingredientStackObjs[i], req.ingredients[i]);
+
+      if (i != 0 && req.ingredients[i] == INGREDIENT_TYPE.BREAD)
+      {
+        Sprite sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_top");
+        ingredientStackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
+      }
     }
 
     // Set display according to sauce type
@@ -50,11 +57,10 @@ public class MonsterRequest : MonoBehaviour {
     {
       GameObject sideObj = Instantiate(ingredientObj, transform.position, Quaternion.identity);
       Vector3 localScale = transform.localScale;
-      localScale = Vector3.Scale(localScale, new Vector3(0.8f, 0.08f, 1.0f));
+      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.4f, 1.0f));
       sideObj.transform.localScale = localScale;
-      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 4.0f + i * localScale.y * 2.0f, 0);
+      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y / 2.0f, 0);
       sideObj.transform.SetParent(transform);
-      sideObj.GetComponent<SpriteRenderer>().color = Color.grey;
 
       ingredientStackObjs.Add(sideObj);
     }

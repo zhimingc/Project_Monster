@@ -57,7 +57,8 @@ public class PlayerScript : MonoBehaviour {
   // Gets MonsterManager to check if a request is met using the grid
   void CheckIfRequestMet()
   {
-    monsterMan.CheckRequestsMet(gridMan.grid);
+    //monsterMan.CheckRequestsMet(gridMan.grid);
+    monsterMan.CheckRequestMetAll(gridMan.grid);
   }
 
   public PLAYER_STATE GetPlayerState()

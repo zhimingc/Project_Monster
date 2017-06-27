@@ -49,9 +49,9 @@ public class MonsterManager : MonoBehaviour {
   void Awake()
   {
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
-    timerDisplay = GameObject.Find("timer_bar");
-    timerPos = timerDisplay.transform.position;
-    timerScale = timerDisplay.transform.localScale;
+    //timerDisplay = GameObject.Find("timer_bar");
+    //timerPos = timerDisplay.transform.position;
+    //timerScale = timerDisplay.transform.localScale;
   }
 
   // Use this for initialization
@@ -73,10 +73,10 @@ public class MonsterManager : MonoBehaviour {
     // Init request timer
     if (!rp.isTimerOn)
     {
-      GameObject.Find("timer_text").GetComponent<Text>().enabled = false;
-      timerDisplay.GetComponent<SpriteRenderer>().enabled = false;
+      //GameObject.Find("timer_text").GetComponent<Text>().enabled = false;
+      //timerDisplay.GetComponent<SpriteRenderer>().enabled = false;
     }
-    ResetRequestTimer();
+    //ResetRequestTimer();
   }
 	
 	// Update is called once per frame
@@ -106,9 +106,17 @@ public class MonsterManager : MonoBehaviour {
     foreach (MonsterRequest box in requestBoxes) box.gameObject.SetActive(flag);
   }
 
-  public void CheckRequestsMet(List<List<GameObject>> grid)
+  public void CheckRequestMetAll(List<List<GameObject>> grid)
   {
-    Request req = requestBoxes[0].GetComponent<MonsterRequest>().request;
+    foreach(MonsterRequest obj in requestBoxes)
+    {
+      CheckRequestMet(grid, obj);
+    }
+  }
+
+  public void CheckRequestMet(List<List<GameObject>> grid, MonsterRequest reqBox)
+  {
+    Request req = reqBox.request;
 
     for (int x = 0; x < grid.Count; ++x)
     {
@@ -133,17 +141,36 @@ public class MonsterManager : MonoBehaviour {
 
         // request has been met
         gs.ClearStack();
-        AdvanceRequests();
+        //AdvanceRequests();
         GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
 
         // Increase score
         GameManager.Instance.AddScore(1);
+        UpdateReqeustMet(reqBox);
 
         // Continue recursively to check for any other completes
-        CheckRequestsMet(grid);
+        //CheckRequestMet(grid);
+        CheckRequestMetAll(grid);
         return;
       }
     }
+  }
+
+  public void AddSauceToAllRequests()
+  {
+    for (int i = 0; i < requestBoxes.Count - 1; ++i)
+    {
+      Request req = requestBoxes[i].request;
+      req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+      requestBoxes[i].SetRequest(req);
+    }
+
+  }
+
+  void UpdateReqeustMet(MonsterRequest box)
+  {
+    int index = requestBoxes.IndexOf(box);
+    requestBoxes[index].SetRequest(GenerateRandomRequest());
   }
 
   void AdvanceRequests()
@@ -180,13 +207,13 @@ public class MonsterManager : MonoBehaviour {
     if (addTopBread == 0) req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
     // Add sauce if it is lunch or dinner time
-    if (GameManager.Instance.dayMan.FutureShiftCheck(DAY_STATE.LUNCH))
+    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
     {
       req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
     }
 
     // Add grid type if it is dinner time
-    if (GameManager.Instance.dayMan.FutureShiftCheck(DAY_STATE.DINNER))
+    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.DINNER))
     {
       req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
     }
@@ -205,8 +232,8 @@ public class MonsterManager : MonoBehaviour {
     currentTimer = maxTimer;
 
     // Reset timer display
-    timerDisplay.transform.position = timerPos;
-    timerDisplay.transform.localScale = timerScale;
+    //timerDisplay.transform.position = timerPos;
+    //timerDisplay.transform.localScale = timerScale;
   }
 
   void UpdateRequestTimer()
@@ -223,8 +250,8 @@ public class MonsterManager : MonoBehaviour {
     {
       // Update timer display
       float offsetAmt = (1 - (currentTimer / maxTimer)) * timerScale.y;
-      timerDisplay.transform.position = timerPos - new Vector3(0, offsetAmt / 2.0f, 0);
-      timerDisplay.transform.localScale = timerScale - new Vector3(0, offsetAmt, 0);
+      //timerDisplay.transform.position = timerPos - new Vector3(0, offsetAmt / 2.0f, 0);
+      //timerDisplay.transform.localScale = timerScale - new Vector3(0, offsetAmt, 0);
     }
   }
 }
