@@ -29,13 +29,19 @@ public class BinScript : MonoBehaviour {
 
   void UpdateStateFeedback()
   {
+    Sprite sprite = null;
+
     if (canThrowAway)
     {
-      GetComponent<SpriteRenderer>().color = Color.green;
+      //GetComponent<SpriteRenderer>().color = Color.white;
+      sprite = Resources.Load<Sprite>("Sprites/slot_circle_black");
+      GetComponent<SpriteRenderer>().sprite = sprite;
     }
     else
     {
-      GetComponent<SpriteRenderer>().color = Color.red;
+      //GetComponent<SpriteRenderer>().color = Color.red;
+      sprite = Resources.Load<Sprite>("Sprites/slot_circle");
+      GetComponent<SpriteRenderer>().sprite = sprite;
     }
   }
 
@@ -62,7 +68,7 @@ public class BinScript : MonoBehaviour {
   {
     if (canThrowAway && playerScript.playerState == PLAYER_STATE.DRAGGING)
     {
-      GetComponent<SpriteRenderer>().color = Color.red;
+      //GetComponent<SpriteRenderer>().color = Color.red;
       // Stop grid from moving
       playerScript.blockBeingDragged.GetComponent<IngredientBlock>().beingDragged = false;
       // Update grid with move

@@ -36,8 +36,9 @@ public class SauceScript : MonoBehaviour {
   {
     if (!isCoolingDown && playerScript.playerState == PLAYER_STATE.DRAGGING)
     {
-      if (Input.GetMouseButtonUp(0) && playerScript.hoveredGrid != null)
-      {
+      //if (Input.GetMouseButtonUp(0) && playerScript.hoveredGrid != null)
+      if (InputMan.OnUp() && playerScript.hoveredGrid != null)
+        {
         isCoolingDown = true;
         // Set sauce cooldown
         curCooldown = GameManager.Instance.turnCounter;
@@ -47,7 +48,8 @@ public class SauceScript : MonoBehaviour {
 
   void OnMouseOver()
   {
-    if (Input.GetMouseButtonDown(0) &&
+    //if (Input.GetMouseButtonDown(0) &&
+    if (InputMan.OnDown() &&
       !isCoolingDown && playerScript.playerState == PLAYER_STATE.IDLE)
     {
       sauceObj.GetComponent<IngredientBlock>().StartDrag();

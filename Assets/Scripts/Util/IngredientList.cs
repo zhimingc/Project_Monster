@@ -34,7 +34,7 @@ static public class IngredientFactory
 {
   static public void InitializeGrid(GameObject grid, GRID_TYPE type)
   {
-    Sprite gridSprite = Resources.Load<Sprite>("Sprites/block_split_old");
+    Sprite gridSprite = Resources.Load<Sprite>("Sprites/slot_square");
 
     switch (type)
     {
@@ -42,7 +42,7 @@ static public class IngredientFactory
         grid.GetComponent<SpriteRenderer>().sprite = gridSprite;
         break;
       case GRID_TYPE.BOWL:
-        gridSprite = Resources.Load<Sprite>("Sprites/block_circle");
+        gridSprite = Resources.Load<Sprite>("Sprites/slot_circle");
         grid.GetComponent<SpriteRenderer>().sprite = gridSprite;
         break;
     }

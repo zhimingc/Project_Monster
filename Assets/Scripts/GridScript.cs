@@ -187,7 +187,7 @@ public class GridScript : MonoBehaviour {
   public bool CheckIfLegalMove()
   {
     IngredientBlock block = playerScript.blockBeingDragged;
-    Vector2[] layout = block.layout;
+    //Vector2[] layout = block.layout;
 
     return gridMan.CheckIfLegalMove(this, block);
   }

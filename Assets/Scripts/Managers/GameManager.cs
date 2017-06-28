@@ -41,6 +41,9 @@ public class GameManager : Singleton<GameManager>
 
     // Delegate which gets called ever time a scene loads
     SceneManager.sceneLoaded += OnSceneLoaded;
+
+    //Screen.SetResolution(1080, 1920, false);
+    Screen.SetResolution(540, 960, false);
   }
 
   void InitializeManagers()

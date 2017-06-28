@@ -15,13 +15,13 @@ public class IngredientBlock : MonoBehaviour {
 
   // UI for being dragged
   private Vector3 draggedScale, idleScale;
-  private bool isBigScale;
+  //private bool isBigScale;
   private LTDescr moveDescr;
 
   void Awake()
   {
     isReverseLayout = false;
-    isBigScale = false;
+    //isBigScale = false;
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
   }
@@ -80,7 +80,7 @@ public class IngredientBlock : MonoBehaviour {
     Vector3 vecToMove = pos - ingredients[0].transform.position;
 
     // Move parent such that mouse aligns with core ingredient
-    Vector3 dest = transform.position + vecToMove;
+    //Vector3 dest = transform.position + vecToMove;
     //LeanTween.move(gameObject, dest, 0.1f).setEase(LeanTweenType.easeOutQuad);
     transform.position += vecToMove;
     transform.position = pos;
@@ -152,6 +152,14 @@ public class IngredientBlock : MonoBehaviour {
     {
       StartDrag();
     } 
+  }
+
+  public void OnTouchStay()
+  {
+    if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
+    {
+      StartDrag();
+    }
   }
 
   public void ToggleUsability(bool flag)

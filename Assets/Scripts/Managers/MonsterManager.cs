@@ -15,6 +15,12 @@ public class RequestParameters
   public int[] ingCountRange;
   public int topBreadProbability;
   public bool isTimerOn;
+
+  // Weighted distributions (out of a 100)
+  public int[] sauceDist = new int[] { 33, 33, 34 };
+  public int[] waresDist = new int[] { 50, 50 };
+  public int[] ingredientDist = new int[] { 50, 50 };
+  public int weightSwing = 10;  // swings the weight of the other distributions by this amt
 };
 
 [System.Serializable]
@@ -43,7 +49,7 @@ public class MonsterManager : MonoBehaviour {
 
   private float currentTimer;
   private GameObject timerDisplay;
-  private Vector3 timerPos, timerScale;
+  //private Vector3 timerPos, timerScale;
   private IngredientManager ingredientMan;
 
   void Awake()
@@ -194,7 +200,11 @@ public class MonsterManager : MonoBehaviour {
     req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
     // Add ingredients
-    int numIngredients = Random.Range(rp.ingCountRange[0], rp.ingCountRange[1]);
+    //int numIngredients = Random.Range(rp.ingCountRange[0], rp.ingCountRange[1]);
+    int numIngredients = GenerateWithDist(rp.ingredientDist);
+    SwingWeights(numIngredients, rp.ingredientDist);
+    numIngredients += 1;
+
     for (int i = 0; i < numIngredients; ++i)
     {
       // Start from 1 to exclude BREAD
@@ -209,16 +219,52 @@ public class MonsterManager : MonoBehaviour {
     // Add sauce if it is lunch or dinner time
     if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
     {
-      req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+      //req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+      req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
+      SwingWeights((int)req.sauce, rp.sauceDist);
     }
 
     // Add grid type if it is dinner time
     if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.DINNER))
     {
-      req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
+      //req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
+      req.gridType = (GRID_TYPE)GenerateWithDist(rp.waresDist);
+      SwingWeights((int)req.gridType, rp.waresDist);
     }
 
     return req;
+  }
+
+  // Swings weights depending on outcome
+  void SwingWeights(int outcome, int[] dist)
+  {
+    int singleSwing = rp.weightSwing / (dist.Length - 1);
+
+    // Decrease outcome change
+    dist[outcome] -= rp.weightSwing;
+
+    // Increate other distributions
+    for (int i = 0; i < dist.Length; ++i)
+    {
+      if (i == outcome) continue;
+      dist[i] += singleSwing;
+    }
+  }
+
+  // Generates an index depending on given distribution (out of 100)
+  int GenerateWithDist(int[] distribution)
+  {
+    int i = 0;
+    int total = 0;
+    int random = Random.Range(0, 100);
+
+    for (; i < distribution.Length; ++i)
+    {
+      total += distribution[i];
+      if (random < total) break;
+    }
+
+    return i;
   }
 
   void ResetRequestTimer()
@@ -249,7 +295,7 @@ public class MonsterManager : MonoBehaviour {
     else
     {
       // Update timer display
-      float offsetAmt = (1 - (currentTimer / maxTimer)) * timerScale.y;
+      //float offsetAmt = (1 - (currentTimer / maxTimer)) * timerScale.y;
       //timerDisplay.transform.position = timerPos - new Vector3(0, offsetAmt / 2.0f, 0);
       //timerDisplay.transform.localScale = timerScale - new Vector3(0, offsetAmt, 0);
     }
