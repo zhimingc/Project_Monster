@@ -66,6 +66,11 @@ public class BinScript : MonoBehaviour {
 
   void OnMouseEnter()
   {
+    OnTouchDown();
+  }
+
+  public void OnTouchDown()
+  {
     if (canThrowAway && playerScript.playerState == PLAYER_STATE.DRAGGING)
     {
       //GetComponent<SpriteRenderer>().color = Color.red;
@@ -96,6 +101,11 @@ public class BinScript : MonoBehaviour {
   }
 
   void OnMouseExit()
+  {
+    OnTouchExit();
+  }
+
+  public void OnTouchExit()
   {
     //GetComponent<SpriteRenderer>().color = Color.white;
 

@@ -77,7 +77,8 @@ public class PlayerScript : MonoBehaviour {
         CheckIfRequestMet();
         GameManager.Instance.CheckLevelComplete();
 
-        if (hoveredGrid != null) hoveredGrid.ResetHoveredGrid();
+        //if (hoveredGrid != null) hoveredGrid.ResetHoveredGrid();
+        gridMan.ResetGrid();
         SetHoveredGrid(null);
         break;
     }

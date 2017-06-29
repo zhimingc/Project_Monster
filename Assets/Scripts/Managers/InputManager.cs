@@ -4,7 +4,7 @@ using UnityEngine;
 
 static public class InputMan {
 
-  static RuntimePlatform platform;
+  static public RuntimePlatform platform;
 
 	static public bool OnDown()
   {
@@ -15,9 +15,10 @@ static public class InputMan {
       case RuntimePlatform.IPhonePlayer:
         res = Input.GetTouch(0).phase == TouchPhase.Began;
         break;
-      case RuntimePlatform.WebGLPlayer:
-      case RuntimePlatform.WindowsPlayer:
-      case RuntimePlatform.OSXPlayer:
+      default:
+      //case RuntimePlatform.WebGLPlayer:
+      //case RuntimePlatform.WindowsPlayer:
+      //case RuntimePlatform.OSXPlayer:
         res = Input.GetMouseButtonDown(0);
         break;
     }

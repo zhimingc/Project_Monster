@@ -39,7 +39,7 @@ public class DayManager : MonoBehaviour {
     if (progressScaler >= 1.0f) progressScaler = 1.0f;
     float progressSize = (progressScaler) * initialProgressSize;
     progressBar.transform.localScale = new Vector3(progressSize, 0.25f, 1.0f);
-    progressBar.transform.position = new Vector3(-initialProgressSize / 2.0f + progressSize / 2.0f, 7.5f, 0.0f);
+    progressBar.transform.position = transform.position + new Vector3(-initialProgressSize / 2.0f + progressSize / 2.0f, 7.5f, 0.0f);
   }
 
   void ShiftTrigger(DAY_STATE shift)

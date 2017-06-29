@@ -89,7 +89,9 @@ static public class IngredientFactory
         ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
         break;
       case INGREDIENT_TYPE.EATER:
-        ingredient.GetComponent<SpriteRenderer>().color = Color.black;
+        sprite = Resources.Load<Sprite>("Sprites/cross");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        ingredient.GetComponent<SpriteRenderer>().color = Color.red;
         break;
       case INGREDIENT_TYPE.SAUCE:
         InitializeSauce(ingredient, sauce);
@@ -109,6 +111,7 @@ static public class IngredientFactory
       case INGREDIENT_TYPE.BREAD:
         sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_bot");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        ingredient.GetComponent<SpriteRenderer>().color = Color.white;
         break;
       case INGREDIENT_TYPE.LETTUCE:
         ingredient.GetComponent<SpriteRenderer>().color = Color.green;
@@ -116,12 +119,15 @@ static public class IngredientFactory
       case INGREDIENT_TYPE.MEAT:
         sprite = Resources.Load<Sprite>("Sprites/ham_side");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        ingredient.GetComponent<SpriteRenderer>().color = Color.white;
         break;
       case INGREDIENT_TYPE.CHEESE:
         ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
         break;
       case INGREDIENT_TYPE.EATER:
-        ingredient.GetComponent<SpriteRenderer>().color = Color.black;
+        sprite = Resources.Load<Sprite>("Sprites/cross_bar");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        ingredient.GetComponent<SpriteRenderer>().color = Color.red;
         break;
       case INGREDIENT_TYPE.SAUCE:
         InitializeSauce(ingredient, sauce);
@@ -129,6 +135,7 @@ static public class IngredientFactory
       case INGREDIENT_TYPE.EMPTY:
         sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
+        ingredient.GetComponent<SpriteRenderer>().color = Color.white;
         break;
     }
   }

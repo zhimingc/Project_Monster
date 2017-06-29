@@ -32,30 +32,33 @@ public class TouchManager : MonoBehaviour
 
       Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
-      if (Physics.Raycast(ray, out hit, Mathf.Infinity, touchInputMask))
+      Vector2 origin = cam.ScreenToWorldPoint(Input.mousePosition);
+      RaycastHit2D hit2D = Physics2D.Raycast(origin, Vector2.zero, Mathf.Infinity, touchInputMask);
+      if (hit2D.collider != null)
       {
-        GameObject recipient = hit.transform.gameObject;
+        GameObject recipient = hit2D.transform.gameObject;
         touchList.Add(recipient);
-
 
         if (Input.GetMouseButton(0))
         {
-          recipient.SendMessage("onTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
+          recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
 
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-          recipient.SendMessage("onTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
+          recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
 
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-          recipient.SendMessage("onTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
+          recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
         }
 
       }
+
+
 
       foreach (GameObject g in touchesOld)
       {
@@ -78,12 +81,11 @@ public class TouchManager : MonoBehaviour
       {
 
         Ray ray = cam.ScreenPointToRay(touch.position);
-
-        if (Physics.Raycast(ray, out hit, touchInputMask))
+        RaycastHit2D hit2D = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, touchInputMask);
+        if (hit2D.collider != null)
         {
-          GameObject recipient = hit.transform.gameObject;
+          GameObject recipient = hit2D.transform.gameObject;
           touchList.Add(recipient);
-
 
           switch (touch.phase)
           {

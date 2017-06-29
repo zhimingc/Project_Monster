@@ -28,8 +28,8 @@ public class GameManager : Singleton<GameManager>
   private GridManager gridMan;
   private MonsterManager monsterMan;
 
-  private bool startWithHelp;
-
+  public bool startWithHelp, helpToggler;
+ 
   void Awake()
   {
     startWithHelp = true;
@@ -38,18 +38,22 @@ public class GameManager : Singleton<GameManager>
     // Init for when scene loads
     InitializeManagers();
     if (startWithHelp) ToggleHelpScreen();
+    helpToggler = true;
 
     // Delegate which gets called ever time a scene loads
     SceneManager.sceneLoaded += OnSceneLoaded;
 
     //Screen.SetResolution(1080, 1920, false);
     Screen.SetResolution(540, 960, false);
+
+    InputMan.platform = Application.platform;
   }
 
   void InitializeManagers()
   {
     turnCounter = 0;
     currentLevel = 0;
+    helpToggler = true;
     scoreMan.InitScore();
     dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
     uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
@@ -57,19 +61,53 @@ public class GameManager : Singleton<GameManager>
     monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
   }
 
+  public void ButtonBehaviour(BUTTON_TYPE type)
+  {
+    switch (type)
+    {
+      case BUTTON_TYPE.RESTART:
+        // Resets level
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        break;
+      case BUTTON_TYPE.HELP:
+        ToggleHelpScreen();
+        break;
+      case BUTTON_TYPE.MUSIC:
+        bool invert = !AudioListener.pause;
+        AudioListener.pause = invert;
+        AudioListener.volume = invert ? 0 : 1;
+        break;
+    }
+  }
+
   void Update()
   {
     // Debug
     if (Input.anyKeyDown)
     {
+      if (Input.GetKeyDown(KeyCode.S))
+      {
+        bool invert = !AudioListener.pause;
+        AudioListener.pause = invert;
+        AudioListener.volume = invert ? 0 : 1;
+      }
+
       if (Input.GetKeyDown(KeyCode.H))
       {
         ToggleHelpScreen();
       }
       else if (uiMan.helpText.enabled == true)
       {
-        uiMan.ToggleHelpText(false);
-        gridMan.ToggleGrid(true);
+        if (helpToggler)
+        {
+          uiMan.ToggleHelpText(false);
+          gridMan.ToggleGrid(true);
+          helpToggler = false;
+        }
+        else
+        {
+          helpToggler = true;
+        }
       }
     }
     if (Input.GetKeyDown(KeyCode.R))
@@ -92,6 +130,9 @@ public class GameManager : Singleton<GameManager>
     bool flag = uiMan.helpText.enabled;
     uiMan.ToggleHelpText(!flag);
     gridMan.ToggleGrid(flag);
+
+    // hack
+    helpToggler = false;
   }
 
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

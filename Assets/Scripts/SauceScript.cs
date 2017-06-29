@@ -48,6 +48,11 @@ public class SauceScript : MonoBehaviour {
 
   void OnMouseOver()
   {
+    OnTouchStay();
+  }
+
+  public void OnTouchStay()
+  {
     //if (Input.GetMouseButtonDown(0) &&
     if (InputMan.OnDown() &&
       !isCoolingDown && playerScript.playerState == PLAYER_STATE.IDLE)
@@ -59,6 +64,11 @@ public class SauceScript : MonoBehaviour {
   }
 
   void OnMouseExit()
+  {
+    OnTouchExit();
+  }
+
+  public void OnTouchExit()
   {
     if (!isCoolingDown && playerScript.playerState == PLAYER_STATE.IDLE)
     {

@@ -57,9 +57,9 @@ public class MonsterRequest : MonoBehaviour {
     {
       GameObject sideObj = Instantiate(ingredientObj, transform.position, Quaternion.identity);
       Vector3 localScale = transform.localScale;
-      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.4f, 1.0f));
+      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.5f, 1.0f));
       sideObj.transform.localScale = localScale;
-      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y / 2.0f, 0);
+      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y / 2.5f, 0);
       sideObj.transform.SetParent(transform);
 
       ingredientStackObjs.Add(sideObj);

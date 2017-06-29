@@ -146,16 +146,14 @@ public class IngredientBlock : MonoBehaviour {
     ToggleScale();
   }
 
-  void OnMouseOver() 
-  { 
-    if (Input.GetMouseButtonDown(0) && playerScript.GetPlayerState() == PLAYER_STATE.IDLE) 
-    {
-      StartDrag();
-    } 
+  void OnMouseOver()
+  {
+    OnTouchStay();
   }
 
   public void OnTouchStay()
   {
+    //if (Input.GetMouseButtonDown(0) && playerScript.GetPlayerState() == PLAYER_STATE.IDLE) 
     if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
     {
       StartDrag();

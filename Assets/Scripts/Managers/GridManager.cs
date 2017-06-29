@@ -31,6 +31,18 @@ public class GridManager : MonoBehaviour {
     }
   }
 
+  // reset board; calls ResetHoveredGrid()
+  public void ResetGrid()
+  {
+    for (int x = 0; x < grid.Count; ++x)
+    {
+      for (int y = 0; y < grid[x].Count; ++y)
+      {
+        grid[x][y].GetComponent<GridScript>().ResetHoveredGrid();
+      }
+    }
+  }
+
   // checks if the grid is full
   public bool IfGridFull()
   {

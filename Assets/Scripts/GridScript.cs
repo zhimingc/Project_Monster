@@ -50,11 +50,11 @@ public class GridScript : MonoBehaviour {
     {
       GameObject ingredient = Instantiate(ingredientSide);
       Vector3 localScale = transform.localScale;
-      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.4f, 1.0f));
+      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.5f, 1.0f));
       ingredient.transform.localScale = localScale;
 
       //ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
-      ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.25f + i * localScale.y / 2.0f, 0);
+      ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.25f + i * localScale.y / 2.5f, 0);
 
       ingredient.transform.SetParent(transform);
       stackObjs.Add(ingredient);
@@ -65,6 +65,11 @@ public class GridScript : MonoBehaviour {
   }
 
   void OnMouseEnter()
+  {
+    OnTouchDown();
+  }
+
+  public void OnTouchDown()
   {
     // Update the grid if an ingredient block is being dragged
     if (playerScript.blockBeingDragged != null)
@@ -94,9 +99,16 @@ public class GridScript : MonoBehaviour {
         break;
       // Eats the top ingredient
       case INGREDIENT_TYPE.EATER:
-        if (ingredientStack.Count == 0) break;
-        tmpHold = ingredientStack[ingredientStack.Count - 1];
-        ingredientStack.RemoveAt(ingredientStack.Count - 1);
+        if (ingredientStack.Count == 0)
+        {
+          ingredientStack.Add(INGREDIENT_TYPE.EATER);
+        }
+        else
+        {
+          tmpHold = ingredientStack[ingredientStack.Count - 1];
+          //ingredientStack.RemoveAt(ingredientStack.Count - 1);
+          ingredientStack[ingredientStack.Count - 1] = INGREDIENT_TYPE.EATER;
+        }
         break;
       default:
         ingredientStack.Add(ingredient.type);
@@ -120,8 +132,13 @@ public class GridScript : MonoBehaviour {
         // Only adds back ingredient if something was removed
         if (tmpHold != INGREDIENT_TYPE.EMPTY)
         {
-          ingredientStack.Add(tmpHold);
+          ingredientStack[ingredientStack.Count - 1] = tmpHold;
+          //ingredientStack.Add(tmpHold);
           tmpHold = INGREDIENT_TYPE.EMPTY;
+        }
+        else
+        {
+          ingredientStack.Remove(INGREDIENT_TYPE.EATER);
         }
         break;
       default:
@@ -144,6 +161,7 @@ public class GridScript : MonoBehaviour {
     {
       Sprite sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
       stackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
+      stackObjs[i].GetComponent<SpriteRenderer>().color = Color.white;
 
       // Change color depending on ingredient type
       if (i < ingredientStack.Count)
@@ -165,7 +183,17 @@ public class GridScript : MonoBehaviour {
     IngredientFactory.InitializeGrid(gameObject, gridType);
   }
 
+  void RemoveEaterIngredient()
+  {
+    ingredientStack.Remove(INGREDIENT_TYPE.EATER);
+  }
+
   void OnMouseExit()
+  {
+    OnTouchExit();
+  }
+
+  public void OnTouchExit()
   {
     // Update the grid if an ingredient block is being dragged
     if (playerScript.blockBeingDragged != null && playerScript.hoveredGrid == this)
@@ -206,5 +234,7 @@ public class GridScript : MonoBehaviour {
   {
     tmpHold = INGREDIENT_TYPE.EMPTY;
     tmpSauce = SAUCE_TYPE.EMPTY;
+    RemoveEaterIngredient();
+    UpdateStackDisplay();
   }
 }

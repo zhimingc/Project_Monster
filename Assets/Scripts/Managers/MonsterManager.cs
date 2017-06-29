@@ -164,7 +164,7 @@ public class MonsterManager : MonoBehaviour {
 
   public void AddSauceToAllRequests()
   {
-    for (int i = 0; i < requestBoxes.Count - 1; ++i)
+    for (int i = 0; i < requestBoxes.Count; ++i)
     {
       Request req = requestBoxes[i].request;
       req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);

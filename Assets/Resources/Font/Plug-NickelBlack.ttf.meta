@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: e6b86ea130665eb4ca719b4abcd7ca9a
+timeCreated: 1498719738
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Plug-NickelBlack
+  fontNames:
+  - Plug-NickelBlack
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
