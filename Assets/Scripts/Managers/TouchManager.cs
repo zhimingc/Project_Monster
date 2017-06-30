@@ -30,7 +30,7 @@ public class TouchManager : MonoBehaviour
       touchList.Clear();
 
 
-      Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+      //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
       Vector2 origin = cam.ScreenToWorldPoint(Input.mousePosition);
       RaycastHit2D hit2D = Physics2D.Raycast(origin, Vector2.zero, Mathf.Infinity, touchInputMask);

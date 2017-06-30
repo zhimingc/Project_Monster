@@ -19,6 +19,7 @@ public class DayManager : MonoBehaviour {
   public int[] shiftIntervals;
 
   private MonsterManager monsterMan;
+  private BackgroundManager backMan;  // To update background graphics
   private float initialProgressSize;
 
 	// Use this for initialization
@@ -26,6 +27,7 @@ public class DayManager : MonoBehaviour {
     dayState = DAY_STATE.BREAKFAST;
     dayFeedback = GameObject.Find("shift_text");
     monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
+    backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
 
     initialProgressSize = progressBar.transform.localScale.x;
     UpdateProgressBar();
@@ -35,7 +37,18 @@ public class DayManager : MonoBehaviour {
 
   public void UpdateProgressBar()
   {
-    float progressScaler = (float)GameManager.Instance.scoreMan.score / shiftIntervals[2];
+    int curShift = (int)dayState;
+
+    int curShiftBase = 0;
+    if (curShift > 0) curShiftBase = shiftIntervals[curShift - 1];
+
+    int curShiftLim = shiftIntervals[curShift];
+
+    float progressScaler = ((float)GameManager.Instance.scoreMan.score - curShiftBase) / (curShiftLim);
+    if (progressScaler >= 1.0f) progressScaler = 1.0f;
+    backMan.UpdateSunPosition(progressScaler);
+
+    progressScaler = (float)GameManager.Instance.scoreMan.score / shiftIntervals[2];
     if (progressScaler >= 1.0f) progressScaler = 1.0f;
     float progressSize = (progressScaler) * initialProgressSize;
     progressBar.transform.localScale = new Vector3(progressSize, 0.25f, 1.0f);
@@ -68,6 +81,7 @@ public class DayManager : MonoBehaviour {
           // Change the feedback text to reflect shift
           dayState = ((DAY_STATE)i);
           ShiftTrigger(dayState);
+          backMan.ChangeTimeState(i); // update bg
 
           string dayText = dayState.ToString();
           dayFeedback.GetComponent<Text>().text = dayText;

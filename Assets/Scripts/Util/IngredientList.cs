@@ -56,7 +56,10 @@ static public class IngredientFactory
         ingredient.GetComponent<SpriteRenderer>().color = Color.black;
         break;
       case SAUCE_TYPE.MUSTARD:
-        ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
+        Utility.SetColorFromHex(ingredient, "#ffc04c");
+
+        //ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
+
         break;
       case SAUCE_TYPE.WASABI:
         ingredient.GetComponent<SpriteRenderer>().color = Color.green;
@@ -75,7 +78,7 @@ static public class IngredientFactory
     switch (type) 
     { 
       case INGREDIENT_TYPE.BREAD:
-        sprite = Resources.Load<Sprite>("Sprites/bread_dark");
+        sprite = Resources.Load<Sprite>("Sprites/bread_dark_top");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         break; 
       case INGREDIENT_TYPE.LETTUCE: 
