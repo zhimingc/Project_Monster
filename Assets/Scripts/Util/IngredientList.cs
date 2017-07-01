@@ -42,7 +42,7 @@ static public class IngredientFactory
         grid.GetComponent<SpriteRenderer>().sprite = gridSprite;
         break;
       case GRID_TYPE.BOWL:
-        gridSprite = Resources.Load<Sprite>("Sprites/slot_circle");
+        gridSprite = Resources.Load<Sprite>("Sprites/slot_circle_2");
         grid.GetComponent<SpriteRenderer>().sprite = gridSprite;
         break;
     }

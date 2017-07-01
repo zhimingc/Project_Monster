@@ -48,26 +48,28 @@ public class MonsterManager : MonoBehaviour {
   //public int score = 0;
 
   private float currentTimer;
-  private GameObject timerDisplay;
   //private Vector3 timerPos, timerScale;
   private IngredientManager ingredientMan;
-  private float eatingSoundPitcher;
+  private List<GameObject> reserveMonsters;
 
   void Awake()
   {
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
-    eatingSoundPitcher = 0.75f;
-    //timerDisplay = GameObject.Find("timer_bar");
-    //timerPos = timerDisplay.transform.position;
-    //timerScale = timerDisplay.transform.localScale;
   }
 
   // Use this for initialization
   void Start () {
+    // Get/Generate monster request prefabs
     requestBoxes = new List<MonsterRequest>();
+    reserveMonsters = new List<GameObject>();
     requestBoxes.Add(GameObject.Find("monster_request_0").GetComponent<MonsterRequest>());
     requestBoxes.Add(GameObject.Find("monster_request_1").GetComponent<MonsterRequest>());
     requestBoxes.Add(GameObject.Find("monster_request_2").GetComponent<MonsterRequest>());
+    GameObject monsterReq = Resources.Load<GameObject>("Prefabs/monster_0");
+    reserveMonsters.Add(Instantiate(monsterReq));
+    reserveMonsters.Add(Instantiate(monsterReq));
+    reserveMonsters.Add(Instantiate(monsterReq));
+    foreach (GameObject mon in reserveMonsters) mon.GetComponent<MonsterAnimation>().Hide();
 
     // Init request boxes
     foreach (MonsterRequest box in requestBoxes)
@@ -163,6 +165,21 @@ public class MonsterManager : MonoBehaviour {
         // Increase score
         GameManager.Instance.AddScore(1);
         UpdateReqeustMet(reqBox);
+
+        // Animate monsters in/out
+        Vector3 monsPos = reqBox.GetComponent<MonsterRequest>().monsterObj.transform.position;
+        foreach(GameObject reserve in reserveMonsters)
+        {
+          MonsterAnimation anim = reserve.GetComponent<MonsterAnimation>();
+          if (anim.isAnimating()) continue;
+          anim.MoveOutFrom(monsPos);
+          break;
+        }
+
+        //Vector3 moveIn = reqBox.transform.position;
+        Vector3 moveIn = monsPos;
+        moveIn.x = -7;
+        reqBox.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
 
         // Continue recursively to check for any other completes
         //CheckRequestMet(grid);

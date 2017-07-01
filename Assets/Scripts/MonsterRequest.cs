@@ -4,20 +4,31 @@ using UnityEngine;
 
 public class MonsterRequest : MonoBehaviour {
 
-  public GameObject ingredientObj;
+  public GameObject ingredientObj, speechBubble, monsterObj;
   public Request request;
 
   private List<GameObject> ingredientStackObjs;
+  private Vector3 originScale;
 
   // Use this for initialization
   void Start () {
-
+    originScale = transform.localScale;
   }
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+  public void ToggleSpeechBubble(bool flag)
+  {
+    speechBubble.GetComponent<SpriteRenderer>().enabled = flag;
+    if (flag == true)
+    {
+      transform.localScale = new Vector3(0, 0, 0);
+      LeanTween.delayedCall(0.5f, () => { LeanTween.scale(gameObject, originScale, 0.5f); });
+    }
+  }
 
   public void SetRequest(Request req)
   {
@@ -58,9 +69,9 @@ public class MonsterRequest : MonoBehaviour {
       GameObject sideObj = Instantiate(ingredientObj, transform.position, Quaternion.identity);
       Vector3 localScale = transform.localScale;
       localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.5f, 1.0f));
-      sideObj.transform.localScale = localScale;
-      sideObj.transform.position += new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y / 2.5f, 0);
       sideObj.transform.SetParent(transform);
+      sideObj.transform.localScale = localScale;
+      sideObj.transform.localPosition += new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y / 2.5f, 0);
 
       ingredientStackObjs.Add(sideObj);
     }
