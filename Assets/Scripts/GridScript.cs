@@ -64,6 +64,37 @@ public class GridScript : MonoBehaviour {
     stackObjs[stackObjs.Count - 1].GetComponent<SpriteRenderer>().enabled = false;
   }
 
+  void GridMouseUp()
+  {
+    // Audio feedback
+    string name = null;
+    
+
+    if (playerScript.blockBeingDragged.GetComponent<IngredientBlock>().IsSauceBlock())
+    {
+      name = "splat";
+    }
+    else
+    {
+      int thud = Random.Range(0, 3);
+      switch (thud)
+      {
+        case 0:
+          name = "thud1";
+          break;
+        case 1:
+          name = "thud2";
+          break;
+        case 2:
+          name = "thud3";
+          break;
+      }
+    }
+
+
+    GameManager.Instance.SFX().PlaySoundWithPitch(name, 0.7f, 0.9f);
+  }
+
   void OnMouseEnter()
   {
     OnTouchDown();
@@ -84,6 +115,9 @@ public class GridScript : MonoBehaviour {
       playerScript.blockBeingDragged.SetBlockPosition(transform.position);
       playerScript.SetHoveredGrid(this);
       gridMan.AddIngredientBlockToGrid(this, playerScript.blockBeingDragged);
+
+      // Update mouse up event
+      playerScript.SetMouseUpDel(GridMouseUp);
     }
   }
 
@@ -204,6 +238,9 @@ public class GridScript : MonoBehaviour {
       playerScript.blockBeingDragged.GetComponent<IngredientBlock>().beingDragged = true;
       playerScript.blockBeingDragged.ToggleIngredients(true);
       gridMan.RemoveIngredientBlockFromGrid(this, playerScript.blockBeingDragged);
+
+      // Update mouse up event
+      playerScript.ResetMouseUpDel();
     }
   }
 

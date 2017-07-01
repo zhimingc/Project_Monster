@@ -211,26 +211,37 @@ public class IngredientManager : MonoBehaviour {
     Vector2 ingredientSize = gridBlockSize;
     Vector2 newScale = (ingredientSize + new Vector2(spacing, spacing)) * maxLayout; 
     parent.transform.localScale = newScale; 
-    parent.transform.position = t.position + new Vector3(newScale.x, -newScale.y, 0.0f) / (maxLayout * 2.0f); 
- 
+    parent.transform.position = t.position + new Vector3(newScale.x, -newScale.y, 0.0f) / (maxLayout * 2.0f);
+
     // Create core of ingredient 
+    GameObject ingredientHolder = new GameObject();
+    ingredientHolder.transform.position = t.position;
+    ingredientHolder.transform.localScale = ingredientSize;
+    ingredientHolder.transform.SetParent(parent.transform);
+
     GameObject ingredientObj = Instantiate(center, t.position, Quaternion.identity);
-    ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, ingredientSize);
-    ingredientObj.transform.SetParent(parent.transform); 
+    ingredientObj.transform.SetParent(ingredientHolder.transform);
+    ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, new Vector2(1.0f, 1.0f));
     blockScript.AddIngredient(ingredientObj); 
  
     // Create ingredient layout 
     foreach (Vector2 vec in blockLayouts[layout]) 
-    {  
+    {
+      GameObject ingredientHolder2 = new GameObject();
+      ingredientHolder2.transform.position = t.position;
+      ingredientHolder2.transform.localScale = ingredientSize;
+      ingredientHolder2.transform.SetParent(parent.transform);
+
       // Create ingredients within connection 
       GameObject newIngredient = Instantiate(center, t.position, Quaternion.identity);
-      newIngredient.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, ingredientSize);
- 
+
       // Initialize new ingredient 
       Vector3 offset = Vector2.Scale(vec, ingredientSize + new Vector2(spacing, spacing));
       newIngredient.transform.position += offset;
  
-      newIngredient.transform.SetParent(parent.transform); 
+      newIngredient.transform.SetParent(ingredientHolder2.transform);
+      newIngredient.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, new Vector2(1.0f, 1.0f));
+
       blockScript.AddIngredient(newIngredient); 
     } 
  

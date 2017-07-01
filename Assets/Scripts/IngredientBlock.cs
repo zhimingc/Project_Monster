@@ -14,8 +14,7 @@ public class IngredientBlock : MonoBehaviour {
   private IngredientManager ingredientMan;
 
   // UI for being dragged
-  private Vector3 draggedScale, idleScale;
-  //private bool isBigScale;
+  public Vector3 draggedScale, idleScale;
   private LTDescr moveDescr;
 
   void Awake()
@@ -28,12 +27,13 @@ public class IngredientBlock : MonoBehaviour {
 
   // Use this for initialization
 	void Start () {
-    isUsable = true;
+    //isUsable = true;
     beingDragged = false;
-    draggedScale = transform.localScale;
+    //draggedScale = transform.localScale;
 
     // initialize as idle scale
-    transform.localScale = idleScale;
+    ToggleUsability(isUsable);
+    //transform.localScale = idleScale;
   }
 	
 	// Update is called once per frame
@@ -44,9 +44,15 @@ public class IngredientBlock : MonoBehaviour {
     }
   }
 
+  public bool IsSauceBlock()
+  {
+    return ingredients[0].GetComponent<IngredientScript>().type == INGREDIENT_TYPE.SAUCE;
+  }
+
   public void SetIdleScale(float scaling)
   {
     idleScale = transform.localScale * scaling;
+    draggedScale = transform.localScale;
   }
 
   public void SetIdleScale(Vector3 scaling)
@@ -123,12 +129,16 @@ public class IngredientBlock : MonoBehaviour {
       //isBigScale = true;
       transform.localScale = idleScale;
       LeanTween.scale(gameObject, draggedScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
+
+      InteractSFX(true);
     }
     else
     {
       //isBigScale = false;
       transform.localScale = draggedScale;
       LeanTween.scale(gameObject, idleScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
+
+      InteractSFX(false);
     }
   }
 
@@ -160,6 +170,22 @@ public class IngredientBlock : MonoBehaviour {
     }
   }
 
+  public void InteractSFX(bool flag)
+  {
+    if (flag)
+    {
+      var clip = GameManager.Instance.SFX().GetAudio("upslide");
+      clip.pitch = Random.Range(0.7f, 0.9f);
+      GameManager.Instance.SFX().PlaySound(clip);
+    }
+    else
+    {
+      var clip = GameManager.Instance.SFX().GetAudio("downslide");
+      clip.pitch = Random.Range(0.7f, 0.9f);
+      GameManager.Instance.SFX().PlaySound(clip);
+    }
+  }
+
   public void ToggleUsability(bool flag)
   {
     isUsable = flag;
@@ -167,13 +193,15 @@ public class IngredientBlock : MonoBehaviour {
     {
       GetComponent<BoxCollider2D>().enabled = true;
       GetComponent<SpriteRenderer>().enabled = true;
-      GetComponent<SpriteRenderer>().color = Color.green;
+      GetComponent<SpriteRenderer>().color = Color.white;
+      transform.localScale = idleScale;
     }
     else
     {
       GetComponent<BoxCollider2D>().enabled = false;
       GetComponent<SpriteRenderer>().enabled = true;
       GetComponent<SpriteRenderer>().color = Color.white;
+      transform.localScale = idleScale * 0.75f;
     }
   }
 }

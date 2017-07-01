@@ -51,10 +51,12 @@ public class MonsterManager : MonoBehaviour {
   private GameObject timerDisplay;
   //private Vector3 timerPos, timerScale;
   private IngredientManager ingredientMan;
+  private float eatingSoundPitcher;
 
   void Awake()
   {
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
+    eatingSoundPitcher = 0.75f;
     //timerDisplay = GameObject.Find("timer_bar");
     //timerPos = timerDisplay.transform.position;
     //timerScale = timerDisplay.transform.localScale;
@@ -97,6 +99,11 @@ public class MonsterManager : MonoBehaviour {
         Request req = GenerateRandomRequest();
         box.SetRequest(req);
       }
+    }
+
+    if (Input.GetKeyDown(KeyCode.S))
+    {
+      PlayEatingSound();
     }
 	}
 
@@ -148,7 +155,10 @@ public class MonsterManager : MonoBehaviour {
         // request has been met
         gs.ClearStack();
         //AdvanceRequests();
+
+        // feedback for request met
         GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+        PlayEatingSound();
 
         // Increase score
         GameManager.Instance.AddScore(1);
@@ -171,6 +181,24 @@ public class MonsterManager : MonoBehaviour {
       requestBoxes[i].SetRequest(req);
     }
 
+  }
+
+  void PlayEatingSound()
+  {
+    AudioProps clip = new AudioProps();
+
+    // Different sounds for diff monsters?
+    //int soundToPlay = Random.Range(0, 2);
+    //if (soundToPlay == 0) clip = GameManager.Instance.SFX().GetAudio("nom");
+    //else  clip = GameManager.Instance.SFX().GetAudio("bite");
+
+    clip = GameManager.Instance.SFX().GetAudio("nom");
+    clip.pitch = Random.Range(0.7f, 0.9f);
+    //clip.pitch = eatingSoundPitcher;
+    //eatingSoundPitcher += 0.05f;
+    //if (eatingSoundPitcher > 1.1f) eatingSoundPitcher = 0.75f;
+
+    GameManager.Instance.SFX().PlaySound(clip);
   }
 
   void UpdateReqeustMet(MonsterRequest box)

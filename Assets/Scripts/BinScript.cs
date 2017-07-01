@@ -91,12 +91,12 @@ public class BinScript : MonoBehaviour {
   {
     if (canThrowAway && playerScript.playerState == PLAYER_STATE.DRAGGING)
     {
-      if (Input.GetMouseButtonUp(0))
-      {
-        canThrowAway = false;
-        // Set bin cooldown
-        binCooldown = GameManager.Instance.turnCounter;
-      }
+      canThrowAway = false;
+      // Set bin cooldown
+      binCooldown = GameManager.Instance.turnCounter;
+
+      // Audio feedback
+      GameManager.Instance.SFX().PlaySoundWithPitch("trash", 0.75f, 1.0f);
     }
   }
 

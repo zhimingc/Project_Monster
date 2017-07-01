@@ -23,6 +23,7 @@ public class GameManager : Singleton<GameManager>
 
   public ScoreManager scoreMan;
   public DayManager dayMan;
+  public SFXManager sfxMan;
 
   private UIManager uiMan;
   private GridManager gridMan;
@@ -34,6 +35,7 @@ public class GameManager : Singleton<GameManager>
   {
     startWithHelp = true;
     scoreMan = new ScoreManager();
+    sfxMan = gameObject.AddComponent<SFXManager>();
 
     // Init for when scene loads
     InitializeManagers();
@@ -61,6 +63,11 @@ public class GameManager : Singleton<GameManager>
     monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
   }
 
+  public SFXManager SFX()
+  {
+    return sfxMan;
+ }
+
   public void ButtonBehaviour(BUTTON_TYPE type)
   {
     switch (type)
@@ -85,12 +92,12 @@ public class GameManager : Singleton<GameManager>
     // Debug
     if (Input.anyKeyDown)
     {
-      if (Input.GetKeyDown(KeyCode.S))
-      {
-        bool invert = !AudioListener.pause;
-        AudioListener.pause = invert;
-        AudioListener.volume = invert ? 0 : 1;
-      }
+      //if (Input.GetKeyDown(KeyCode.S))
+      //{
+      //  bool invert = !AudioListener.pause;
+      //  AudioListener.pause = invert;
+      //  AudioListener.volume = invert ? 0 : 1;
+      //}
 
       if (Input.GetKeyDown(KeyCode.H))
       {

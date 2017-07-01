@@ -74,12 +74,12 @@ public class PlayerScript : MonoBehaviour {
     {
       // Switching to idle
       case PLAYER_STATE.IDLE:
-        CheckIfRequestMet();
-        GameManager.Instance.CheckLevelComplete();
-
         //if (hoveredGrid != null) hoveredGrid.ResetHoveredGrid();
         gridMan.ResetGrid();
         SetHoveredGrid(null);
+
+        CheckIfRequestMet();
+        GameManager.Instance.CheckLevelComplete();
         break;
     }
   }

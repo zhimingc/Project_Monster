@@ -37,7 +37,7 @@ public class DayManager : MonoBehaviour {
 
   public void UpdateProgressBar()
   {
-    int curShift = (int)dayState;
+    int curShift = Mathf.Min((int)DAY_STATE.DINNER, (int)dayState);
 
     int curShiftBase = 0;
     if (curShift > 0) curShiftBase = shiftIntervals[curShift - 1];

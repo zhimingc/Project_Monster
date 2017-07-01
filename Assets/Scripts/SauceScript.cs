@@ -123,6 +123,7 @@ public class SauceScript : MonoBehaviour {
     sauceObj.transform.position = transform.position;
     sauceObj.GetComponent<IngredientBlock>().SetIdleScale(new Vector3(1.0f, 1.0f, 1.0f));
     sauceObj.GetComponent<IngredientBlock>().oldPos = transform.position;
+    sauceObj.GetComponent<IngredientBlock>().isUsable = true;
     sauceObj.transform.parent = transform;
 
     sauceObj.GetComponent<BoxCollider2D>().enabled = false;

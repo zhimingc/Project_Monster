@@ -57,9 +57,6 @@ static public class IngredientFactory
         break;
       case SAUCE_TYPE.MUSTARD:
         Utility.SetColorFromHex(ingredient, "#ffc04c");
-
-        //ingredient.GetComponent<SpriteRenderer>().color = Color.yellow;
-
         break;
       case SAUCE_TYPE.WASABI:
         ingredient.GetComponent<SpriteRenderer>().color = Color.green;
