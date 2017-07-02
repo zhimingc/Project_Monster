@@ -7,6 +7,9 @@ public enum BUTTON_TYPE
   RESTART,
   HELP,
   MUSIC,
+  START,
+  START_HELP,
+  SETTINGS
 }
 
 public class ButtonBehaviour : MonoBehaviour {

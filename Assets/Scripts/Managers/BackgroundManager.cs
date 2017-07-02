@@ -13,6 +13,7 @@ public class BackgroundManager : MonoBehaviour {
 
   // Time of day
   public TIME_OF_DAY timeOfDay;
+  public TIME_OF_DAY overrideTime;
 
   // Cloud ambient parameters
   public GameObject cloudObj, cloudShadowObj;
@@ -44,7 +45,7 @@ public class BackgroundManager : MonoBehaviour {
     sunPositions[1] = new Vector3(0, 8.5f, 0);
     sunPositions[2] = new Vector3(4, 7, 0);
 
-    ChangeTimeState(0);
+    ChangeTimeState((int)overrideTime);
     SpawnStartClouds();
   }
 	

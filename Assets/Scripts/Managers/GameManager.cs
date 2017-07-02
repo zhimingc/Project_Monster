@@ -38,9 +38,13 @@ public class GameManager : Singleton<GameManager>
     sfxMan = gameObject.AddComponent<SFXManager>();
 
     // Init for when scene loads
-    InitializeManagers();
-    if (startWithHelp) ToggleHelpScreen();
-    helpToggler = true;
+    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    {
+      InitializeManagers();
+
+      if (startWithHelp) ToggleHelpScreen();
+      helpToggler = true;
+    }
 
     // Delegate which gets called ever time a scene loads
     SceneManager.sceneLoaded += OnSceneLoaded;
@@ -57,10 +61,13 @@ public class GameManager : Singleton<GameManager>
     currentLevel = 0;
     helpToggler = true;
     scoreMan.InitScore();
-    dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
-    uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
-    gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
-    monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
+    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    {
+      dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
+      uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
+      gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
+      monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
+    }
   }
 
   public SFXManager SFX()
@@ -84,52 +91,67 @@ public class GameManager : Singleton<GameManager>
         AudioListener.pause = invert;
         AudioListener.volume = invert ? 0 : 1;
         break;
+      case BUTTON_TYPE.START:
+        // Resets level
+        SceneManager.LoadScene("vertical-phone");
+        break;
     }
   }
 
   void Update()
   {
-    // Debug
-    if (Input.anyKeyDown)
+    if (SceneManager.GetActiveScene().name == "vertical-phone")
     {
-      //if (Input.GetKeyDown(KeyCode.S))
-      //{
-      //  bool invert = !AudioListener.pause;
-      //  AudioListener.pause = invert;
-      //  AudioListener.volume = invert ? 0 : 1;
-      //}
+      // Debug
+      if (Input.anyKeyDown)
+      {
+        //if (Input.GetKeyDown(KeyCode.S))
+        //{
+        //  bool invert = !AudioListener.pause;
+        //  AudioListener.pause = invert;
+        //  AudioListener.volume = invert ? 0 : 1;
+        //}
 
-      if (Input.GetKeyDown(KeyCode.H))
-      {
-        ToggleHelpScreen();
-      }
-      else if (uiMan.helpText.enabled == true)
-      {
-        if (helpToggler)
+        if (Input.GetKeyDown(KeyCode.H))
         {
-          uiMan.ToggleHelpText(false);
-          gridMan.ToggleGrid(true);
-          helpToggler = false;
+          ToggleHelpScreen();
         }
-        else
+        else if (uiMan.helpText.enabled == true)
         {
-          helpToggler = true;
+          if (helpToggler)
+          {
+            uiMan.ToggleHelpText(false);
+            gridMan.ToggleGrid(true);
+            helpToggler = false;
+          }
+          else
+          {
+            helpToggler = true;
+          }
         }
       }
+      if (Input.GetKeyDown(KeyCode.R))
+      {
+        // Resets level
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+      }
+
+      // Update to display score
+      scoreMan.DisplayScore();
     }
-    if (Input.GetKeyDown(KeyCode.R))
-    {
-      // Resets level
-      SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
+
     if (Input.GetKeyDown(KeyCode.Escape))
     {
-      Application.Quit();
+      if (SceneManager.GetActiveScene().name == "vertical-phone")
+      {
+        SceneManager.LoadScene(1);
+      }
+      else
+      {
+        Application.Quit();
+      }
+      
     }
-
-
-    // Update to display score
-    scoreMan.DisplayScore();
   }
 
   void ToggleHelpScreen()

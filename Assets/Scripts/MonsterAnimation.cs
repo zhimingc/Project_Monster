@@ -28,7 +28,7 @@ public class MonsterAnimation : MonoBehaviour {
     monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_1_angry");
 
     // initial state
-    GetComponent<SpriteRenderer>().sprite = monsterStates[0];
+    //GetComponent<SpriteRenderer>().sprite = monsterStates[0];
   }
 
   public void Hide()
