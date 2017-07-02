@@ -26,7 +26,10 @@ public class MonsterRequest : MonoBehaviour {
     if (flag == true)
     {
       transform.localScale = new Vector3(0, 0, 0);
-      LeanTween.delayedCall(0.5f, () => { LeanTween.scale(gameObject, originScale, 0.5f); });
+      LeanTween.delayedCall(0.5f, () => 
+      {
+        LeanTween.scale(gameObject, originScale, 1.0f).setEase(LeanTweenType.easeInOutQuad);
+      });
     }
   }
 

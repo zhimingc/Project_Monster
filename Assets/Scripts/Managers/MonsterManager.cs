@@ -65,11 +65,11 @@ public class MonsterManager : MonoBehaviour {
     requestBoxes.Add(GameObject.Find("monster_request_0").GetComponent<MonsterRequest>());
     requestBoxes.Add(GameObject.Find("monster_request_1").GetComponent<MonsterRequest>());
     requestBoxes.Add(GameObject.Find("monster_request_2").GetComponent<MonsterRequest>());
-    GameObject monsterReq = Resources.Load<GameObject>("Prefabs/monster_0");
+    GameObject monsterReq = Resources.Load<GameObject>("Prefabs/monster_holder");
     reserveMonsters.Add(Instantiate(monsterReq));
     reserveMonsters.Add(Instantiate(monsterReq));
     reserveMonsters.Add(Instantiate(monsterReq));
-    foreach (GameObject mon in reserveMonsters) mon.GetComponent<MonsterAnimation>().Hide();
+    foreach (GameObject mon in reserveMonsters) mon.GetComponentInChildren<MonsterAnimation>().Hide();
 
     // Init request boxes
     foreach (MonsterRequest box in requestBoxes)
@@ -170,7 +170,7 @@ public class MonsterManager : MonoBehaviour {
         Vector3 monsPos = reqBox.GetComponent<MonsterRequest>().monsterObj.transform.position;
         foreach(GameObject reserve in reserveMonsters)
         {
-          MonsterAnimation anim = reserve.GetComponent<MonsterAnimation>();
+          MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
           if (anim.isAnimating()) continue;
           anim.MoveOutFrom(monsPos);
           break;
