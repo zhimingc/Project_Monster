@@ -53,13 +53,13 @@ static public class IngredientFactory
     switch (type)
     {
       case SAUCE_TYPE.SOYSAUCE:
-        ingredient.GetComponent<SpriteRenderer>().color = Color.black;
+        Utility.SetColorFromHex(ingredient, "#3C3C3CFF");
         break;
       case SAUCE_TYPE.MUSTARD:
         Utility.SetColorFromHex(ingredient, "#ffc04c");
         break;
       case SAUCE_TYPE.WASABI:
-        ingredient.GetComponent<SpriteRenderer>().color = Color.green;
+        Utility.SetColorFromHex(ingredient, "#58FF6EFF");
         break;
       case SAUCE_TYPE.EMPTY:
         ingredient.GetComponent<SpriteRenderer>().color = Color.white;

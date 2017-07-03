@@ -9,7 +9,7 @@ public class MonsterAnimation : MonoBehaviour {
   public GameObject requestObj, parent;
 
   private float[] boundaries;
-  private Vector3 origin, originScale;
+  private Vector3 origin;// originScale;
   private BackgroundManager backMan;
   private Sprite[] monsterStates;
 
@@ -20,7 +20,7 @@ public class MonsterAnimation : MonoBehaviour {
     animTime = 1.0f;
     boundaries = backMan.cloudPosLimits;
     origin = transform.position;
-    originScale = transform.localScale;
+    //originScale = transform.localScale;
 
     // sprites
     monsterStates = new Sprite[2];

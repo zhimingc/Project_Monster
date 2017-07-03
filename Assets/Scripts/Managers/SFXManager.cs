@@ -21,9 +21,11 @@ public class SFXManager : MonoBehaviour{
 
   public Dictionary<string, AudioClip> soundLib;
   List<AudioSource> audioSources;
+  public bool isMute;
 
   void Awake()
   {
+    isMute = false;
     audioSources = new List<AudioSource>();
     soundLib = new Dictionary<string, AudioClip>();
     soundLib.Add("nom", Resources.Load<AudioClip>("Audio/SFX/nom_1.0"));
@@ -35,6 +37,21 @@ public class SFXManager : MonoBehaviour{
     soundLib.Add("thud3", Resources.Load<AudioClip>("Audio/SFX/thud3_C_zerolagtime"));
     soundLib.Add("trash", Resources.Load<AudioClip>("Audio/SFX/trashfall"));
     soundLib.Add("splat", Resources.Load<AudioClip>("Audio/SFX/splat"));
+  }
+
+  public bool ToggleMute()
+  {
+    isMute = !isMute;
+
+    if (isMute)
+    {
+      foreach (AudioSource src in audioSources)
+      {
+        src.Stop();
+      }
+    }
+
+    return isMute;
   }
 
   public AudioProps GetAudio(string name)
@@ -66,6 +83,8 @@ public class SFXManager : MonoBehaviour{
 
   public void PlaySound(AudioProps props)
   {
+    if (isMute) return;
+
     // Look for a free audio source
     foreach (AudioSource source in audioSources)
     {

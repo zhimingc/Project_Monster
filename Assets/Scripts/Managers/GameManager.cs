@@ -25,6 +25,7 @@ public class GameManager : Singleton<GameManager>
   public DayManager dayMan;
   public SFXManager sfxMan;
 
+  private MusicManager musicMan;
   private UIManager uiMan;
   private GridManager gridMan;
   private MonsterManager monsterMan;
@@ -33,9 +34,10 @@ public class GameManager : Singleton<GameManager>
  
   void Awake()
   {
-    startWithHelp = true;
+    startWithHelp = false;
     scoreMan = new ScoreManager();
     sfxMan = gameObject.AddComponent<SFXManager>();
+    musicMan = gameObject.AddComponent<MusicManager>();
 
     // Init for when scene loads
     if (SceneManager.GetActiveScene().name == "vertical-phone")
@@ -67,6 +69,7 @@ public class GameManager : Singleton<GameManager>
       uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
       gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
       monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
+      musicMan.Init();
     }
   }
 
@@ -75,7 +78,38 @@ public class GameManager : Singleton<GameManager>
     return sfxMan;
  }
 
-  public void ButtonBehaviour(BUTTON_TYPE type)
+  public void ButtonInit(BUTTON_TYPE type, ButtonBehaviour btn)
+  {
+    switch (type)
+    {
+      case BUTTON_TYPE.TOG_MUSIC:
+        if (!musicMan.isMute)
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/musicOn");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        else
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/musicOff");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        break;
+      case BUTTON_TYPE.TOG_SFX:
+        if (!sfxMan.isMute)
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/audioOn");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        else
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/audioOff");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        break;
+    }
+  }
+
+  public void ButtonBehaviour(BUTTON_TYPE type, ButtonBehaviour btn)
   {
     switch (type)
     {
@@ -95,6 +129,45 @@ public class GameManager : Singleton<GameManager>
         // Resets level
         SceneManager.LoadScene("vertical-phone");
         break;
+      case BUTTON_TYPE.CREDITS:
+        SceneManager.LoadScene("screen-credits");
+        break;
+      case BUTTON_TYPE.SETTINGS:
+        SceneManager.LoadScene("screen-options");
+        break;
+      case BUTTON_TYPE.TO_START:
+        SceneManager.LoadScene("screen-start");
+        break;
+      case BUTTON_TYPE.START_HELP_BASIC:
+        SceneManager.LoadScene("screen-howtoplay-basic");
+        break;
+      case BUTTON_TYPE.START_HELP_TIPS:
+        SceneManager.LoadScene("screen-howtoplay-tips");
+        break;
+      case BUTTON_TYPE.TOG_MUSIC:
+        if (!musicMan.ToggleMute())
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/musicOn");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        else
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/musicOff");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        break;
+      case BUTTON_TYPE.TOG_SFX:
+        if (!sfxMan.ToggleMute())
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/audioOn");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        else
+        {
+          Sprite sp = Resources.Load<Sprite>("Sprites/UI/audioOff");
+          btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
+        }
+        break;
     }
   }
 
@@ -105,13 +178,6 @@ public class GameManager : Singleton<GameManager>
       // Debug
       if (Input.anyKeyDown)
       {
-        //if (Input.GetKeyDown(KeyCode.S))
-        //{
-        //  bool invert = !AudioListener.pause;
-        //  AudioListener.pause = invert;
-        //  AudioListener.volume = invert ? 0 : 1;
-        //}
-
         if (Input.GetKeyDown(KeyCode.H))
         {
           ToggleHelpScreen();
@@ -144,7 +210,7 @@ public class GameManager : Singleton<GameManager>
     {
       if (SceneManager.GetActiveScene().name == "vertical-phone")
       {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene("screen-start");
       }
       else
       {
@@ -156,18 +222,22 @@ public class GameManager : Singleton<GameManager>
 
   void ToggleHelpScreen()
   {
-    bool flag = uiMan.helpText.enabled;
-    uiMan.ToggleHelpText(!flag);
-    gridMan.ToggleGrid(flag);
+    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    {
+      bool flag = uiMan.helpText.enabled;
+      uiMan.ToggleHelpText(!flag);
+      gridMan.ToggleGrid(flag);
 
-    // hack
-    helpToggler = false;
+      // hack
+      helpToggler = false;
+    }
   }
 
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
   {
     InitializeManagers();
     if (startWithHelp) ToggleHelpScreen();
+    helpToggler = true;
   }
 
   public void IncrementTurnCounter()

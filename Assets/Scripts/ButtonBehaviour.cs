@@ -8,13 +8,23 @@ public enum BUTTON_TYPE
   HELP,
   MUSIC,
   START,
-  START_HELP,
-  SETTINGS
+  START_HELP_BASIC,
+  START_HELP_TIPS,
+  SETTINGS,
+  CREDITS,
+  TO_START,
+  TOG_MUSIC,
+  TOG_SFX
 }
 
 public class ButtonBehaviour : MonoBehaviour {
 
   public BUTTON_TYPE type;
+
+  void Start()
+  {
+    GameManager.Instance.ButtonInit(type, this);
+  }
 
   void OnMouseOver()
   {
@@ -24,6 +34,6 @@ public class ButtonBehaviour : MonoBehaviour {
 	public void OnTouchDown()
   {
     if (InputMan.OnDown())
-      GameManager.Instance.ButtonBehaviour(type);
+      GameManager.Instance.ButtonBehaviour(type, this);
   }
 }

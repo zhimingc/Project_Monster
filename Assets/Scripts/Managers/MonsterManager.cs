@@ -118,7 +118,11 @@ public class MonsterManager : MonoBehaviour {
 
   public void ToggleMonsterRequests(bool flag)
   {
-    foreach (MonsterRequest box in requestBoxes) box.gameObject.SetActive(flag);
+    foreach (MonsterRequest box in requestBoxes)
+    {
+      box.monsterObj.SetActive(flag);
+      box.gameObject.SetActive(flag);
+    }
   }
 
   public void CheckRequestMetAll(List<List<GameObject>> grid)

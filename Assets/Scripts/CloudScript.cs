@@ -12,7 +12,7 @@ public class CloudScript : MonoBehaviour {
   private Vector3 originScale;
   public float bounceAmt, bounceSpeed;
 
-  private LTDescr scaleLT;
+  //private LTDescr scaleLT;
   private float bounceTimer;
   
 	// Use this for initialization
@@ -41,7 +41,7 @@ public class CloudScript : MonoBehaviour {
   {
     bounceTimer = bounceSpeed + 0.1f;
     Vector3 scaleTo = originScale + originScale * bounceAmt;
-    scaleLT = LeanTween.scale(gameObject, scaleTo, bounceSpeed).setEase(LeanTweenType.easeInOutQuad);
+    //scaleLT = LeanTween.scale(gameObject, scaleTo, bounceSpeed).setEase(LeanTweenType.easeInOutQuad);
     LeanTween.scale(cloudShadow, scaleTo, bounceSpeed).setEase(LeanTweenType.easeInOutQuad);
 
     bounceAmt = -bounceAmt;
