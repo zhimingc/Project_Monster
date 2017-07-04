@@ -11,6 +11,13 @@ static public class Utility {
     obj.GetComponent<SpriteRenderer>().color = tmpColor;
   }
 
+  static public Color GetColorFromHex(string hex)
+  {
+    Color tmpColor = new Color();
+    ColorUtility.TryParseHtmlString(hex, out tmpColor);
+    return tmpColor;
+  }
+
   static public void Swap<T>(ref T lhs, ref T rhs)
   {
     T temp;

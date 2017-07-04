@@ -25,6 +25,7 @@ public class GameManager : Singleton<GameManager>
   public DayManager dayMan;
   public SFXManager sfxMan;
 
+  private LoadManager loadMan;
   private MusicManager musicMan;
   private UIManager uiMan;
   private GridManager gridMan;
@@ -38,6 +39,7 @@ public class GameManager : Singleton<GameManager>
     scoreMan = new ScoreManager();
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
+    loadMan = gameObject.AddComponent<LoadManager>();
 
     // Init for when scene loads
     if (SceneManager.GetActiveScene().name == "vertical-phone")
@@ -115,7 +117,7 @@ public class GameManager : Singleton<GameManager>
     {
       case BUTTON_TYPE.RESTART:
         // Resets level
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        LoadSceneWithTransition(SceneManager.GetActiveScene().name);
         break;
       case BUTTON_TYPE.HELP:
         ToggleHelpScreen();
@@ -127,22 +129,29 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.START:
         // Resets level
-        SceneManager.LoadScene("vertical-phone");
+        LoadSceneWithTransition("vertical-phone");
         break;
       case BUTTON_TYPE.CREDITS:
-        SceneManager.LoadScene("screen-credits");
+        LoadSceneWithTransition("screen-credits");
         break;
       case BUTTON_TYPE.SETTINGS:
-        SceneManager.LoadScene("screen-options");
+        LoadSceneWithTransition("screen-options");
         break;
       case BUTTON_TYPE.TO_START:
-        SceneManager.LoadScene("screen-start");
+        LoadSceneWithTransition("screen-start");
         break;
       case BUTTON_TYPE.START_HELP_BASIC:
-        SceneManager.LoadScene("screen-howtoplay-basic");
+        if (SceneManager.GetActiveScene().name == "screen-howtoplay-tips")
+        {
+          LoadSceneVanilla("screen-howtoplay-basic");
+        }
+        else
+        {
+          LoadSceneWithTransition("screen-howtoplay-basic");
+        }
         break;
       case BUTTON_TYPE.START_HELP_TIPS:
-        SceneManager.LoadScene("screen-howtoplay-tips");
+        LoadSceneVanilla("screen-howtoplay-tips");
         break;
       case BUTTON_TYPE.TOG_MUSIC:
         if (!musicMan.ToggleMute())
@@ -169,6 +178,20 @@ public class GameManager : Singleton<GameManager>
         }
         break;
     }
+  }
+
+  void LoadSceneVanilla(string name)
+  {
+    SceneManager.LoadScene(name);
+  }
+
+  void LoadSceneWithTransition(string name)
+  {
+    loadMan.LoadOut();
+    LeanTween.delayedCall(loadMan.loadSpeed, () =>
+    {
+      SceneManager.LoadScene(name);
+    });
   }
 
   void Update()
@@ -238,6 +261,9 @@ public class GameManager : Singleton<GameManager>
     InitializeManagers();
     if (startWithHelp) ToggleHelpScreen();
     helpToggler = true;
+
+    // load screen
+    loadMan.LoadIn();
   }
 
   public void IncrementTurnCounter()
@@ -253,15 +279,15 @@ public class GameManager : Singleton<GameManager>
     dayMan.CheckForShiftChange();
     dayMan.UpdateProgressBar();
 
-    // Change blocks for dinner shift
-    if (dayMan.IsOrPastShift(DAY_STATE.DINNER))
-    {
-      gridMan.ToggleDinnerShiftGrids(true);
-    }
-    else
-    {
-      gridMan.ToggleDinnerShiftGrids(false);
-    }
+    //// Change blocks for dinner shift
+    //if (dayMan.IsOrPastShift(DAY_STATE.DINNER))
+    //{
+    //  gridMan.ToggleDinnerShiftGrids(true);
+    //}
+    //else
+    //{
+    //  gridMan.ToggleDinnerShiftGrids(false);
+    //}
   }
 
   public void SetGameState(GAME_STATE state)

@@ -17,9 +17,13 @@ public class DayManager : MonoBehaviour {
   public DAY_STATE dayState;
   public GameObject dayFeedback, progressBar, sauces;
   public int[] shiftIntervals;
+  public float shiftChangeSpeed;
+  public GameObject shiftChangeObj;
 
   private MonsterManager monsterMan;
   private BackgroundManager backMan;  // To update background graphics
+  private SauceManager sauceMan;      // To active sauces for lunch
+  private GridManager gridMan;            // To activate grids for dinner
   private float initialProgressSize;
 
 	// Use this for initialization
@@ -28,11 +32,69 @@ public class DayManager : MonoBehaviour {
     dayFeedback = GameObject.Find("shift_text");
     monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
     backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
+    sauceMan = GameObject.Find("sauce_man").GetComponent<SauceManager>();
+    gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
+    shiftChangeObj = GameObject.Find("shift_object");
 
     initialProgressSize = progressBar.transform.localScale.x;
     UpdateProgressBar();
     CheckForShiftChange();
+  }
 
+  void Update()
+  {
+    // debug
+    if (Input.GetKeyDown(KeyCode.K))
+    {
+      PlayShiftSign();
+    }
+  }
+
+  void ShiftTrigger(DAY_STATE shift)
+  {
+    switch (shift)
+    {
+      case DAY_STATE.LUNCH:
+        monsterMan.AddSauceToAllRequests();
+        break;
+      case DAY_STATE.DINNER:
+        break;
+    }
+  }
+
+  void PlayShiftSign()
+  {
+    switch (dayState)
+    {
+      case DAY_STATE.LUNCH:
+        backMan.ChangeSignColors(dayState);
+        shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
+        shiftChangeObj.GetComponentInChildren<Text>().text = "L U N C H !";
+        LeanTween.delayedCall(1.5f, () =>
+        {
+          sauceMan.ActivateSauces();
+        });
+        LeanTween.delayedCall(3.5f, () =>
+        {
+          shiftChangeObj.GetComponent<Animator>().SetTrigger("isExit");
+        });
+
+        break;
+      case DAY_STATE.DINNER:
+        backMan.ChangeSignColors(dayState);
+        shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
+        shiftChangeObj.GetComponentInChildren<Text>().text = "D I N N E R !";
+        LeanTween.delayedCall(1.5f, () =>
+        {
+          // change grid to bowls here
+          gridMan.ToggleDinnerShiftGrids(true);
+        });
+        LeanTween.delayedCall(3.5f, () =>
+        {
+          shiftChangeObj.GetComponent<Animator>().SetTrigger("isExit");
+        });
+        break;
+    }
   }
 
   public void UpdateProgressBar()
@@ -55,19 +117,7 @@ public class DayManager : MonoBehaviour {
     progressBar.transform.position = transform.position + new Vector3(-initialProgressSize / 2.0f + progressSize / 2.0f, 7.5f, 0.0f);
   }
 
-  void ShiftTrigger(DAY_STATE shift)
-  {
-    switch (shift)
-    {
-      case DAY_STATE.LUNCH:
-        monsterMan.AddSauceToAllRequests();
-        break;
-      case DAY_STATE.DINNER:
-        break;
-    }
-  }
-
-	public void CheckForShiftChange()
+  public void CheckForShiftChange()
   {
     int score = GameManager.Instance.scoreMan.score;
     if ((int)dayState < shiftIntervals.Length && score >= shiftIntervals[(int)dayState])
@@ -81,6 +131,8 @@ public class DayManager : MonoBehaviour {
           // Change the feedback text to reflect shift
           dayState = ((DAY_STATE)i);
           ShiftTrigger(dayState);
+          PlayShiftSign();
+
           backMan.ChangeTimeState(i); // update bg
 
           string dayText = dayState.ToString();
@@ -88,15 +140,6 @@ public class DayManager : MonoBehaviour {
           break;
         }
       }
-    }
-    
-    if (IsOrPastShift(DAY_STATE.LUNCH))
-    {
-      sauces.SetActive(true);
-    }
-    else
-    {
-      sauces.SetActive(false);
     }
   }
 

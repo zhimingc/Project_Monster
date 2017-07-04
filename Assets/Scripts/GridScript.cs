@@ -227,6 +227,12 @@ public class GridScript : MonoBehaviour {
     OnTouchExit();
   }
 
+  public void EmitEatenParticles()
+  {
+    // emit particles when eaten
+    psObj.Play();
+  }
+
   public void OnTouchExit()
   {
     // Update the grid if an ingredient block is being dragged
@@ -262,8 +268,7 @@ public class GridScript : MonoBehaviour {
     ingredientStack.Clear();
     UpdateStackDisplay();
 
-    // emit particles when eaten
-    psObj.Play();
+    EmitEatenParticles();
   }
 
   // Reset any grid data if player mouse up

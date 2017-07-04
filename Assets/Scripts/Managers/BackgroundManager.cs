@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum TIME_OF_DAY
 {
@@ -29,10 +30,30 @@ public class BackgroundManager : MonoBehaviour {
   private List<GameObject> clouds;
   private Vector3[] sunPositions;
 
+  private string[] groundColors, skyColors, cloudColors, shadowColors;
+
   // Use this for initialization
   void Start()
   {
     clouds = new List<GameObject>();
+
+    // init colors
+    groundColors = new string[3]
+    {
+      "#b2d395ff", "#d39c95ff", "#a495d3ff"
+    };
+    skyColors = new string[3]
+    {
+      "#cfe3c4ff", "#e3d3c4ff", "#c4c4e3ff"
+    };
+    cloudColors = new string[3]
+    {
+      "#feeeeeff", "#eefef4ff", "#eef0feff"
+    };
+    shadowColors = new string[3]
+    {
+      "#95c36dff", "#b97779ff", "#826dc3ff"
+    };
 
     // Get bg objects
     bgGround = GameObject.Find("bg_ground");
@@ -60,10 +81,10 @@ public class BackgroundManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.C))
-    {
-      SpawnCloud();
-    }
+		//if (Input.GetKeyDown(KeyCode.C))
+  //  {
+  //    SpawnCloud();
+  //  }
 
     UpdateCloudSpawner();
   }
@@ -129,50 +150,20 @@ public class BackgroundManager : MonoBehaviour {
     {
       case TIME_OF_DAY.MORNING:
         toMove = progress * (sunPositions[1] - sunPositions[0]);
-        bgSun.transform.position = sunPositions[0] + toMove;
+        LeanTween.move(bgSun, sunPositions[0] + toMove, 0.5f);
         break;
       case TIME_OF_DAY.AFTERNOON:
         toMove = progress * (sunPositions[2] - sunPositions[1]);
-        bgSun.transform.position = sunPositions[1] + toMove;
+        LeanTween.move(bgSun, sunPositions[1] + toMove, 0.5f);
         break;
-      //case TIME_OF_DAY.NIGHT:
-      //  toMove = progress * (sunPositions[3] - sunPositions[2]);
-      //  bgSun.transform.position = sunPositions[2] + toMove;
-      //  break;
     }
   }
 
   void UpdateBGProperties()
   {
-    switch(timeOfDay)
-    {
-      case TIME_OF_DAY.MORNING:
-        //Utility.SetColorFromHex(bgGround, "#d3b295ff");
-        Utility.SetColorFromHex(bgGround, "#b2d395ff");
-        //Utility.SetColorFromHex(bgSky, "#e3dec4ff");
-        Utility.SetColorFromHex(bgSky, "#cfe3c4ff");
-        Utility.SetColorFromHex(bgSun, "#feeeeeff");
-
-        // sun position
-        bgSun.transform.position = sunPositions[0];
-        break;
-      case TIME_OF_DAY.AFTERNOON:
-        Utility.SetColorFromHex(bgGround, "#d39c95ff");
-        Utility.SetColorFromHex(bgSky, "#e3d3c4ff");
-        Utility.SetColorFromHex(bgSun, "#eefef4ff");
-
-        // sun position
-        bgSun.transform.position = sunPositions[1];
-        break;
-      case TIME_OF_DAY.NIGHT:
-        Utility.SetColorFromHex(bgGround, "#a495d3ff");
-        Utility.SetColorFromHex(bgSky, "#c4c4e3ff");
-        Utility.SetColorFromHex(bgSun, "#eef0feff");
-
-        // sun position
-        bgSun.transform.position = sunPositions[2];
-        break;
-    }
+    Utility.SetColorFromHex(bgGround, groundColors[(int)timeOfDay]);
+    Utility.SetColorFromHex(bgSky, skyColors[(int)timeOfDay]);
+    Utility.SetColorFromHex(bgSun, cloudColors[(int)timeOfDay]);
 
     UpdateCloudColor(cloudObj, cloudShadowObj);
   }
@@ -188,23 +179,18 @@ public class BackgroundManager : MonoBehaviour {
 
   public void UpdateCloudColor(GameObject cloud, GameObject shadow)
   {
-    switch (timeOfDay)
-    {
-      case TIME_OF_DAY.MORNING:
-        Utility.SetColorFromHex(cloud, "#feeeeeff");
-        //Utility.SetColorFromHex(shadow, "#c3956dff");
-        Utility.SetColorFromHex(shadow, "#95c36dff");
-        break;
-      case TIME_OF_DAY.AFTERNOON:
-        Utility.SetColorFromHex(cloud, "#eefef4ff");
-        Utility.SetColorFromHex(shadow, "#b97779ff");
-        break;
-      case TIME_OF_DAY.NIGHT:
-        Utility.SetColorFromHex(cloud, "#eef0feff");
-        Utility.SetColorFromHex(shadow, "#826dc3ff");
-        break;
-    }
+    Utility.SetColorFromHex(cloud, cloudColors[(int)timeOfDay]);
+    Utility.SetColorFromHex(shadow, shadowColors[(int)timeOfDay]);
   }
 
+  public void ChangeSignColors(DAY_STATE state)
+  {
+    Image back = GameObject.Find("shift_object/shift_back").GetComponent<Image>();
+    Image front = GameObject.Find("shift_object/shift_front").GetComponent<Image>();
+    Text text = GameObject.Find("shift_object/shift_sign_text").GetComponent<Text>();
 
+    text.color = Utility.GetColorFromHex(shadowColors[(int)state]);
+    back.color = Utility.GetColorFromHex(shadowColors[(int)state]);
+    front.color = Utility.GetColorFromHex(skyColors[(int)state]);
+  }
 }

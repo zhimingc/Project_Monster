@@ -153,8 +153,17 @@ public class GridManager : MonoBehaviour {
   public void ToggleDinnerShiftGrids(bool flag)
   {
     GRID_TYPE type = flag ? GRID_TYPE.BOWL : GRID_TYPE.PLATE;
+
     grid[0][0].GetComponent<GridScript>().ToggleGridType(type);
-    grid[1][1].GetComponent<GridScript>().ToggleGridType(type);
+    grid[0][0].GetComponentInChildren<GridScript>().EmitEatenParticles();
+    GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+
+    LeanTween.delayedCall(0.5f, () =>
+    {
+      grid[1][1].GetComponent<GridScript>().ToggleGridType(type);
+      grid[1][1].GetComponentInChildren<GridScript>().EmitEatenParticles();
+      GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+    });
   }
 
   void ConstructGrid(int gridX, int gridY)
