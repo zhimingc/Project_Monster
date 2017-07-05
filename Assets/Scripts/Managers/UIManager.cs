@@ -5,18 +5,20 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
 
-  public Text loseText;
+  public GameObject loseSign;
   public Text helpText;
 
-	// Use this for initialization
-	void Awake () {
-    loseText = GameObject.Find("lose").GetComponent<Text>();
+
+  // Use this for initialization
+  void Awake () {
+    loseSign = GameObject.Find("lose_sign");
     helpText = GameObject.Find("instructions_text").GetComponent<Text>();
+
   }
-	
+
   public void ToggleLoseText(bool flag)
   {
-    loseText.enabled = flag;
+    loseSign.GetComponent<Animator>().SetTrigger("isEnter");
   }
 
   public void ToggleHelpText(bool flag)

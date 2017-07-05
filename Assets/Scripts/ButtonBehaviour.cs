@@ -14,7 +14,8 @@ public enum BUTTON_TYPE
   CREDITS,
   TO_START,
   TOG_MUSIC,
-  TOG_SFX
+  TOG_SFX,
+  CONTINUE_GAME
 }
 
 public class ButtonBehaviour : MonoBehaviour {
@@ -29,6 +30,14 @@ public class ButtonBehaviour : MonoBehaviour {
   void OnMouseOver()
   {
     OnTouchDown();
+  }
+
+  public void ChangeButtonColors(int state, string[] skyColors, string[] shadowColors)
+  {
+    SpriteRenderer[] renders = GetComponentsInChildren<SpriteRenderer>();
+    renders[0].color = Utility.GetColorFromHex(shadowColors[state]);
+    renders[1].color = Utility.GetColorFromHex(shadowColors[state]);
+    renders[2].color = Utility.GetColorFromHex(skyColors[state]);
   }
 
 	public void OnTouchDown()

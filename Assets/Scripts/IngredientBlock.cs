@@ -193,14 +193,14 @@ public class IngredientBlock : MonoBehaviour {
     {
       GetComponent<BoxCollider2D>().enabled = true;
       GetComponent<SpriteRenderer>().enabled = true;
-      GetComponent<SpriteRenderer>().color = Color.white;
+      //GetComponent<SpriteRenderer>().color = Color.white;
       transform.localScale = idleScale;
     }
     else
     {
       GetComponent<BoxCollider2D>().enabled = false;
       GetComponent<SpriteRenderer>().enabled = true;
-      GetComponent<SpriteRenderer>().color = Color.white;
+      //GetComponent<SpriteRenderer>().color = Color.white;
       transform.localScale = idleScale * 0.75f;
     }
   }

@@ -19,6 +19,7 @@ public class DayManager : MonoBehaviour {
   public int[] shiftIntervals;
   public float shiftChangeSpeed;
   public GameObject shiftChangeObj;
+  public GameObject endOfDaySign;
 
   private MonsterManager monsterMan;
   private BackgroundManager backMan;  // To update background graphics
@@ -35,10 +36,12 @@ public class DayManager : MonoBehaviour {
     sauceMan = GameObject.Find("sauce_man").GetComponent<SauceManager>();
     gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
     shiftChangeObj = GameObject.Find("shift_object");
+    endOfDaySign = GameObject.Find("win_sign");
 
     initialProgressSize = progressBar.transform.localScale.x;
     UpdateProgressBar();
     CheckForShiftChange();
+    backMan.ChangeSignColors(shiftChangeObj, DAY_STATE.BREAKFAST);
   }
 
   void Update()
@@ -64,12 +67,15 @@ public class DayManager : MonoBehaviour {
 
   void PlayShiftSign()
   {
+    // play sfx
+    GameManager.Instance.SFX().PlaySound("good");
+
     switch (dayState)
     {
       case DAY_STATE.LUNCH:
-        backMan.ChangeSignColors(dayState);
+        backMan.ChangeSignColors(shiftChangeObj, dayState);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
-        shiftChangeObj.GetComponentInChildren<Text>().text = "L U N C H !";
+        shiftChangeObj.GetComponentInChildren<Text>().text = "LUNCH!";
         LeanTween.delayedCall(1.5f, () =>
         {
           sauceMan.ActivateSauces();
@@ -81,9 +87,9 @@ public class DayManager : MonoBehaviour {
 
         break;
       case DAY_STATE.DINNER:
-        backMan.ChangeSignColors(dayState);
+        backMan.ChangeSignColors(shiftChangeObj, dayState);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
-        shiftChangeObj.GetComponentInChildren<Text>().text = "D I N N E R !";
+        shiftChangeObj.GetComponentInChildren<Text>().text = "DINNER!";
         LeanTween.delayedCall(1.5f, () =>
         {
           // change grid to bowls here
@@ -93,6 +99,10 @@ public class DayManager : MonoBehaviour {
         {
           shiftChangeObj.GetComponent<Animator>().SetTrigger("isExit");
         });
+        break;
+      case DAY_STATE.WIN:
+        backMan.ChangeSignColors(endOfDaySign, DAY_STATE.DINNER);
+        endOfDaySign.GetComponent<Animator>().SetTrigger("isEnter");
         break;
     }
   }

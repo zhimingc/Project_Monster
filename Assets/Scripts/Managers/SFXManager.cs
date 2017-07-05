@@ -11,10 +11,12 @@ public class AudioProps
   {
     clip = c;
     pitch = 1.0f;
+    vol = 1.0f;
   }
 
   public AudioClip clip;
   public float pitch;
+  public float vol;
 };
 
 public class SFXManager : MonoBehaviour{
@@ -37,6 +39,11 @@ public class SFXManager : MonoBehaviour{
     soundLib.Add("thud3", Resources.Load<AudioClip>("Audio/SFX/thud3_C_zerolagtime"));
     soundLib.Add("trash", Resources.Load<AudioClip>("Audio/SFX/trashfall"));
     soundLib.Add("splat", Resources.Load<AudioClip>("Audio/SFX/splat"));
+    soundLib.Add("boom1", Resources.Load<AudioClip>("Audio/SFX/boom_C_group1"));
+    soundLib.Add("boom2", Resources.Load<AudioClip>("Audio/SFX/boom_C_themfish"));
+    soundLib.Add("good", Resources.Load<AudioClip>("Audio/SFX/good"));
+    soundLib.Add("portal_in", Resources.Load<AudioClip>("Audio/SFX/portal_in"));
+    soundLib.Add("portal_out", Resources.Load<AudioClip>("Audio/SFX/portal_out"));
   }
 
   public bool ToggleMute()
@@ -71,14 +78,16 @@ public class SFXManager : MonoBehaviour{
     GameManager.Instance.SFX().PlaySound(clip);
   }
 
-  public void PlaySound(string name)
+  public void PlaySound(string name, float vol = 1.0f)
   {
     if (soundLib.ContainsKey(name) == false)
     {
       print("Sound library does not contain " + name + ".");
     }
 
-    PlaySound(new AudioProps(soundLib[name]));
+    AudioProps props = new AudioProps(soundLib[name]);
+    props.vol = vol;
+    PlaySound(props);
   }
 
   public void PlaySound(AudioProps props)
@@ -90,6 +99,7 @@ public class SFXManager : MonoBehaviour{
     {
       if (source.isPlaying) continue;
       ApplyProperties(source, props);
+      source.volume = props.vol;
       source.Play();
       return;
     }
@@ -97,6 +107,7 @@ public class SFXManager : MonoBehaviour{
     // No free audio sources; create and use a new one
     AudioSource src = gameObject.AddComponent<AudioSource>();
     ApplyProperties(src, props);
+    src.volume = props.vol;
     src.Play();
     audioSources.Add(src);
   }

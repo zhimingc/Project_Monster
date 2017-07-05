@@ -21,15 +21,15 @@ public class SauceScript : MonoBehaviour {
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
     maxCooldown = GetComponentInParent<SauceManager>().maxCooldown;
+    isCoolingDown = false;
 
     GenerateSauce();
-    isCoolingDown = false;
+    UpdateStateFeedback();
   }
 	
 	// Update is called once per frame
 	void Update () {
     UpdateCooldown();
-    UpdateStateFeedback();
   }
 
   public void SauceMouseUp()
@@ -38,7 +38,7 @@ public class SauceScript : MonoBehaviour {
     {
       //if (Input.GetMouseButtonUp(0) && playerScript.hoveredGrid != null)
       if (InputMan.OnUp() && playerScript.hoveredGrid != null)
-        {
+      {
         isCoolingDown = true;
         // Set sauce cooldown
         curCooldown = GameManager.Instance.turnCounter;
@@ -94,6 +94,7 @@ public class SauceScript : MonoBehaviour {
       {
         isCoolingDown = false;
         GenerateSauce();
+        UpdateStateFeedback();
       }
     }
     else
@@ -110,8 +111,9 @@ public class SauceScript : MonoBehaviour {
     }
     else
     {
-      GetComponent<SpriteRenderer>().color = Color.green;
-      sauceObj.GetComponent<SpriteRenderer>().color = Color.green;
+      Color sauceColor = sauceObj.GetComponentsInChildren<SpriteRenderer>()[1].color;
+      GetComponent<SpriteRenderer>().color = sauceColor;
+      sauceObj.GetComponent<SpriteRenderer>().color = sauceColor;
     }
   }
 
@@ -125,6 +127,7 @@ public class SauceScript : MonoBehaviour {
     sauceObj.GetComponent<IngredientBlock>().oldPos = transform.position;
     sauceObj.GetComponent<IngredientBlock>().isUsable = true;
     sauceObj.transform.parent = transform;
+    sauceObj.GetComponent<SpriteRenderer>().enabled = false;
 
     sauceObj.GetComponent<BoxCollider2D>().enabled = false;
   }

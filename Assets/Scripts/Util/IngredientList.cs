@@ -53,7 +53,8 @@ static public class IngredientFactory
     switch (type)
     {
       case SAUCE_TYPE.SOYSAUCE:
-        Utility.SetColorFromHex(ingredient, "#3C3C3CFF");
+        //Utility.SetColorFromHex(ingredient, "#3C3C3CFF");
+        Utility.SetColorFromHex(ingredient, "#58EAFFFF");
         break;
       case SAUCE_TYPE.MUSTARD:
         Utility.SetColorFromHex(ingredient, "#ffc04c");

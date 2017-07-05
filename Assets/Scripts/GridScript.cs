@@ -19,6 +19,7 @@ public class GridScript : MonoBehaviour {
 
   // feedback
   private ParticleSystem psObj;
+  private GameObject exclaimObj;
 
   void Awake()
   {
@@ -29,6 +30,8 @@ public class GridScript : MonoBehaviour {
     maxIngredients = 5;
 
     psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
+    exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);
+    //exclaimObj.GetComponent<SpriteRenderer>().enabled = false;
   }
 
 	// Use this for initialization
@@ -191,6 +194,9 @@ public class GridScript : MonoBehaviour {
 
   void UpdateStackDisplay()
   {
+    // feedback that the grid is full
+    exclaimObj.SetActive(ingredientStack.Count >= stackObjs.Count);
+
     for (int i = 0; i < stackObjs.Count; ++i)
     {
       Sprite sprite = Resources.Load<Sprite>("Sprites/ingredient_side");

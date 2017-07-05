@@ -30,9 +30,12 @@ public class GameManager : Singleton<GameManager>
   private UIManager uiMan;
   private GridManager gridMan;
   private MonsterManager monsterMan;
+  private BackgroundManager backMan;
 
   public bool startWithHelp, helpToggler;
- 
+
+  public void WakeUp() { }
+
   void Awake()
   {
     startWithHelp = false;
@@ -59,6 +62,15 @@ public class GameManager : Singleton<GameManager>
     InputMan.platform = Application.platform;
   }
 
+  void ToggleSplashScreens()
+  {
+    LeanTween.delayedCall(2.5f, () =>
+    {
+      LoadSceneWithTransition("screen-start");
+      musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
+    });
+  }
+
   void InitializeManagers()
   {
     turnCounter = 0;
@@ -71,7 +83,7 @@ public class GameManager : Singleton<GameManager>
       uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
       gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
       monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
-      musicMan.Init();
+      backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
     }
   }
 
@@ -130,6 +142,7 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.START:
         // Resets level
         LoadSceneWithTransition("vertical-phone");
+        musicMan.ToggleBGM(BGM_CLIPS.LEVEL);
         break;
       case BUTTON_TYPE.CREDITS:
         LoadSceneWithTransition("screen-credits");
@@ -139,6 +152,7 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.TO_START:
         LoadSceneWithTransition("screen-start");
+        musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
         break;
       case BUTTON_TYPE.START_HELP_BASIC:
         if (SceneManager.GetActiveScene().name == "screen-howtoplay-tips")
@@ -176,6 +190,9 @@ public class GameManager : Singleton<GameManager>
           Sprite sp = Resources.Load<Sprite>("Sprites/UI/audioOff");
           btn.GetComponentsInChildren<SpriteRenderer>()[1].sprite = sp;
         }
+        break;
+      case BUTTON_TYPE.CONTINUE_GAME:
+        dayMan.endOfDaySign.GetComponent<Animator>().SetTrigger("isExit");
         break;
     }
   }
@@ -264,6 +281,12 @@ public class GameManager : Singleton<GameManager>
 
     // load screen
     loadMan.LoadIn();
+
+    // splash screen behaviour
+    if (SceneManager.GetActiveScene().name == "screen-splash")
+    {
+      ToggleSplashScreens();
+    }
   }
 
   public void IncrementTurnCounter()
@@ -278,16 +301,6 @@ public class GameManager : Singleton<GameManager>
     // Check for day change
     dayMan.CheckForShiftChange();
     dayMan.UpdateProgressBar();
-
-    //// Change blocks for dinner shift
-    //if (dayMan.IsOrPastShift(DAY_STATE.DINNER))
-    //{
-    //  gridMan.ToggleDinnerShiftGrids(true);
-    //}
-    //else
-    //{
-    //  gridMan.ToggleDinnerShiftGrids(false);
-    //}
   }
 
   public void SetGameState(GAME_STATE state)
@@ -306,15 +319,10 @@ public class GameManager : Singleton<GameManager>
     }
   }
 
-  void SetPlayingBehaviour()
-  {
-    // Turn off lose text
-    uiMan.ToggleLoseText(false);
-    monsterMan.ToggleMonsterRequests(true);
-  }
-
   void SetLoseBehaviour()
   {
+    backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
+
     // Turn on lose text
     uiMan.ToggleLoseText(true);
     // Turn off monster request boxes

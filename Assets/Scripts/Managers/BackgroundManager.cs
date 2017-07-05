@@ -30,7 +30,13 @@ public class BackgroundManager : MonoBehaviour {
   private List<GameObject> clouds;
   private Vector3[] sunPositions;
 
-  private string[] groundColors, skyColors, cloudColors, shadowColors;
+  public string[] groundColors, skyColors, cloudColors, shadowColors;
+
+  void Awake()
+  {
+    // wake up game manager
+    GameManager.Instance.WakeUp();
+  }
 
   // Use this for initialization
   void Start()
@@ -92,6 +98,7 @@ public class BackgroundManager : MonoBehaviour {
   public void ChangeTimeState(int newState)
   {
     timeOfDay = (TIME_OF_DAY) newState;
+    if (timeOfDay >= TIME_OF_DAY.NIGHT) timeOfDay = TIME_OF_DAY.NIGHT;
 
     UpdateBGProperties();
     UpdateAllClouds();
@@ -183,14 +190,17 @@ public class BackgroundManager : MonoBehaviour {
     Utility.SetColorFromHex(shadow, shadowColors[(int)timeOfDay]);
   }
 
-  public void ChangeSignColors(DAY_STATE state)
+  public void ChangeSignColors(GameObject sign, DAY_STATE state)
   {
-    Image back = GameObject.Find("shift_object/shift_back").GetComponent<Image>();
-    Image front = GameObject.Find("shift_object/shift_front").GetComponent<Image>();
-    Text text = GameObject.Find("shift_object/shift_sign_text").GetComponent<Text>();
-
+    Image[] backings = sign.GetComponentsInChildren<Image>();
+    Text text = sign.GetComponentInChildren<Text>();
+    ButtonBehaviour[] buttons = sign.GetComponentsInChildren<ButtonBehaviour>();
     text.color = Utility.GetColorFromHex(shadowColors[(int)state]);
-    back.color = Utility.GetColorFromHex(shadowColors[(int)state]);
-    front.color = Utility.GetColorFromHex(skyColors[(int)state]);
+    backings[0].color = Utility.GetColorFromHex(shadowColors[(int)state]);
+    backings[1].color = Utility.GetColorFromHex(skyColors[(int)state]);
+    foreach(ButtonBehaviour button in buttons)
+    {
+      button.ChangeButtonColors((int)state, skyColors, shadowColors);
+    }
   }
 }

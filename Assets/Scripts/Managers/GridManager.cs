@@ -157,12 +157,16 @@ public class GridManager : MonoBehaviour {
     grid[0][0].GetComponent<GridScript>().ToggleGridType(type);
     grid[0][0].GetComponentInChildren<GridScript>().EmitEatenParticles();
     GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+    // play sfx
+    GameManager.Instance.SFX().PlaySoundWithPitch("boom1", 0.9f, 1.1f);
 
     LeanTween.delayedCall(0.5f, () =>
     {
       grid[1][1].GetComponent<GridScript>().ToggleGridType(type);
       grid[1][1].GetComponentInChildren<GridScript>().EmitEatenParticles();
       GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+      // play sfx
+      GameManager.Instance.SFX().PlaySoundWithPitch("boom1", 0.9f, 1.1f);
     });
   }
 

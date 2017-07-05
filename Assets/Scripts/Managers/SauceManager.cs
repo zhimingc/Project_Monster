@@ -9,7 +9,7 @@ public class SauceManager : MonoBehaviour {
 
   // Use this for initialization
   void Start() {
-    foreach (GameObject sauce in sauces) sauce.SetActive(false);
+    //foreach (GameObject sauce in sauces) sauce.SetActive(false);
 
   }
 	
@@ -23,6 +23,9 @@ public class SauceManager : MonoBehaviour {
         sauce.SetActive(true);
         sauce.GetComponentInChildren<ParticleSystem>().Play();
         GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+
+        // play sfx
+        GameManager.Instance.SFX().PlaySoundWithPitch("boom1", 0.9f, 1.1f);
       });
       lagTimer += 0.5f;
     }
