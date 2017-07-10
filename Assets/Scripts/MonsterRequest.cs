@@ -2,13 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum MONSTER_TYPE
+{
+  NORMAL,
+  TIMED,
+};
+
+public struct MonsterTypeParams
+{
+  // timed monsters
+  public float curTimer, maxTimer;
+}
+
 public class MonsterRequest : MonoBehaviour {
 
   public GameObject ingredientObj, speechBubble, monsterObj;
   public Request request;
+  public MONSTER_TYPE monsterType;
 
   private List<GameObject> ingredientStackObjs;
   private Vector3 originScale;
+
+  // monster specific behaviour
+  private MonsterTypeParams typeParams;
+  public GameObject stopwatch;
 
   // Use this for initialization
   void Start () {
@@ -17,8 +34,54 @@ public class MonsterRequest : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+    MonsterUpdate();
+
+  }
+
+  void MonsterUpdate()
+  {
+    if (GameManager.Instance.IsPaused()) return;
+
+    switch (monsterType)
+    {
+      case MONSTER_TYPE.TIMED:
+        if (typeParams.curTimer <= 0.0f)
+        {
+          // times up
+          GameManager.Instance.SetLoseBehaviour();
+        }
+        else
+        {
+          typeParams.curTimer -= Time.deltaTime;
+          float cutoff = 0.001f + (1.0f - typeParams.curTimer / typeParams.maxTimer);
+          stopwatch.GetComponentInChildren<MeshRenderer>().material.SetFloat("_Cutoff", cutoff);
+
+          // text feedback
+          string timeString = "";
+          if (typeParams.curTimer > 10.0f) timeString = typeParams.curTimer.ToString("0");
+          else timeString = typeParams.curTimer.ToString("0.0");
+          stopwatch.GetComponentInChildren<TextMesh>().text = timeString;
+        }
+        break;
+    }
+  }
+
+  void SetMonsterType(Request req)
+  {
+    monsterType = req.monsterType;
+    typeParams = req.typeParams;
+
+    // init depending on monster type
+    switch (monsterType)
+    {
+      case MONSTER_TYPE.NORMAL:
+        stopwatch.SetActive(false);
+        break;
+      case MONSTER_TYPE.TIMED:
+        stopwatch.SetActive(true);
+        break;
+    }
+  }
 
   public void ToggleSpeechBubble(bool flag)
   {
@@ -36,6 +99,9 @@ public class MonsterRequest : MonoBehaviour {
   public void SetRequest(Request req)
   {
     request = req;
+
+    // Set new monster type
+    SetMonsterType(req);
 
     // reset ingredient stack obj
     for (int i = 0; i < ingredientStackObjs.Count; ++i)

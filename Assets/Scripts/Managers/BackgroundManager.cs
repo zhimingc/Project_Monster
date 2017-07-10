@@ -163,6 +163,10 @@ public class BackgroundManager : MonoBehaviour {
         toMove = progress * (sunPositions[2] - sunPositions[1]);
         LeanTween.move(bgSun, sunPositions[1] + toMove, 0.5f);
         break;
+      case TIME_OF_DAY.NIGHT:
+        //toMove = progress * (sunPositions[2] - sunPositions[1]);
+        //LeanTween.move(bgSun, sunPositions[1] + toMove, 0.5f);
+        break;
     }
   }
 

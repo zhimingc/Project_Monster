@@ -34,9 +34,10 @@ static public class InputMan {
       case RuntimePlatform.IPhonePlayer:
         res = Input.GetTouch(0).phase == TouchPhase.Ended;
         break;
-      case RuntimePlatform.WebGLPlayer:
-      case RuntimePlatform.WindowsPlayer:
-      case RuntimePlatform.OSXPlayer:
+      default:
+        //case RuntimePlatform.WebGLPlayer:
+        //case RuntimePlatform.WindowsPlayer:
+        //case RuntimePlatform.OSXPlayer:
         res = Input.GetMouseButtonUp(0);
         break;
     }

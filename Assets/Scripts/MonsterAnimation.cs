@@ -7,11 +7,12 @@ public class MonsterAnimation : MonoBehaviour {
   // Animation properties
   public float animTime;
   public GameObject requestObj, parent;
+  public Vector3 origin;// originScale;
 
   private float[] boundaries;
-  private Vector3 origin;// originScale;
   private BackgroundManager backMan;
   private Sprite[] monsterStates;
+  //private int delayedCallID;
 
   // Use this for initialization
   void Awake () {
@@ -37,6 +38,14 @@ public class MonsterAnimation : MonoBehaviour {
     parent.transform.position = new Vector3(boundaries[1], 0, 0);
   }
 
+  public void ForceMoveComplete()
+  {
+    LeanTween.cancel(parent);
+    LeanTween.cancel(gameObject);
+    //GetComponent<Animator>().SetBool("isMoving", false);
+    parent.transform.position = origin;
+  }
+
   public void MoveInFrom(Vector3 from)
   {
     // monsters moving out are angry (sprite)
@@ -51,7 +60,7 @@ public class MonsterAnimation : MonoBehaviour {
 
     //LeanTween.scale(gameObject, originScale, animTime);
     LeanTween.move(parent, origin, animTime).setEase(LeanTweenType.easeInOutQuad);
-    LeanTween.delayedCall(animTime, () =>
+    LeanTween.delayedCall(gameObject, animTime, () =>
     {
       GetComponent<Animator>().SetBool("isMoving", false);
     });

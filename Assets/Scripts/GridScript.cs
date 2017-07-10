@@ -9,6 +9,8 @@ public class GridScript : MonoBehaviour {
   public SAUCE_TYPE sauceType;  // lunch mechanic
   public GRID_TYPE gridType;    // dinner mechanic
   public int[] coordinates;
+  public GameObject monsterServeObj;  // graphics to show that you can serve
+  public bool canServe;         // flag to indicate if this grid meets any requests
 
   private List<GameObject> stackObjs;
   private PlayerScript playerScript;
@@ -16,7 +18,8 @@ public class GridScript : MonoBehaviour {
   private INGREDIENT_TYPE tmpHold; // Holds ingredient for eater
   private SAUCE_TYPE tmpSauce;     // Holds sauce type when hovering new sauce
   private int maxIngredients;      // maximum ingredients the grid can hold
-
+  private MonsterRequest monReq;   // request this grid meets
+  
   // feedback
   private ParticleSystem psObj;
   private GameObject exclaimObj;
@@ -31,7 +34,10 @@ public class GridScript : MonoBehaviour {
 
     psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
     exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);
-    //exclaimObj.GetComponent<SpriteRenderer>().enabled = false;
+    monsterServeObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/monster_serve"), transform);
+    
+    // Init can serve variables
+    SetCanServe(false);
   }
 
 	// Use this for initialization
@@ -72,7 +78,6 @@ public class GridScript : MonoBehaviour {
     // Audio feedback
     string name = null;
     
-
     if (playerScript.blockBeingDragged.GetComponent<IngredientBlock>().IsSauceBlock())
     {
       name = "splat";
@@ -93,7 +98,6 @@ public class GridScript : MonoBehaviour {
           break;
       }
     }
-
 
     GameManager.Instance.SFX().PlaySoundWithPitch(name, 0.7f, 0.9f);
   }
@@ -121,6 +125,9 @@ public class GridScript : MonoBehaviour {
 
       // Update mouse up event
       playerScript.SetMouseUpDel(GridMouseUp);
+
+      // Update ability to serve
+      GameManager.Instance.monsterMan.CheckRequestMetAll();
     }
   }
 
@@ -190,6 +197,9 @@ public class GridScript : MonoBehaviour {
   {
     gridType = type;
     UpdateStackDisplay();
+
+    // Update ability to serve
+    GameManager.Instance.monsterMan.CheckRequestMetAll();
   }
 
   void UpdateStackDisplay()
@@ -253,6 +263,29 @@ public class GridScript : MonoBehaviour {
 
       // Update mouse up event
       playerScript.ResetMouseUpDel();
+
+      // Update ability to serve
+      GameManager.Instance.monsterMan.CheckRequestMetAll();
+    }
+    
+
+  }
+
+  void OnMouseOver()
+  {
+    OnTouchStay();
+  }
+
+  public void OnTouchStay()
+  {
+    // Serve request if able to
+    if (InputMan.OnDown())
+    {
+      if (canServe)
+      {
+        GameManager.Instance.monsterMan.ServeMonsterRequest(this, monReq);
+        SetCanServe(false);
+      }
     }
   }
 
@@ -284,5 +317,12 @@ public class GridScript : MonoBehaviour {
     tmpSauce = SAUCE_TYPE.EMPTY;
     RemoveEaterIngredient();
     UpdateStackDisplay();
+  }
+
+  public void SetCanServe(bool flag, MonsterRequest setReq = null)
+  {
+    canServe = flag;
+    monsterServeObj.SetActive(flag);
+    monReq = setReq;
   }
 }

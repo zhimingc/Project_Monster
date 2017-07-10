@@ -17,14 +17,14 @@ public class PlayerScript : MonoBehaviour {
   public GridScript hoveredGrid;
 
   private GridManager gridMan;
-  private MonsterManager monsterMan;
+  //private MonsterManager monsterMan;
   private bool deleteIngredientFlag;
   private MouseUpBehaviour mouseUpDelegate;
 
   void Awake()
   {
     gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
-    monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
+    //monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
   }
 
 	// Use this for initialization
@@ -58,7 +58,7 @@ public class PlayerScript : MonoBehaviour {
   void CheckIfRequestMet()
   {
     //monsterMan.CheckRequestsMet(gridMan.grid);
-    monsterMan.CheckRequestMetAll(gridMan.grid);
+    //monsterMan.CheckRequestMetAll();
   }
 
   public PLAYER_STATE GetPlayerState()
@@ -106,7 +106,7 @@ public class PlayerScript : MonoBehaviour {
   void UpdateIngredientBlock()
   {
     // When an ingredient block is being dragged
-    if (Input.GetMouseButtonUp(0) && playerState == PLAYER_STATE.DRAGGING &&
+    if (InputMan.OnUp() && playerState == PLAYER_STATE.DRAGGING &&
       blockBeingDragged != null)
     {
       IngredientBlock blockScript = blockBeingDragged.GetComponent<IngredientBlock>();

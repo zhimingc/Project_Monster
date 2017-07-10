@@ -24,20 +24,22 @@ public class GameManager : Singleton<GameManager>
   public ScoreManager scoreMan;
   public DayManager dayMan;
   public SFXManager sfxMan;
+  public MonsterManager monsterMan;
+  public GridManager gridMan;
 
   private LoadManager loadMan;
   private MusicManager musicMan;
   private UIManager uiMan;
-  private GridManager gridMan;
-  private MonsterManager monsterMan;
   private BackgroundManager backMan;
 
   public bool startWithHelp, helpToggler;
+  private bool isPaused;
 
   public void WakeUp() { }
 
   void Awake()
   {
+    isPaused = false;
     startWithHelp = false;
     scoreMan = new ScoreManager();
     sfxMan = gameObject.AddComponent<SFXManager>();
@@ -85,6 +87,16 @@ public class GameManager : Singleton<GameManager>
       monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
       backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
     }
+  }
+
+  public bool IsPaused()
+  {
+    return isPaused;
+  }
+
+  public void SetIsPaused(bool flag)
+  {
+    isPaused = flag;
   }
 
   public SFXManager SFX()
@@ -193,6 +205,7 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.CONTINUE_GAME:
         dayMan.endOfDaySign.GetComponent<Animator>().SetTrigger("isExit");
+        SetIsPaused(false);
         break;
     }
   }
@@ -275,6 +288,9 @@ public class GameManager : Singleton<GameManager>
 
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
   {
+    // start the scene with pause off
+    SetIsPaused(false);
+
     InitializeManagers();
     if (startWithHelp) ToggleHelpScreen();
     helpToggler = true;
@@ -299,8 +315,8 @@ public class GameManager : Singleton<GameManager>
     scoreMan.AddScore(amt);
 
     // Check for day change
-    dayMan.CheckForShiftChange();
     dayMan.UpdateProgressBar();
+    dayMan.CheckForShiftChange();
   }
 
   public void SetGameState(GAME_STATE state)
@@ -314,12 +330,12 @@ public class GameManager : Singleton<GameManager>
 
         break;
       case GAME_STATE.LOSE:
-        SetLoseBehaviour();
+        //SetLoseBehaviour();
         break;
     }
   }
 
-  void SetLoseBehaviour()
+  public void SetLoseBehaviour()
   {
     backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
 
@@ -327,6 +343,9 @@ public class GameManager : Singleton<GameManager>
     uiMan.ToggleLoseText(true);
     // Turn off monster request boxes
     monsterMan.ToggleMonsterRequests(false);
+
+    SetGameState(GAME_STATE.LOSE);
+    SetIsPaused(true);
   }
 
   public void CheckLevelComplete()
@@ -334,7 +353,7 @@ public class GameManager : Singleton<GameManager>
     // Lose the game is a grid is full
     if (gridMan.IfGridFull())
     {
-      SetGameState(GAME_STATE.LOSE);
+      SetLoseBehaviour();
     }
   }
 }

@@ -14,13 +14,16 @@ public class RequestParameters
 
   public int[] ingCountRange;
   public int topBreadProbability;
-  public bool isTimerOn;
 
   // Weighted distributions (out of a 100)
   public int[] sauceDist = new int[] { 33, 33, 34 };
   public int[] waresDist = new int[] { 50, 50 };
   public int[] ingredientDist = new int[] { 50, 50 };
   public int weightSwing = 10;  // swings the weight of the other distributions by this amt
+
+  // Contract parameters
+  public bool timerContractOn;
+  public float timerMax;
 };
 
 [System.Serializable]
@@ -32,9 +35,25 @@ public class Request
     sauce = SAUCE_TYPE.EMPTY;
   }
 
+  public bool IsSameAs(Request lhs)
+  {
+    if (ingredients.Count != lhs.ingredients.Count) return false;
+    if (sauce != lhs.sauce || gridType != lhs.gridType) return false;
+
+    for (int i = 0; i < ingredients.Count; ++i)
+    {
+      if (ingredients[i] != lhs.ingredients[i])
+        return false;
+    }
+
+    return true;
+  }
+
   public List<INGREDIENT_TYPE> ingredients;
   public SAUCE_TYPE sauce;
   public GRID_TYPE gridType;
+  public MONSTER_TYPE monsterType;
+  public MonsterTypeParams typeParams;
 };
 
 public class MonsterManager : MonoBehaviour {
@@ -79,20 +98,12 @@ public class MonsterManager : MonoBehaviour {
       box.InitStack();
       box.SetRequest(req);
     }
-
-    // Init request timer
-    if (!rp.isTimerOn)
-    {
-      //GameObject.Find("timer_text").GetComponent<Text>().enabled = false;
-      //timerDisplay.GetComponent<SpriteRenderer>().enabled = false;
-    }
-    //ResetRequestTimer();
   }
 	
 	// Update is called once per frame
 	void Update () {
     // Timer for requests
-    if (rp.isTimerOn) UpdateRequestTimer();
+    //if (rp.isTimerOn) UpdateRequestTimer();
 
     if (Input.GetKeyDown(KeyCode.R))
     {
@@ -125,9 +136,21 @@ public class MonsterManager : MonoBehaviour {
     }
   }
 
-  public void CheckRequestMetAll(List<List<GameObject>> grid)
+  public void CheckRequestMetAll()
   {
-    foreach(MonsterRequest obj in requestBoxes)
+    var grid = GameManager.Instance.gridMan.grid;
+
+    // set all grids to cannot serve first
+    for (int x = 0; x < grid.Count; ++x)
+    {
+      for (int y = 0; y < grid[x].Count; ++y)
+      {
+        GridScript gs = grid[x][y].GetComponent<GridScript>();
+        gs.SetCanServe(false);
+      }
+    }
+
+    foreach (MonsterRequest obj in requestBoxes)
     {
       CheckRequestMet(grid, obj);
     }
@@ -136,12 +159,15 @@ public class MonsterManager : MonoBehaviour {
   public void CheckRequestMet(List<List<GameObject>> grid, MonsterRequest reqBox)
   {
     Request req = reqBox.request;
+    //lhs.ingredients.Remove(INGREDIENT_TYPE.EATER);
 
     for (int x = 0; x < grid.Count; ++x)
     {
       for (int y = 0; y < grid[x].Count; ++y)
       {
         GridScript gs = grid[x][y].GetComponent<GridScript>();
+        List<INGREDIENT_TYPE> gridIngredients = new List<INGREDIENT_TYPE>(gs.ingredientStack);
+        gridIngredients.RemoveAll((INGREDIENT_TYPE type) => { return type == INGREDIENT_TYPE.EATER; });
 
         // Check if grid request is met
         if (req.gridType != gs.gridType) continue;
@@ -150,47 +176,52 @@ public class MonsterManager : MonoBehaviour {
         if (req.sauce != gs.sauceType) continue;
         
         // Check if ingredients request is met
-        if (req.ingredients.Count != gs.ingredientStack.Count) continue;
+        if (req.ingredients.Count != gridIngredients.Count) continue;
         bool same = true;
         for (int i = 0; i < req.ingredients.Count; ++i)
         {
-          if (req.ingredients[i] != gs.ingredientStack[i]) same = false;
+          if (req.ingredients[i] != gridIngredients[i]) same = false;
         }
         if (!same) continue;
 
-        // request has been met
-        gs.ClearStack();
-        //AdvanceRequests();
-
-        // feedback for request met
-        GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
-        PlayEatingSound();
-
-        // Increase score
-        GameManager.Instance.AddScore(1);
-        UpdateReqeustMet(reqBox);
-
-        // Animate monsters in/out
-        Vector3 monsPos = reqBox.GetComponent<MonsterRequest>().monsterObj.transform.position;
-        foreach(GameObject reserve in reserveMonsters)
-        {
-          MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
-          if (anim.isAnimating()) continue;
-          anim.MoveOutFrom(monsPos);
-          break;
-        }
-
-        //Vector3 moveIn = reqBox.transform.position;
-        Vector3 moveIn = monsPos;
-        moveIn.x = -7;
-        reqBox.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
-
-        // Continue recursively to check for any other completes
-        //CheckRequestMet(grid);
-        CheckRequestMetAll(grid);
-        return;
+        //ServeMonsterRequest(gs, reqBox);
+        gs.SetCanServe(true, reqBox);
       }
     }
+  }
+
+  public void ServeMonsterRequest(GridScript gs, MonsterRequest reqBox)
+  {
+    // request has been met
+    gs.ClearStack();
+    //AdvanceRequests();
+
+    // feedback for request met
+    GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+    PlayEatingSound();
+
+    // Increase score
+    GameManager.Instance.AddScore(1);
+    UpdateReqeustMet(reqBox);
+
+    // Animate monsters in/out
+    reqBox.monsterObj.GetComponent<MonsterAnimation>().ForceMoveComplete();
+    Vector3 monsPos = reqBox.monsterObj.GetComponent<MonsterAnimation>().origin;
+    foreach (GameObject reserve in reserveMonsters)
+    {
+      MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
+      if (anim.isAnimating()) continue;
+      anim.MoveOutFrom(monsPos);
+      break;
+    }
+
+    //Vector3 moveIn = reqBox.transform.position;
+    Vector3 moveIn = monsPos;
+    moveIn.x = -7;
+    reqBox.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
+
+    // update serve ability of grids;
+    CheckRequestMetAll();
   }
 
   public void AddSauceToAllRequests()
@@ -225,6 +256,7 @@ public class MonsterManager : MonoBehaviour {
   void UpdateReqeustMet(MonsterRequest box)
   {
     int index = requestBoxes.IndexOf(box);
+    requestBoxes[index].request = new Request();
     requestBoxes[index].SetRequest(GenerateRandomRequest());
   }
 
@@ -241,9 +273,34 @@ public class MonsterManager : MonoBehaviour {
     ResetRequestTimer();
   }
 
+  void GenMonsterType(out Request req)
+  {
+    req = new Request();
+
+    List<int> allMonsterTypes = new List<int>();
+    // List of contracted monsters
+    allMonsterTypes.Add(0);
+    if (rp.timerContractOn) allMonsterTypes.Add((int)MONSTER_TYPE.TIMED);
+
+    // Generate monster type
+    req.monsterType = (MONSTER_TYPE) allMonsterTypes[Random.Range(0, allMonsterTypes.Count)];
+
+    switch (req.monsterType)
+    {
+      case MONSTER_TYPE.TIMED:
+        req.typeParams.maxTimer = rp.timerMax;
+        req.typeParams.curTimer = rp.timerMax;
+        break;
+    }
+  }
+  
+
   Request GenerateRandomRequest()
   {
     Request req = new Request();
+
+    // Determine monster type
+    GenMonsterType(out req);
 
     // Add bot bread
     req.ingredients.Add(INGREDIENT_TYPE.BREAD);
@@ -279,6 +336,17 @@ public class MonsterManager : MonoBehaviour {
       //req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
       req.gridType = (GRID_TYPE)GenerateWithDist(rp.waresDist);
       SwingWeights((int)req.gridType, rp.waresDist);
+    }
+
+    // Reroll if the request is the same as any existing request
+    foreach (MonsterRequest existing in requestBoxes)
+    {
+      //if (existing.request.IsSameAs(req))
+      if (req.IsSameAs(existing.request))
+      {
+        req = GenerateRandomRequest();
+        break;
+      }
     }
 
     return req;
@@ -331,22 +399,22 @@ public class MonsterManager : MonoBehaviour {
     //timerDisplay.transform.localScale = timerScale;
   }
 
-  void UpdateRequestTimer()
-  {
-    currentTimer -= Time.deltaTime;
-    UpdateTimerText();
+  //void UpdateRequestTimer()
+  //{
+  //  currentTimer -= Time.deltaTime;
+  //  UpdateTimerText();
 
-    // Player loses if they run out of time
-    if (currentTimer <= 0.0f)
-    {
-      GameManager.Instance.SetGameState(GAME_STATE.LOSE);
-    }
-    else
-    {
-      // Update timer display
-      //float offsetAmt = (1 - (currentTimer / maxTimer)) * timerScale.y;
-      //timerDisplay.transform.position = timerPos - new Vector3(0, offsetAmt / 2.0f, 0);
-      //timerDisplay.transform.localScale = timerScale - new Vector3(0, offsetAmt, 0);
-    }
-  }
+  //  // Player loses if they run out of time
+  //  if (currentTimer <= 0.0f)
+  //  {
+  //    GameManager.Instance.SetGameState(GAME_STATE.LOSE);
+  //  }
+  //  else
+  //  {
+  //    // Update timer display
+  //    //float offsetAmt = (1 - (currentTimer / maxTimer)) * timerScale.y;
+  //    //timerDisplay.transform.position = timerPos - new Vector3(0, offsetAmt / 2.0f, 0);
+  //    //timerDisplay.transform.localScale = timerScale - new Vector3(0, offsetAmt, 0);
+  //  }
+  //}
 }

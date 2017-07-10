@@ -39,7 +39,7 @@ public class DayManager : MonoBehaviour {
     endOfDaySign = GameObject.Find("win_sign");
 
     initialProgressSize = progressBar.transform.localScale.x;
-    UpdateProgressBar();
+    //UpdateProgressBar();
     CheckForShiftChange();
     backMan.ChangeSignColors(shiftChangeObj, DAY_STATE.BREAKFAST);
   }
@@ -103,6 +103,7 @@ public class DayManager : MonoBehaviour {
       case DAY_STATE.WIN:
         backMan.ChangeSignColors(endOfDaySign, DAY_STATE.DINNER);
         endOfDaySign.GetComponent<Animator>().SetTrigger("isEnter");
+        GameManager.Instance.SetIsPaused(true);
         break;
     }
   }
@@ -116,7 +117,7 @@ public class DayManager : MonoBehaviour {
 
     int curShiftLim = shiftIntervals[curShift];
 
-    float progressScaler = ((float)GameManager.Instance.scoreMan.score - curShiftBase) / (curShiftLim);
+    float progressScaler = ((float)GameManager.Instance.scoreMan.score - curShiftBase) / (curShiftLim - curShiftBase);
     if (progressScaler >= 1.0f) progressScaler = 1.0f;
     backMan.UpdateSunPosition(progressScaler);
 

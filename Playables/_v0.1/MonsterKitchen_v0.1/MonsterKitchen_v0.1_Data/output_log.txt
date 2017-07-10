@@ -7,28 +7,28 @@ Direct3D:
     VRAM:     2019 MB
     Driver:   22.21.13.8233
 Begin MonoManager ReloadAssembly
-Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.dll (this message is harmless)
-Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.dll into Unity Child Domain
-Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
-Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
-Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
-Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.097 seconds
-Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\System.Core.dll (this message is harmless)
-Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\System.dll (this message is harmless)
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.682 seconds
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Aftershock PC\Desktop\Projects\Project_Monster\Playables\_v0.1\MonsterKitchen_v0.1\MonsterKitchen_v0.1_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 5.724158 ms
+UnloadTime: 3.494795 ms
 [Singleton] An instance of GameManager is needed in the scene, so '(singleton) GameManager (UnityEngine.GameObject)' was created with DontDestroyOnLoad.
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: 2e24 -> priority: 1 
-  Thread -> id: 1a3c -> priority: 1 
-  Thread -> id: 2b6c -> priority: 1 
-  Thread -> id: 2a8 -> priority: 1 
+  Thread -> id: 34f0 -> priority: 1 
+  Thread -> id: 31c0 -> priority: 1 
+  Thread -> id: c9c -> priority: 1 
+  Thread -> id: 3938 -> priority: 1 
