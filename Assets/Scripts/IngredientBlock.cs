@@ -2,62 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IngredientBlock : MonoBehaviour {
-
+public class IngredientBlock : BlockBehaviour
+{
   public List<GameObject> ingredients;
-  public bool beingDragged, isUsable;
-  public Vector2[] layout;
-  public Vector3 oldPos;
-  public bool isReverseLayout;
-
-  private PlayerScript playerScript;
-  private IngredientManager ingredientMan;
-
-  // UI for being dragged
-  public Vector3 draggedScale, idleScale;
-  private LTDescr moveDescr;
-
-  void Awake()
-  {
-    isReverseLayout = false;
-    //isBigScale = false;
-    playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
-    ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
-  }
-
-  // Use this for initialization
-	void Start () {
-    //isUsable = true;
-    beingDragged = false;
-    //draggedScale = transform.localScale;
-
-    // initialize as idle scale
-    ToggleUsability(isUsable);
-    //transform.localScale = idleScale;
-  }
-	
-	// Update is called once per frame
-	void Update () {
-    if (beingDragged)
-    {
-      DragUpdate();
-    }
-  }
 
   public bool IsSauceBlock()
   {
     return ingredients[0].GetComponent<IngredientScript>().type == INGREDIENT_TYPE.SAUCE;
-  }
-
-  public void SetIdleScale(float scaling)
-  {
-    idleScale = transform.localScale * scaling;
-    draggedScale = transform.localScale;
-  }
-
-  public void SetIdleScale(Vector3 scaling)
-  {
-    idleScale = scaling;
   }
 
   public void AddIngredient(GameObject ingredient) 
@@ -92,7 +43,7 @@ public class IngredientBlock : MonoBehaviour {
     transform.position = pos;
   }
 
-  public void StopDrag(bool deleteIngredient)
+  new public void StopDrag(bool deleteIngredient)
   {
     if (deleteIngredient == false)
     {
@@ -116,33 +67,7 @@ public class IngredientBlock : MonoBehaviour {
 
   }
 
-  void ReturnToOrigin()
-  {
-    if (moveDescr != null) LeanTween.cancel(moveDescr.id);
-    moveDescr = LeanTween.move(gameObject, oldPos, 0.25f).setEase(LeanTweenType.easeOutQuad);
-  }
-
-  public void ToggleScale()
-  {
-    if (beingDragged)
-    {
-      //isBigScale = true;
-      transform.localScale = idleScale;
-      LeanTween.scale(gameObject, draggedScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
-
-      InteractSFX(true);
-    }
-    else
-    {
-      //isBigScale = false;
-      transform.localScale = draggedScale;
-      LeanTween.scale(gameObject, idleScale, 0.25f).setEase(LeanTweenType.easeOutQuad);
-
-      InteractSFX(false);
-    }
-  }
-
-  public void StartDrag()
+  new public void StartDrag()
   {
     beingDragged = true;
     GetComponent<BoxCollider2D>().enabled = false;
@@ -159,49 +84,5 @@ public class IngredientBlock : MonoBehaviour {
   void OnMouseOver()
   {
     OnTouchStay();
-  }
-
-  public void OnTouchStay()
-  {
-    //if (Input.GetMouseButtonDown(0) && playerScript.GetPlayerState() == PLAYER_STATE.IDLE) 
-    if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
-    {
-      StartDrag();
-    }
-  }
-
-  public void InteractSFX(bool flag)
-  {
-    if (flag)
-    {
-      var clip = GameManager.Instance.SFX().GetAudio("upslide");
-      clip.pitch = Random.Range(0.7f, 0.9f);
-      GameManager.Instance.SFX().PlaySound(clip);
-    }
-    else
-    {
-      var clip = GameManager.Instance.SFX().GetAudio("downslide");
-      clip.pitch = Random.Range(0.7f, 0.9f);
-      GameManager.Instance.SFX().PlaySound(clip);
-    }
-  }
-
-  public void ToggleUsability(bool flag)
-  {
-    isUsable = flag;
-    if (isUsable == true)
-    {
-      GetComponent<BoxCollider2D>().enabled = true;
-      GetComponent<SpriteRenderer>().enabled = true;
-      //GetComponent<SpriteRenderer>().color = Color.white;
-      transform.localScale = idleScale;
-    }
-    else
-    {
-      GetComponent<BoxCollider2D>().enabled = false;
-      GetComponent<SpriteRenderer>().enabled = true;
-      //GetComponent<SpriteRenderer>().color = Color.white;
-      transform.localScale = idleScale * 0.75f;
-    }
   }
 }

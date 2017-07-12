@@ -77,29 +77,34 @@ public class GridScript : MonoBehaviour {
   {
     // Audio feedback
     string name = null;
-    
-    if (playerScript.blockBeingDragged.GetComponent<IngredientBlock>().IsSauceBlock())
+
+    if (playerScript.IsTypeOfBlock<IngredientBlock>())
     {
-      name = "splat";
-    }
-    else
-    {
-      int thud = Random.Range(0, 3);
-      switch (thud)
+      IngredientBlock ingredientBlock = (IngredientBlock)playerScript.blockBeingDragged;
+      if (ingredientBlock.IsSauceBlock())
       {
-        case 0:
-          name = "thud1";
-          break;
-        case 1:
-          name = "thud2";
-          break;
-        case 2:
-          name = "thud3";
-          break;
+        name = "splat";
+      }
+      else
+      {
+        int thud = Random.Range(0, 3);
+        switch (thud)
+        {
+          case 0:
+            name = "thud1";
+            break;
+          case 1:
+            name = "thud2";
+            break;
+          case 2:
+            name = "thud3";
+            break;
+        }
       }
     }
 
-    GameManager.Instance.SFX().PlaySoundWithPitch(name, 0.7f, 0.9f);
+    if (name != null) GameManager.Instance.SFX().PlaySoundWithPitch(name, 0.7f, 0.9f);
+
   }
 
   void OnMouseEnter()
@@ -114,14 +119,20 @@ public class GridScript : MonoBehaviour {
     {
       if (!CheckIfLegalMove()) return;
 
-      // Stop grid from moving
-      playerScript.blockBeingDragged.GetComponent<IngredientBlock>().beingDragged = false;
-      playerScript.blockBeingDragged.ToggleIngredients(false);
+      if (playerScript.IsTypeOfBlock<IngredientBlock>())
+      {
+        IngredientBlock ingredientBlock = (IngredientBlock)playerScript.blockBeingDragged;
 
-      // Update grid with move
-      playerScript.blockBeingDragged.SetBlockPosition(transform.position);
-      playerScript.SetHoveredGrid(this);
-      gridMan.AddIngredientBlockToGrid(this, playerScript.blockBeingDragged);
+        // Stop grid from moving
+        ingredientBlock.beingDragged = false;
+        ingredientBlock.ToggleIngredients(false);
+
+        // Update grid with move
+        //playerScript.blockBeingDragged.SetBlockPosition(transform.position);
+        playerScript.SetHoveredGrid(this);
+        gridMan.AddIngredientBlockToGrid(this, ingredientBlock);
+      }
+
 
       // Update mouse up event
       playerScript.SetMouseUpDel(GridMouseUp);
@@ -131,7 +142,7 @@ public class GridScript : MonoBehaviour {
     }
   }
 
-  public void AddIngredientToStack(IngredientScript ingredient)
+  public void AddToStack(IngredientScript ingredient)
   {
     // Change behaviour depending on ingredient type
     switch(ingredient.type)
@@ -163,7 +174,7 @@ public class GridScript : MonoBehaviour {
     UpdateStackDisplay();
   }
 
-  public void RemoveIngredientFromStack(IngredientScript ingredient)
+  public void RemoveFromStack(IngredientScript ingredient)
   {
     // Change behaviour depending on ingredient type
     switch (ingredient.type)
@@ -256,19 +267,20 @@ public class GridScript : MonoBehaviour {
     {
       playerScript.SetHoveredGrid(null);
 
-      // Stop grid from moving
-      playerScript.blockBeingDragged.GetComponent<IngredientBlock>().beingDragged = true;
-      playerScript.blockBeingDragged.ToggleIngredients(true);
-      gridMan.RemoveIngredientBlockFromGrid(this, playerScript.blockBeingDragged);
-
+      if (playerScript.IsTypeOfBlock<IngredientBlock>())
+      {
+        IngredientBlock ingredientBlock = (IngredientBlock)playerScript.blockBeingDragged;
+        // Stop grid from moving
+        ingredientBlock.beingDragged = true;
+        ingredientBlock.ToggleIngredients(true);
+        gridMan.RemoveIngredientBlockFromGrid(this, ingredientBlock);
+      }
       // Update mouse up event
       playerScript.ResetMouseUpDel();
 
       // Update ability to serve
       GameManager.Instance.monsterMan.CheckRequestMetAll();
     }
-    
-
   }
 
   void OnMouseOver()
@@ -296,10 +308,7 @@ public class GridScript : MonoBehaviour {
 
   public bool CheckIfLegalMove()
   {
-    IngredientBlock block = playerScript.blockBeingDragged;
-    //Vector2[] layout = block.layout;
-
-    return gridMan.CheckIfLegalMove(this, block);
+    return gridMan.CheckIfLegalMove(this, playerScript.blockBeingDragged);
   }
 
   public void ClearStack()

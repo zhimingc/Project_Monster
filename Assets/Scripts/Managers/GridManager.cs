@@ -61,7 +61,7 @@ public class GridManager : MonoBehaviour {
     return false;
   }
 
-  public bool CheckIfLegalMove(GridScript singleGrid, IngredientBlock block)
+  public bool CheckIfLegalMove(GridScript singleGrid, BlockBehaviour block)
   {
     Vector2[] layout = block.layout;
     Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
@@ -108,7 +108,7 @@ public class GridManager : MonoBehaviour {
   {
     Vector2[] layout = block.layout;
     Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
-    singleGrid.AddIngredientToStack(block.ingredients[0].GetComponent<IngredientScript>());
+    singleGrid.AddToStack(block.ingredients[0].GetComponent<IngredientScript>());
 
     // Plus 1 because index 0 is the center
     for (int i = 0; i < layout.Length; ++i)
@@ -118,15 +118,16 @@ public class GridManager : MonoBehaviour {
 
       // Call add ingredient
       GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
-      curGrid.AddIngredientToStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+      curGrid.AddToStack(block.ingredients[i+1].GetComponent<IngredientScript>());
     }
   }
+
 
   public void RemoveIngredientBlockFromGrid(GridScript singleGrid, IngredientBlock block)
   {
     Vector2[] layout = block.layout;
     Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
-    singleGrid.RemoveIngredientFromStack(block.ingredients[0].GetComponent<IngredientScript>());
+    singleGrid.RemoveFromStack(block.ingredients[0].GetComponent<IngredientScript>());
 
     // Plus 1 because index 0 is the center
     for (int i = 0; i < layout.Length; ++i)
@@ -136,7 +137,7 @@ public class GridManager : MonoBehaviour {
 
       // Call add ingredient
       GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
-      curGrid.RemoveIngredientFromStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+      curGrid.RemoveFromStack(block.ingredients[i+1].GetComponent<IngredientScript>());
     }
   }
 

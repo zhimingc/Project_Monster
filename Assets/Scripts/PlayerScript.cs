@@ -12,7 +12,7 @@ public delegate void MouseUpBehaviour();
 
 public class PlayerScript : MonoBehaviour {
 
-  public IngredientBlock blockBeingDragged;
+  public BlockBehaviour blockBeingDragged;
   public PLAYER_STATE playerState;
   public GridScript hoveredGrid;
 
@@ -35,7 +35,7 @@ public class PlayerScript : MonoBehaviour {
 
   }
 	
-  public void DragIngredientBlock(IngredientBlock block)
+  public void DragIngredientBlock(BlockBehaviour block)
   {
     blockBeingDragged = block;
   }
@@ -100,6 +100,12 @@ public class PlayerScript : MonoBehaviour {
     mouseUpDelegate = DefaultMouseUpDel;  // reset mouse up behaviour
   }
 
+  public bool IsTypeOfBlock<T>()
+  {
+    if (blockBeingDragged == null) return false;
+    return blockBeingDragged.GetComponent<T>() != null;
+  }
+
   void DefaultMouseUpDel()
   {}
 
@@ -109,12 +115,21 @@ public class PlayerScript : MonoBehaviour {
     if (InputMan.OnUp() && playerState == PLAYER_STATE.DRAGGING &&
       blockBeingDragged != null)
     {
-      IngredientBlock blockScript = blockBeingDragged.GetComponent<IngredientBlock>();
-      blockScript.StopDrag(deleteIngredientFlag);
+      if (blockBeingDragged.GetComponent<IngredientBlock>() != null)
+      {
+        IngredientBlock blockScript = blockBeingDragged.GetComponent<IngredientBlock>();
+        blockScript.StopDrag(deleteIngredientFlag);
+      }
+      if (blockBeingDragged.GetComponent<ItemScript>() != null)
+      {
+        ItemScript blockScript = blockBeingDragged.GetComponent<ItemScript>();
+        blockScript.StopDrag(deleteIngredientFlag);
+      }
+
       mouseUpDelegate();
-      blockBeingDragged = null;
       ResetMouseUpDel();
 
+      blockBeingDragged = null;
       SetPlayerState(PLAYER_STATE.IDLE);
     }
   }
