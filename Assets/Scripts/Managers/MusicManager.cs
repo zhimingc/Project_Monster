@@ -43,6 +43,12 @@ public class MusicManager : MonoBehaviour {
     }
 
     DontDestroyOnLoad(bgmObj);
+
+    // Don't play while in editor
+    if (Application.platform == RuntimePlatform.WindowsEditor)
+    {
+      bgmObj.mute = true;
+    }
   }
 
   // Use this for initialization

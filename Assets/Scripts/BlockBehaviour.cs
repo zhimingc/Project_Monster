@@ -8,6 +8,7 @@ public class BlockBehaviour : MonoBehaviour
   public Vector2[] layout;
   public Vector3 oldPos;
   public bool isReverseLayout;
+  public List<GameObject> childenObjs;
 
   protected PlayerScript playerScript;
   protected IngredientManager ingredientMan;
@@ -16,16 +17,17 @@ public class BlockBehaviour : MonoBehaviour
   public Vector3 draggedScale, idleScale;
   protected LTDescr moveDescr;
 
-  void Awake()
+  protected void Awake()
   {
     isReverseLayout = false;
     //isBigScale = false;
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
+    childenObjs = new List<GameObject>();
   }
 
   // Use this for initialization
-  void Start()
+  protected void Start()
   {
     //isUsable = true;
     beingDragged = false;
@@ -37,12 +39,18 @@ public class BlockBehaviour : MonoBehaviour
   }
 
   // Update is called once per frame
-  void Update()
+  protected void Update()
   {
     if (beingDragged)
     {
       DragUpdate();
     }
+  }
+
+  public void ToggleObjects(bool flag)
+  {
+    foreach (GameObject obj in childenObjs)
+      obj.GetComponent<SpriteRenderer>().enabled = flag;
   }
 
   public void SetIdleScale(float scaling)
@@ -56,7 +64,7 @@ public class BlockBehaviour : MonoBehaviour
     idleScale = scaling;
   }
 
-  void DragUpdate()
+  protected void DragUpdate()
   {
     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     mousePos.z = 0.0f;
@@ -126,20 +134,6 @@ public class BlockBehaviour : MonoBehaviour
     ToggleScale();
   }
 
-  void OnMouseOver()
-  {
-    OnTouchStay();
-  }
-
-  public void OnTouchStay()
-  {
-    //if (Input.GetMouseButtonDown(0) && playerScript.GetPlayerState() == PLAYER_STATE.IDLE) 
-    if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
-    {
-      StartDrag();
-    }
-  }
-
   public void InteractSFX(bool flag)
   {
     if (flag)
@@ -162,15 +156,11 @@ public class BlockBehaviour : MonoBehaviour
     if (isUsable == true)
     {
       GetComponent<BoxCollider2D>().enabled = true;
-      GetComponent<SpriteRenderer>().enabled = true;
-      //GetComponent<SpriteRenderer>().color = Color.white;
       transform.localScale = idleScale;
     }
     else
     {
       GetComponent<BoxCollider2D>().enabled = false;
-      GetComponent<SpriteRenderer>().enabled = true;
-      //GetComponent<SpriteRenderer>().color = Color.white;
       transform.localScale = idleScale * 0.75f;
     }
   }

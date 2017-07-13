@@ -30,8 +30,86 @@ public enum GRID_TYPE
   NUM_GRID
 }
 
-static public class IngredientFactory
+public enum ITEM_TYPE
 {
+  EATER,
+  BIN
+};
+
+
+static public class ObjectFactory
+{
+  // Ingredient block layouts 
+  static public int maxLayout = 2;
+  static public Vector2[][] blockLayouts = new Vector2[][]
+  {
+    new Vector2[] { },                      // single block
+    new Vector2[] { new Vector2( 1, 0 ) },  // double horizontal 
+    new Vector2[] { new Vector2( 0, -1 ) }, // double vertical 
+  };
+
+  static public void GenerateObjectBlock(BlockBehaviour parent, Transform t)
+  {
+    Vector2 ingredientSize = t.localScale;
+    Vector2 newScale = ingredientSize / maxLayout;
+    parent.transform.localScale = newScale;
+    parent.transform.position = t.position;
+    parent.transform.SetParent(t);
+
+    // Create core of ingredient 
+    GameObject ingredientHolder = new GameObject("Holder");
+    ingredientHolder.transform.position = t.position + new Vector3(-newScale.x, newScale.y, 0.0f) / maxLayout;
+    ingredientHolder.transform.localScale = newScale;
+    ingredientHolder.transform.SetParent(parent.transform);
+
+    GameObject ingredientObj = new GameObject("Object");
+    ingredientObj.transform.position = ingredientHolder.transform.position;
+    ingredientObj.transform.localScale = newScale;
+    ingredientObj.transform.SetParent(ingredientHolder.transform);
+    parent.childenObjs.Add(ingredientObj);
+
+    // Create ingredient layout 
+    foreach (Vector2 vec in parent.layout)
+    {
+      GameObject ingredientHolder2 = new GameObject("Holder");
+      ingredientHolder2.transform.position = t.position;
+      ingredientHolder2.transform.localScale = newScale;
+      ingredientHolder2.transform.SetParent(parent.transform);
+
+      // Create ingredients within connection 
+      GameObject newIngredient = new GameObject("Object");
+      newIngredient.transform.localScale = newScale;
+      parent.childenObjs.Add(newIngredient);
+
+      // Initialize new ingredient 
+      Vector3 offset = Vector2.Scale(vec, newScale);
+      newIngredient.transform.position = ingredientHolder.transform.position;
+      newIngredient.transform.position += offset;
+      newIngredient.transform.SetParent(ingredientHolder2.transform);
+    }
+
+    //return parent.childenObjs;
+  }
+
+  static public void InitializeItem(GameObject block, ITEM_TYPE type)
+  {
+    Sprite itemSprite = null;
+
+    switch (type)
+    {
+      case ITEM_TYPE.EATER:
+        itemSprite = Resources.Load<Sprite>("Sprites/cross");
+        block.GetComponent<SpriteRenderer>().sprite = itemSprite;
+        block.GetComponent<SpriteRenderer>().color = Color.red;
+        break;
+      case ITEM_TYPE.BIN:
+        itemSprite = Resources.Load<Sprite>("Sprites/UI/trashcanOpen");
+        block.GetComponent<SpriteRenderer>().sprite = itemSprite;
+        block.GetComponent<SpriteRenderer>().color = Color.black;
+        break;
+    }
+  }
+
   static public void InitializeGrid(GameObject grid, GRID_TYPE type)
   {
     Sprite gridSprite = Resources.Load<Sprite>("Sprites/slot_square");

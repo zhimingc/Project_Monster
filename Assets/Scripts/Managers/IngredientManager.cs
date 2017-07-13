@@ -30,18 +30,9 @@ public class IngredientManager : MonoBehaviour {
   private int ingredientCountdown; // Spawns bread until countdown is up
   private int maxCountdown;
   private int ingredientCountup;   // For specific ingredients spawn, e.g. eater
-  //private int sauceFlipflop;       // Switches between all sauce types
+                                   //private int sauceFlipflop;       // Switches between all sauce types
 
-  // Ingredient block layouts 
-  private int maxLayout = 2; 
-
-  private Vector2[][] blockLayouts = new Vector2[][] 
-  {
-    new Vector2[] { },                      // single block
-    new Vector2[] { new Vector2( 1, 0 ) },  // double horizontal 
-    new Vector2[] { new Vector2( 0, -1 ) }, // double vertical 
-  }; 
- 
+  private int maxLayout;
 
   // Use this for initialization 
   void Awake () { 
@@ -56,6 +47,8 @@ public class IngredientManager : MonoBehaviour {
     ingredientCountup = 0;
     ++numberOfIngredients;  // Because random range excludes max value
     //sauceFlipflop = 1;
+
+    maxLayout = ObjectFactory.maxLayout;
   }
 
   void Start()
@@ -117,12 +110,12 @@ public class IngredientManager : MonoBehaviour {
     //  ingredientTracker = (int)INGREDIENT_TYPE.SAUCE;
     //  sauceTracker = (SAUCE_TYPE) ((++sauceFlipflop) % (int)SAUCE_TYPE.NUM_SAUCE);
     //}
-    if (ingredientCountup % 7 == 0)
-    {
-      // spawns an eater every X turns
-      ingredientTracker = (int)INGREDIENT_TYPE.EATER;
-    }
-    else if (ingredientCountdown-- <= 0)
+    //if (ingredientCountup % 7 == 0)
+    //{
+    //  // spawns an eater every X turns
+    //  ingredientTracker = (int)INGREDIENT_TYPE.EATER;
+    //}
+    if (ingredientCountdown-- <= 0)
     {
       ingredientCountdown = maxCountdown;
       ingredientTracker = ingredientFlipflop;
@@ -150,7 +143,7 @@ public class IngredientManager : MonoBehaviour {
     SAUCE_TYPE sauce = SAUCE_TYPE.EMPTY;
 
     // Get random layout 
-    int layout = Random.Range(0, blockLayouts.Length); 
+    int layout = Random.Range(0, ObjectFactory.blockLayouts.Length); 
  
     // Generate ingredient 
     return GenerateIngredient(type, sauce, layout, transform); 
@@ -175,11 +168,13 @@ public class IngredientManager : MonoBehaviour {
 
       if (isSpawnHorizontal)
       {
-        pos.x = transform.position.x + swing * (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.x * idleScaling) / 2.0f);
+        pos.x = transform.position.x + 
+          swing * (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.x * idleScaling) / 2.0f);
       }
       else
       {
-        pos.y = transform.position.y + swing * (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
+        pos.y = transform.position.y + 
+          swing * (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
       }
       ingredientList[i].transform.position = pos;
       ingredientList[i].GetComponent<IngredientBlock>().oldPos = pos;
@@ -192,7 +187,7 @@ public class IngredientManager : MonoBehaviour {
     // Get random layout 
     int layoutRoll = Random.Range(0, 101);
     int layout = 0;
-    for (layout = 0; layout < blockLayouts.Length; ++layout)
+    for (layout = 0; layout < ObjectFactory.blockLayouts.Length; ++layout)
     {
       if (layoutRoll <= distribution.layoutDistribution[layout])
         break;
@@ -206,7 +201,7 @@ public class IngredientManager : MonoBehaviour {
     GameObject parent = Instantiate(block); 
     IngredientBlock blockScript = parent.GetComponent<IngredientBlock>();
     blockScript.SetIdleScale(idleScaling);
-    blockScript.layout = blockLayouts[layout];
+    blockScript.layout = ObjectFactory.blockLayouts[layout];
 
     Vector2 ingredientSize = gridBlockSize;
     Vector2 newScale = (ingredientSize + new Vector2(spacing, spacing)) * maxLayout; 
@@ -223,9 +218,9 @@ public class IngredientManager : MonoBehaviour {
     ingredientObj.transform.SetParent(ingredientHolder.transform);
     ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, new Vector2(1.0f, 1.0f));
     blockScript.AddIngredient(ingredientObj); 
- 
+
     // Create ingredient layout 
-    foreach (Vector2 vec in blockLayouts[layout]) 
+    foreach (Vector2 vec in ObjectFactory.blockLayouts[layout]) 
     {
       GameObject ingredientHolder2 = new GameObject();
       ingredientHolder2.transform.position = t.position;

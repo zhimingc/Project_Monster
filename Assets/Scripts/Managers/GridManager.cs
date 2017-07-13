@@ -104,11 +104,30 @@ public class GridManager : MonoBehaviour {
   }
 
   // Adds an entire ingredient block to the grid; assumes legal
-  public void AddIngredientBlockToGrid(GridScript singleGrid, IngredientBlock block)
+  //public void AddIngredientBlockToGrid(GridScript singleGrid, IngredientBlock block)
+  //{
+  //  Vector2[] layout = block.layout;
+  //  Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
+  //  singleGrid.AddToStack(block.ingredients[0].GetComponent<IngredientScript>());
+
+  //  // Plus 1 because index 0 is the center
+  //  for (int i = 0; i < layout.Length; ++i)
+  //  {
+  //    Vector2 layoutDir = block.isReverseLayout ? -layout[i] : layout[i];
+  //    Vector2 destGrid = gridCoordinates + layoutDir;
+
+  //    // Call add ingredient
+  //    GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
+  //    curGrid.AddToStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+  //  }
+  //}
+
+  public void AddBlockToGrid(GridScript singleGrid, BlockBehaviour block)
   {
     Vector2[] layout = block.layout;
     Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
-    singleGrid.AddToStack(block.ingredients[0].GetComponent<IngredientScript>());
+    //singleGrid.AddToStack(block.ingredients[0].GetComponent<IngredientScript>());
+    singleGrid.AddToStack(0);
 
     // Plus 1 because index 0 is the center
     for (int i = 0; i < layout.Length; ++i)
@@ -118,16 +137,17 @@ public class GridManager : MonoBehaviour {
 
       // Call add ingredient
       GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
-      curGrid.AddToStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+      curGrid.AddToStack(i + 1);
+      //curGrid.AddToStack(block.ingredients[i + 1].GetComponent<IngredientScript>());
     }
   }
 
 
-  public void RemoveIngredientBlockFromGrid(GridScript singleGrid, IngredientBlock block)
+  public void RemoveBlockFromGrid(GridScript singleGrid, BlockBehaviour block)
   {
     Vector2[] layout = block.layout;
     Vector2 gridCoordinates = new Vector2(singleGrid.coordinates[0], singleGrid.coordinates[1]);
-    singleGrid.RemoveFromStack(block.ingredients[0].GetComponent<IngredientScript>());
+    singleGrid.RemoveFromStack(0);
 
     // Plus 1 because index 0 is the center
     for (int i = 0; i < layout.Length; ++i)
@@ -137,7 +157,7 @@ public class GridManager : MonoBehaviour {
 
       // Call add ingredient
       GridScript curGrid = grid[(int)destGrid.x][(int)destGrid.y].GetComponent<GridScript>();
-      curGrid.RemoveFromStack(block.ingredients[i+1].GetComponent<IngredientScript>());
+      curGrid.RemoveFromStack(i+1);
     }
   }
 

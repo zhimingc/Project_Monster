@@ -125,14 +125,15 @@ public class GridScript : MonoBehaviour {
 
         // Stop grid from moving
         ingredientBlock.beingDragged = false;
-        ingredientBlock.ToggleIngredients(false);
-
-        // Update grid with move
-        //playerScript.blockBeingDragged.SetBlockPosition(transform.position);
-        playerScript.SetHoveredGrid(this);
-        gridMan.AddIngredientBlockToGrid(this, ingredientBlock);
+        //ingredientBlock.ToggleIngredients(false);
       }
 
+      // Toggle object visuals
+      playerScript.blockBeingDragged.ToggleObjects(false);
+
+      // Update grid with move
+      playerScript.SetHoveredGrid(this);
+      gridMan.AddBlockToGrid(this, playerScript.blockBeingDragged);
 
       // Update mouse up event
       playerScript.SetMouseUpDel(GridMouseUp);
@@ -142,65 +143,155 @@ public class GridScript : MonoBehaviour {
     }
   }
 
-  public void AddToStack(IngredientScript ingredient)
+  public void AddToStack(int index)
   {
-    // Change behaviour depending on ingredient type
-    switch(ingredient.type)
+    if (playerScript.IsTypeOfBlock<IngredientBlock>())
     {
-      // Adds sauce to the grid
-      case INGREDIENT_TYPE.SAUCE:
-        tmpSauce = sauceType;
-        sauceType = ingredient.sauceType;
-        break;
-      // Eats the top ingredient
-      case INGREDIENT_TYPE.EATER:
-        if (ingredientStack.Count == 0)
-        {
-          ingredientStack.Add(INGREDIENT_TYPE.EATER);
-        }
-        else
-        {
-          tmpHold = ingredientStack[ingredientStack.Count - 1];
-          //ingredientStack.RemoveAt(ingredientStack.Count - 1);
-          ingredientStack[ingredientStack.Count - 1] = INGREDIENT_TYPE.EATER;
-        }
-        break;
-      default:
-        ingredientStack.Add(ingredient.type);
-        break;
+      IngredientScript ingredient = playerScript.blockBeingDragged.GetComponent<IngredientBlock>().GetIngredientScript(index);
+      // Change behaviour depending on ingredient type
+      switch (ingredient.type)
+      {
+        // Adds sauce to the grid
+        case INGREDIENT_TYPE.SAUCE:
+          tmpSauce = sauceType;
+          sauceType = ingredient.sauceType;
+          break;
+        default:
+          ingredientStack.Add(ingredient.type);
+          break;
+      }
+    }
+
+    if (playerScript.IsTypeOfBlock<ItemScript>())
+    {
+      ItemScript item = playerScript.blockBeingDragged.GetComponent<ItemScript>();
+      // Change behaviour depending on ingredient type
+      switch (item.itemType)
+      {
+        // Eats the top ingredient
+        case ITEM_TYPE.EATER:
+          if (ingredientStack.Count == 0)
+          {
+            ingredientStack.Add(INGREDIENT_TYPE.EATER);
+          }
+          else
+          {
+            tmpHold = ingredientStack[ingredientStack.Count - 1];
+            //ingredientStack.RemoveAt(ingredientStack.Count - 1);
+            ingredientStack[ingredientStack.Count - 1] = INGREDIENT_TYPE.EATER;
+          }
+          break;
+      }
     }
 
     // Visual feedback for grid
     UpdateStackDisplay();
   }
 
-  public void RemoveFromStack(IngredientScript ingredient)
+  //public void AddToStack(IngredientScript ingredient)
+  //{
+  //  // Change behaviour depending on ingredient type
+  //  switch(ingredient.type)
+  //  {
+  //    // Adds sauce to the grid
+  //    case INGREDIENT_TYPE.SAUCE:
+  //      tmpSauce = sauceType;
+  //      sauceType = ingredient.sauceType;
+  //      break;
+  //    // Eats the top ingredient
+  //    case INGREDIENT_TYPE.EATER:
+  //      if (ingredientStack.Count == 0)
+  //      {
+  //        ingredientStack.Add(INGREDIENT_TYPE.EATER);
+  //      }
+  //      else
+  //      {
+  //        tmpHold = ingredientStack[ingredientStack.Count - 1];
+  //        //ingredientStack.RemoveAt(ingredientStack.Count - 1);
+  //        ingredientStack[ingredientStack.Count - 1] = INGREDIENT_TYPE.EATER;
+  //      }
+  //      break;
+  //    default:
+  //      ingredientStack.Add(ingredient.type);
+  //      break;
+  //  }
+
+  //  // Visual feedback for grid
+  //  UpdateStackDisplay();
+  //}
+
+  //public void RemoveFromStack(IngredientScript ingredient)
+  //{
+  //  // Change behaviour depending on ingredient type
+  //  switch (ingredient.type)
+  //  {
+  //    case INGREDIENT_TYPE.SAUCE:
+  //      sauceType = tmpSauce;
+  //      break;
+  //    // Eats the top ingredient
+  //    case INGREDIENT_TYPE.EATER:
+  //      // Only adds back ingredient if something was removed
+  //      if (tmpHold != INGREDIENT_TYPE.EMPTY)
+  //      {
+  //        ingredientStack[ingredientStack.Count - 1] = tmpHold;
+  //        //ingredientStack.Add(tmpHold);
+  //        tmpHold = INGREDIENT_TYPE.EMPTY;
+  //      }
+  //      else
+  //      {
+  //        ingredientStack.Remove(INGREDIENT_TYPE.EATER);
+  //      }
+  //      break;
+  //    default:
+  //      ingredientStack.RemoveAt(ingredientStack.Count - 1);
+  //      break;
+  //  }
+
+  //  UpdateStackDisplay();
+  //}
+
+  public void RemoveFromStack(int index)
   {
-    // Change behaviour depending on ingredient type
-    switch (ingredient.type)
+    if (playerScript.IsTypeOfBlock<IngredientBlock>())
     {
-      case INGREDIENT_TYPE.SAUCE:
-        sauceType = tmpSauce;
-        break;
-      // Eats the top ingredient
-      case INGREDIENT_TYPE.EATER:
-        // Only adds back ingredient if something was removed
-        if (tmpHold != INGREDIENT_TYPE.EMPTY)
-        {
-          ingredientStack[ingredientStack.Count - 1] = tmpHold;
-          //ingredientStack.Add(tmpHold);
-          tmpHold = INGREDIENT_TYPE.EMPTY;
-        }
-        else
-        {
-          ingredientStack.Remove(INGREDIENT_TYPE.EATER);
-        }
-        break;
-      default:
-        ingredientStack.RemoveAt(ingredientStack.Count - 1);
-        break;
+      IngredientScript ingredient = playerScript.blockBeingDragged.GetComponent<IngredientBlock>().GetIngredientScript(index);
+      // Change behaviour depending on ingredient type
+      switch (ingredient.type)
+      {
+        // Adds sauce to the grid
+        case INGREDIENT_TYPE.SAUCE:
+          sauceType = tmpSauce;
+          break;
+        default:
+          ingredientStack.RemoveAt(ingredientStack.Count - 1);
+          break;
+      }
     }
 
+    if (playerScript.IsTypeOfBlock<ItemScript>())
+    {
+      ItemScript item = playerScript.blockBeingDragged.GetComponent<ItemScript>();
+      // Change behaviour depending on ingredient type
+      switch (item.itemType)
+      {
+        // Eats the top ingredient
+        case ITEM_TYPE.EATER:
+          // Only adds back ingredient if something was removed
+          if (tmpHold != INGREDIENT_TYPE.EMPTY)
+          {
+            ingredientStack[ingredientStack.Count - 1] = tmpHold;
+            //ingredientStack.Add(tmpHold);
+            tmpHold = INGREDIENT_TYPE.EMPTY;
+          }
+          else
+          {
+            ingredientStack.Remove(INGREDIENT_TYPE.EATER);
+          }
+          break;
+      }
+    }
+
+    // Visual feedback for grid
     UpdateStackDisplay();
   }
 
@@ -227,7 +318,7 @@ public class GridScript : MonoBehaviour {
       // Change color depending on ingredient type
       if (i < ingredientStack.Count)
       {
-        IngredientFactory.InitializeIngredientSide(stackObjs[i], ingredientStack[i]);
+        ObjectFactory.InitializeIngredientSide(stackObjs[i], ingredientStack[i]);
 
         if (i != 0 && ingredientStack[i] == INGREDIENT_TYPE.BREAD)
         {
@@ -238,10 +329,10 @@ public class GridScript : MonoBehaviour {
     }
 
     // Update sauce feedback for grid
-    IngredientFactory.InitializeSauce(gameObject, sauceType);
+    ObjectFactory.InitializeSauce(gameObject, sauceType);
 
     // Update grid type feedback
-    IngredientFactory.InitializeGrid(gameObject, gridType);
+    ObjectFactory.InitializeGrid(gameObject, gridType);
   }
 
   void RemoveEaterIngredient()
@@ -272,11 +363,17 @@ public class GridScript : MonoBehaviour {
         IngredientBlock ingredientBlock = (IngredientBlock)playerScript.blockBeingDragged;
         // Stop grid from moving
         ingredientBlock.beingDragged = true;
-        ingredientBlock.ToggleIngredients(true);
-        gridMan.RemoveIngredientBlockFromGrid(this, ingredientBlock);
+        //ingredientBlock.ToggleIngredients(true);
+        //ingredientBlock.ToggleObjects(true);
       }
+
+      // Toggle object visuals
+      playerScript.blockBeingDragged.ToggleObjects(true);
+
       // Update mouse up event
-      playerScript.ResetMouseUpDel();
+      //playerScript.ResetMouseUpDel();
+      playerScript.blockBeingDragged.beingDragged = true;
+      gridMan.RemoveBlockFromGrid(this, playerScript.blockBeingDragged);
 
       // Update ability to serve
       GameManager.Instance.monsterMan.CheckRequestMetAll();

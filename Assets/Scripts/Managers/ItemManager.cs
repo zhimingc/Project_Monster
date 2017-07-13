@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ITEM_TYPE
-{
-  EATER,
-  BIN
-};
-
-
 public class ItemManager : MonoBehaviour {
 
   public List<ItemScript> items;

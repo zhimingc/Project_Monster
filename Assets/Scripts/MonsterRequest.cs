@@ -113,7 +113,7 @@ public class MonsterRequest : MonoBehaviour {
     // Set the display according to ingredient
     for (int i = 0; i < req.ingredients.Count; ++i)
     {
-      IngredientFactory.InitializeIngredientSide(ingredientStackObjs[i], req.ingredients[i]);
+      ObjectFactory.InitializeIngredientSide(ingredientStackObjs[i], req.ingredients[i]);
 
       if (i != 0 && req.ingredients[i] == INGREDIENT_TYPE.BREAD)
       {
@@ -123,10 +123,10 @@ public class MonsterRequest : MonoBehaviour {
     }
 
     // Set display according to sauce type
-    IngredientFactory.InitializeSauce(gameObject, req.sauce);
+    ObjectFactory.InitializeSauce(gameObject, req.sauce);
 
     // Set display according to grid type
-    IngredientFactory.InitializeGrid(gameObject, req.gridType);
+    ObjectFactory.InitializeGrid(gameObject, req.gridType);
   }
 
   public void InitStack()

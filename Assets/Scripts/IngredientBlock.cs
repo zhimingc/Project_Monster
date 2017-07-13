@@ -13,16 +13,22 @@ public class IngredientBlock : BlockBehaviour
 
   public void AddIngredient(GameObject ingredient) 
   { 
-    ingredients.Add(ingredient); 
+    ingredients.Add(ingredient);
+    childenObjs.Add(ingredient);
   }
 
-  public void ToggleIngredients(bool flag)
+  //public void ToggleIngredients(bool flag)
+  //{
+  //  foreach (GameObject obj in ingredients)
+  //    obj.GetComponent<SpriteRenderer>().enabled = flag;
+  //}
+
+  public IngredientScript GetIngredientScript(int index)
   {
-    foreach (GameObject obj in ingredients)
-      obj.GetComponent<SpriteRenderer>().enabled = flag;
+    return ingredients[index].GetComponent<IngredientScript>();
   }
 
-  void DragUpdate()
+  new void DragUpdate()
   {
     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     mousePos.z = 0.0f;
@@ -81,8 +87,17 @@ public class IngredientBlock : BlockBehaviour
     ToggleScale();
   }
 
-  void OnMouseOver()
+  protected void OnMouseOver()
   {
     OnTouchStay();
+  }
+
+  public void OnTouchStay()
+  {
+    //if (Input.GetMouseButtonDown(0) && playerScript.GetPlayerState() == PLAYER_STATE.IDLE) 
+    if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
+    {
+      StartDrag();
+    }
   }
 }

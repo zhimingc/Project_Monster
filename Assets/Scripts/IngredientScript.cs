@@ -13,7 +13,7 @@ public class IngredientScript : MonoBehaviour {
     type = _type;
     sauceType = sauce;
     transform.localScale = _size;
-    IngredientFactory.InitializeIngredientTop(gameObject, type, sauce);
+    ObjectFactory.InitializeIngredientTop(gameObject, type, sauce);
 
     if (sauce != SAUCE_TYPE.EMPTY)
     {
