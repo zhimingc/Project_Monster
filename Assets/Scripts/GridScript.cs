@@ -322,7 +322,7 @@ public class GridScript : MonoBehaviour {
 
         if (i != 0 && ingredientStack[i] == INGREDIENT_TYPE.BREAD)
         {
-          sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_top");
+          sprite = Resources.Load<Sprite>("Sprites/bread_side_top");
           stackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
         }
       }

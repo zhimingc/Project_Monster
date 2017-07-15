@@ -154,7 +154,7 @@ static public class ObjectFactory
     switch (type) 
     { 
       case INGREDIENT_TYPE.BREAD:
-        sprite = Resources.Load<Sprite>("Sprites/bread_dark_top");
+        sprite = Resources.Load<Sprite>("Sprites/bread_top");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         break; 
       case INGREDIENT_TYPE.LETTUCE: 
@@ -188,7 +188,7 @@ static public class ObjectFactory
     switch (type)
     {
       case INGREDIENT_TYPE.BREAD:
-        sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_bot");
+        sprite = Resources.Load<Sprite>("Sprites/bread_side_bot");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         ingredient.GetComponent<SpriteRenderer>().color = Color.white;
         break;

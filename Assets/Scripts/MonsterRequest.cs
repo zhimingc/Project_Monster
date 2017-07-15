@@ -117,7 +117,7 @@ public class MonsterRequest : MonoBehaviour {
 
       if (i != 0 && req.ingredients[i] == INGREDIENT_TYPE.BREAD)
       {
-        Sprite sprite = Resources.Load<Sprite>("Sprites/bread_dark_side_top");
+        Sprite sprite = Resources.Load<Sprite>("Sprites/bread_side_top");
         ingredientStackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
       }
     }
