@@ -34,8 +34,50 @@ public class GameManager : Singleton<GameManager>
 
   public bool startWithHelp, helpToggler;
   private bool isPaused;
+  public ItemInfo[] itemSlots;
+  public Dictionary<CONTRACT_TYPE, ContractInfo> contracts;
 
   public void WakeUp() { }
+
+  public ItemInfo GetItemSlot(int num)
+  {
+    return itemSlots[num];
+  }
+
+  public void SetUpItemSlot(int num, ItemInfo info)
+  {
+    itemSlots[num] = info;
+  }
+
+  public void UpdateContracts(ContractInfo info)
+  {
+    if (!info.isActive)
+    {
+      if (contracts.ContainsKey(info.type))
+      {
+        contracts[info.type].isActive = false;
+      }
+    }
+    else if (info.isActive)
+    {
+      if (contracts.ContainsKey(info.type))
+      {
+        contracts[info.type].isActive = true;
+      }
+      else contracts.Add(info.type, info);
+    }
+  }
+
+  public bool CheckForContract(CONTRACT_TYPE type)
+  {
+    if (contracts.ContainsKey(type)) return contracts[type].isActive;
+    return false;
+  }
+    
+  public bool IsInGame()
+  {
+    return SceneManager.GetActiveScene().name == "vertical-phone";
+  }
 
   void Awake()
   {
@@ -45,6 +87,8 @@ public class GameManager : Singleton<GameManager>
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
+    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EATER), new ItemInfo(ITEM_TYPE.BIN) };
+    contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
 
     // Init for when scene loads
     if (SceneManager.GetActiveScene().name == "vertical-phone")
@@ -207,6 +251,9 @@ public class GameManager : Singleton<GameManager>
         dayMan.endOfDaySign.GetComponent<Animator>().SetTrigger("isExit");
         SetIsPaused(false);
         break;
+      case BUTTON_TYPE.TO_SETUP:
+        LoadSceneWithTransition("screen-setup");
+        break;
     }
   }
 
@@ -305,6 +352,11 @@ public class GameManager : Singleton<GameManager>
     }
   }
 
+  public void InitItem(ItemSpawn spawner, int num)
+  {
+    spawner.info = itemSlots[num];
+  }
+
   public void IncrementTurnCounter()
   {
     ++turnCounter;
@@ -351,7 +403,7 @@ public class GameManager : Singleton<GameManager>
   public void CheckLevelComplete()
   {
     // Lose the game is a grid is full
-    if (gridMan.IfGridFull())
+    if (gridMan && gridMan.IfGridFull())
     {
       SetLoseBehaviour();
     }

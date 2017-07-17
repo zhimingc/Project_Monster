@@ -39,6 +39,8 @@ public class SauceScript : MonoBehaviour {
       //if (Input.GetMouseButtonUp(0) && playerScript.hoveredGrid != null)
       if (InputMan.OnUp() && playerScript.hoveredGrid != null)
       {
+        GameManager.Instance.IncrementTurnCounter();
+
         isCoolingDown = true;
         // Set sauce cooldown
         curCooldown = GameManager.Instance.turnCounter;
@@ -59,7 +61,7 @@ public class SauceScript : MonoBehaviour {
     {
       sauceObj.GetComponent<IngredientBlock>().StartDrag();
       // Set delegate to determine mouse up behaviour
-      playerScript.SetMouseUpDel(SauceMouseUp);
+      playerScript.SetMouseUpDel(gameObject, SauceMouseUp);
     }
   }
 
@@ -72,14 +74,16 @@ public class SauceScript : MonoBehaviour {
   {
     if (!isCoolingDown && playerScript.playerState == PLAYER_STATE.IDLE)
     {
-      playerScript.ResetMouseUpDel();
+      playerScript.ResetMouseUpDel(gameObject);
     }
   }
 
   void UpdateCooldown()
   {
+    // THIS PIECE OF CODE IS DOING THE JOB OF MOUSEUPEVENT
     if (!isCoolingDown && sauceObj == null)
     {
+      GameManager.Instance.IncrementTurnCounter();
       isCoolingDown = true;
       curCooldown = GameManager.Instance.turnCounter;
     }

@@ -90,6 +90,9 @@ public class MonsterManager : MonoBehaviour {
     reserveMonsters.Add(Instantiate(monsterReq));
     foreach (GameObject mon in reserveMonsters) mon.GetComponentInChildren<MonsterAnimation>().Hide();
 
+    // update random parameters
+    UpdateMonsterRP();
+
     // Init request boxes
     foreach (MonsterRequest box in requestBoxes)
     {
@@ -119,6 +122,12 @@ public class MonsterManager : MonoBehaviour {
       PlayEatingSound();
     }
 	}
+
+  public void UpdateMonsterRP()
+  {
+    // update rp for contracts
+    rp.timerContractOn = GameManager.Instance.CheckForContract(CONTRACT_TYPE.TIMER);
+  }
 
   void UpdateTimerText()
   {
@@ -393,28 +402,5 @@ public class MonsterManager : MonoBehaviour {
       maxTimer = Mathf.Max(maxTimer, minTimer);
     }
     currentTimer = maxTimer;
-
-    // Reset timer display
-    //timerDisplay.transform.position = timerPos;
-    //timerDisplay.transform.localScale = timerScale;
   }
-
-  //void UpdateRequestTimer()
-  //{
-  //  currentTimer -= Time.deltaTime;
-  //  UpdateTimerText();
-
-  //  // Player loses if they run out of time
-  //  if (currentTimer <= 0.0f)
-  //  {
-  //    GameManager.Instance.SetGameState(GAME_STATE.LOSE);
-  //  }
-  //  else
-  //  {
-  //    // Update timer display
-  //    //float offsetAmt = (1 - (currentTimer / maxTimer)) * timerScale.y;
-  //    //timerDisplay.transform.position = timerPos - new Vector3(0, offsetAmt / 2.0f, 0);
-  //    //timerDisplay.transform.localScale = timerScale - new Vector3(0, offsetAmt, 0);
-  //  }
-  //}
 }

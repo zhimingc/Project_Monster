@@ -83,7 +83,7 @@ public class BinScript : MonoBehaviour {
       playerScript.SetDeleteIngredient(true);
 
       // Set delegate to determine mouse up behaviour
-      playerScript.SetMouseUpDel(BinMouseUp);
+      playerScript.SetMouseUpDel(gameObject, BinMouseUp);
     }
   }
 
@@ -118,7 +118,7 @@ public class BinScript : MonoBehaviour {
 
       playerScript.blockBeingDragged.ToggleScale();
       playerScript.SetDeleteIngredient(false);
-      playerScript.ResetMouseUpDel();
+      playerScript.ResetMouseUpDel(gameObject);
     }
   }
 }

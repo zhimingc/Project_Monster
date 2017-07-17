@@ -5,6 +5,13 @@ using UnityEngine;
 public class IngredientBlock : BlockBehaviour
 {
   public List<GameObject> ingredients;
+  protected IngredientManager ingredientMan;
+
+  new void Start()
+  {
+    base.Start();
+    ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
+  }
 
   public bool IsSauceBlock()
   {

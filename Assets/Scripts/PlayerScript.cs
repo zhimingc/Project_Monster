@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum PLAYER_STATE
 {
@@ -19,11 +20,15 @@ public class PlayerScript : MonoBehaviour {
   private GridManager gridMan;
   //private MonsterManager monsterMan;
   private bool deleteIngredientFlag;
-  private MouseUpBehaviour mouseUpDelegate;
+  //private MouseUpBehaviour mouseUpDelegate;
+  private Dictionary<GameObject, MouseUpBehaviour> mouseUpDelegates;
 
   void Awake()
   {
-    gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
+    if (GameObject.Find("grid_manager"))
+    {
+      gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
+    }
     //monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
   }
 
@@ -31,8 +36,8 @@ public class PlayerScript : MonoBehaviour {
 	void Start () {
     blockBeingDragged = null;
     hoveredGrid = null;
-    mouseUpDelegate = DefaultMouseUpDel;
-
+    //mouseUpDelegate = DefaultMouseUpDel;
+    mouseUpDelegates = new Dictionary<GameObject, MouseUpBehaviour>();
   }
 	
   public void DragIngredientBlock(BlockBehaviour block)
@@ -54,13 +59,6 @@ public class PlayerScript : MonoBehaviour {
 
 	}
 
-  // Gets MonsterManager to check if a request is met using the grid
-  void CheckIfRequestMet()
-  {
-    //monsterMan.CheckRequestsMet(gridMan.grid);
-    //monsterMan.CheckRequestMetAll();
-  }
-
   public PLAYER_STATE GetPlayerState()
   {
     return playerState;
@@ -75,11 +73,13 @@ public class PlayerScript : MonoBehaviour {
       // Switching to idle
       case PLAYER_STATE.IDLE:
         //if (hoveredGrid != null) hoveredGrid.ResetHoveredGrid();
-        gridMan.ResetGrid();
+        if (GameManager.Instance.IsInGame())
+        {
+          gridMan.ResetGrid();
+          GameManager.Instance.CheckLevelComplete();
+        }
         SetHoveredGrid(null);
 
-        CheckIfRequestMet();
-        GameManager.Instance.CheckLevelComplete();
         break;
     }
   }
@@ -89,15 +89,23 @@ public class PlayerScript : MonoBehaviour {
     deleteIngredientFlag = flag;
   }
 
-  public void SetMouseUpDel(MouseUpBehaviour del)
+  public void SetMouseUpDel(GameObject obj, MouseUpBehaviour del)
   {
-    if (mouseUpDelegate == DefaultMouseUpDel)
-      mouseUpDelegate = del;
+    //if (mouseUpDelegate == DefaultMouseUpDel)
+    //  mouseUpDelegate = del;
+
+    mouseUpDelegates[obj] = del;
   }
 
-  public void ResetMouseUpDel()
+  public void ResetMouseUpDel(GameObject obj)
   {
-    mouseUpDelegate = DefaultMouseUpDel;  // reset mouse up behaviour
+    //mouseUpDelegate = DefaultMouseUpDel;  // reset mouse up behaviour
+    mouseUpDelegates.Remove(obj);
+  }
+
+  void ResetAllDelegates()
+  {
+    mouseUpDelegates.Clear();
   }
 
   public bool IsTypeOfBlock<T>()
@@ -125,9 +133,17 @@ public class PlayerScript : MonoBehaviour {
         ItemScript blockScript = blockBeingDragged.GetComponent<ItemScript>();
         blockScript.StopDrag(deleteIngredientFlag);
       }
+      else
+      {
+        BlockBehaviour blockScript = blockBeingDragged.GetComponent<BlockBehaviour>();
+        blockScript.StopDrag(deleteIngredientFlag);
+      }
 
-      mouseUpDelegate();
-      ResetMouseUpDel();
+      foreach (var del in mouseUpDelegates)
+      {
+        del.Value();// mouseUpDelegate();
+      }
+      ResetAllDelegates();
 
       blockBeingDragged = null;
       SetPlayerState(PLAYER_STATE.IDLE);

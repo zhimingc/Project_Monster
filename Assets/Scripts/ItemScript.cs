@@ -65,6 +65,7 @@ public class ItemScript : BlockBehaviour
     }
     else
     {
+      GameManager.Instance.IncrementTurnCounter();
       Destroy(gameObject);
     }
 
@@ -88,7 +89,7 @@ public class ItemScript : BlockBehaviour
       playerScript.SetDeleteIngredient(true);
 
       // Set delegate to determine mouse up behaviour
-      playerScript.SetMouseUpDel(ItemMouseUp);
+      playerScript.SetMouseUpDel(gameObject, ItemMouseUp);
     }
   }
 
@@ -152,7 +153,7 @@ public class ItemScript : BlockBehaviour
     ToggleScale();
 
     // Set delegate to determine mouse up behaviour
-    playerScript.SetMouseUpDel(ItemMouseUp);
+    playerScript.SetMouseUpDel(gameObject, ItemMouseUp);
   }
 
   void OnMouseExit()
@@ -173,7 +174,7 @@ public class ItemScript : BlockBehaviour
 
       playerScript.blockBeingDragged.ToggleScale();
       playerScript.SetDeleteIngredient(false);
-      playerScript.ResetMouseUpDel();
+      playerScript.ResetMouseUpDel(gameObject);
     }
   }
 

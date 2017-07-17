@@ -5,11 +5,12 @@ using UnityEngine.UI;
 
 public class ItemSpawn : MonoBehaviour {
 
+  public int itemNum;
   public GameObject itemBlockPrefab, itemPrefab;
   public ItemScript itemObj;
-  public int curCooldown, maxCooldown;
+  public int curCooldown;
   public Text cooldownText;
-  public ITEM_TYPE itemType;
+  public ItemInfo info;
 
   private bool hasItem;
 
@@ -21,8 +22,9 @@ public class ItemSpawn : MonoBehaviour {
 
   // Use this for initialization
   void Start () {
+    GameManager.Instance.InitItem(this, itemNum);
     SpawnItem();
-    curCooldown = -maxCooldown;
+    curCooldown = 0;
   }
 	
 	// Update is called once per frame
@@ -37,12 +39,12 @@ public class ItemSpawn : MonoBehaviour {
 
     if (!hasItem)
     {
-      int cooldownTime = maxCooldown - (curTurn - curCooldown);
+      int cooldownTime = info.itemCooldown - (curTurn - curCooldown);
       cooldownText.text = cooldownTime.ToString();
       UpdateStateFeedback(false);  // feedback cannot use
 
       // able to use again
-      if (curTurn - curCooldown >= maxCooldown)
+      if (curTurn - curCooldown >= info.itemCooldown)
       {
         hasItem = true;
 
@@ -91,35 +93,34 @@ public class ItemSpawn : MonoBehaviour {
   void SpawnItem()
   {
     hasItem = true;
-    int layout = 1;
+    int layout = 0;
     itemObj = Instantiate(itemBlockPrefab, transform).GetComponent<ItemScript>();
     BlockBehaviour blockScript = itemObj.GetComponent<BlockBehaviour>();
 
-    switch (itemType)
+    switch (info.type)
     {
       case ITEM_TYPE.BIN:
-        // Bins have no layout
-        layout = 0;
+        // Bins have no layout so it stays 0
         GenerateItemSingle(blockScript, transform);
 
-        ObjectFactory.InitializeItem(blockScript.childenObjs[0], itemType);
+        ObjectFactory.InitializeItem(blockScript.childenObjs[0], info.type);
         break;
       case ITEM_TYPE.EATER:
         // Get random layout 
-        //int layout = Random.Range(0, ObjectFactory.blockLayouts.Length);
+        layout = Random.Range(0, ObjectFactory.blockLayouts.Length);
         blockScript.layout = ObjectFactory.blockLayouts[layout];
 
         GenerateItemBlock(blockScript, transform);
         foreach (GameObject child in blockScript.childenObjs)
         {
-          ObjectFactory.InitializeItem(child, itemType);
+          ObjectFactory.InitializeItem(child, info.type);
         }
         break;
     }
 
     // Initialize item script
     //ItemScript itemScript = itemObj.GetComponent<ItemScript>();
-    itemObj.SetItemType(itemType);
+    itemObj.SetItemType(info.type);
   }
 
   void GenerateItemSingle(BlockBehaviour parent, Transform t)

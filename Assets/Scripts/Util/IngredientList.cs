@@ -33,9 +33,48 @@ public enum GRID_TYPE
 public enum ITEM_TYPE
 {
   EATER,
-  BIN
+  BIN,
+  EMPTY
 };
 
+public enum CONTRACT_TYPE
+{
+  TIMER,
+  NUM_CONTRACTS
+}
+
+[System.Serializable]
+public class ItemInfo
+{
+  public ItemInfo()
+  {
+    type = ITEM_TYPE.EATER;
+    itemCooldown = 6;
+  }
+
+  public ItemInfo(ITEM_TYPE _type)
+  {
+    type = _type;
+    itemCooldown = 6;
+  }
+
+  public ITEM_TYPE type;
+  public int itemCooldown;
+};
+
+
+[System.Serializable]
+public class ContractInfo
+{
+  ContractInfo()
+  {
+    type = CONTRACT_TYPE.NUM_CONTRACTS;
+    isActive = false;
+  }
+
+  public CONTRACT_TYPE type;
+  public bool isActive;
+}
 
 static public class ObjectFactory
 {
@@ -97,6 +136,9 @@ static public class ObjectFactory
 
     switch (type)
     {
+      case ITEM_TYPE.EMPTY:
+        block.GetComponent<SpriteRenderer>().enabled = false;
+        break;
       case ITEM_TYPE.EATER:
         itemSprite = Resources.Load<Sprite>("Sprites/cross");
         block.GetComponent<SpriteRenderer>().sprite = itemSprite;

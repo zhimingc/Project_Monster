@@ -29,7 +29,7 @@ public class IngredientManager : MonoBehaviour {
   private int ingredientFlipflop;
   private int ingredientCountdown; // Spawns bread until countdown is up
   private int maxCountdown;
-  private int ingredientCountup;   // For specific ingredients spawn, e.g. eater
+  //private int ingredientCountup;   // For specific ingredients spawn, e.g. eater
                                    //private int sauceFlipflop;       // Switches between all sauce types
 
   private int maxLayout;
@@ -44,7 +44,7 @@ public class IngredientManager : MonoBehaviour {
     ingredientFlipflop = 1;
     maxCountdown = 1;
     ingredientCountdown = maxCountdown;
-    ingredientCountup = 0;
+    //ingredientCountup = 0;
     ++numberOfIngredients;  // Because random range excludes max value
     //sauceFlipflop = 1;
 
@@ -99,22 +99,9 @@ public class IngredientManager : MonoBehaviour {
   GameObject SequentialIngredient()
   {
     // Get queued type 
-    //++ingredientCountup;
     GameManager.Instance.IncrementTurnCounter();
-    ingredientCountup = GameManager.Instance.turnCounter;
 
     SAUCE_TYPE sauceTracker = SAUCE_TYPE.EMPTY;
-    //if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH) &&
-    //  ingredientCountup % 5 == 0)
-    //{
-    //  ingredientTracker = (int)INGREDIENT_TYPE.SAUCE;
-    //  sauceTracker = (SAUCE_TYPE) ((++sauceFlipflop) % (int)SAUCE_TYPE.NUM_SAUCE);
-    //}
-    //if (ingredientCountup % 7 == 0)
-    //{
-    //  // spawns an eater every X turns
-    //  ingredientTracker = (int)INGREDIENT_TYPE.EATER;
-    //}
     if (ingredientCountdown-- <= 0)
     {
       ingredientCountdown = maxCountdown;

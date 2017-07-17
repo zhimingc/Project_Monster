@@ -11,7 +11,6 @@ public class BlockBehaviour : MonoBehaviour
   public List<GameObject> childenObjs;
 
   protected PlayerScript playerScript;
-  protected IngredientManager ingredientMan;
 
   // UI for being dragged
   public Vector3 draggedScale, idleScale;
@@ -22,7 +21,6 @@ public class BlockBehaviour : MonoBehaviour
     isReverseLayout = false;
     //isBigScale = false;
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
-    ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
     childenObjs = new List<GameObject>();
   }
 
