@@ -22,7 +22,7 @@ public class ScoreManager {
 
   public void DisplayScore()
   {
-    scoreObj.GetComponent<Text>().text = score.ToString();
+    scoreObj.GetComponent<Text>().text = "$" + score.ToString();
   }
 
 }

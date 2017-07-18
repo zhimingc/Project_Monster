@@ -43,8 +43,14 @@ public enum CONTRACT_TYPE
   NUM_CONTRACTS
 }
 
+// to be able to pass item and contract info as a base
+public class Info
+{
+
+};
+
 [System.Serializable]
-public class ItemInfo
+public class ItemInfo : Info
 {
   public ItemInfo()
   {
@@ -55,7 +61,15 @@ public class ItemInfo
   public ItemInfo(ITEM_TYPE _type)
   {
     type = _type;
-    itemCooldown = 6;
+    switch (type)
+    {
+      case ITEM_TYPE.EATER:
+        itemCooldown = 5;
+        break;
+      case ITEM_TYPE.BIN:
+        itemCooldown = 3;
+        break;
+    }
   }
 
   public ITEM_TYPE type;
@@ -64,12 +78,18 @@ public class ItemInfo
 
 
 [System.Serializable]
-public class ContractInfo
+public class ContractInfo : Info
 {
-  ContractInfo()
+  public ContractInfo()
   {
     type = CONTRACT_TYPE.NUM_CONTRACTS;
     isActive = false;
+  }
+
+  public ContractInfo(CONTRACT_TYPE _type)
+  {
+    type = _type;
+    isActive = true;
   }
 
   public CONTRACT_TYPE type;

@@ -76,7 +76,7 @@ public class GameManager : Singleton<GameManager>
     
   public bool IsInGame()
   {
-    return SceneManager.GetActiveScene().name == "vertical-phone";
+    return SceneManager.GetActiveScene().name.Contains("vertical-phone");
   }
 
   void Awake()
@@ -90,8 +90,11 @@ public class GameManager : Singleton<GameManager>
     itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EATER), new ItemInfo(ITEM_TYPE.BIN) };
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
 
+    // DEBUG HACK TO ADD CONTRACTS
+    contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
+
     // Init for when scene loads
-    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
       InitializeManagers();
 
@@ -123,7 +126,7 @@ public class GameManager : Singleton<GameManager>
     currentLevel = 0;
     helpToggler = true;
     scoreMan.InitScore();
-    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
       dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
       uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
@@ -273,7 +276,7 @@ public class GameManager : Singleton<GameManager>
 
   void Update()
   {
-    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
       // Debug
       if (Input.anyKeyDown)

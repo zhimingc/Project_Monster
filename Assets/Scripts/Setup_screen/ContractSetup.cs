@@ -5,7 +5,7 @@ using UnityEngine;
 public class ContractSetup : MonoBehaviour {
 
   public ContractInfo info;
-  public GameObject feedback_box;
+  public GameObject feedback_box, icon;
 
   // Use this for initialization
   void Start()
@@ -62,6 +62,14 @@ public class ContractSetup : MonoBehaviour {
     if (InputMan.OnDown())
     {
       ToggleContract();
+
+      // update for contract selection
+      UpdateInfoPanel();
     }
+  }
+
+  void UpdateInfoPanel()
+  {
+    GameObject.Find("info_panel").GetComponent<InfoPanel>().UpdateInfoPanel(icon, info);
   }
 }

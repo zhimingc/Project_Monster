@@ -25,6 +25,9 @@ public class ItemSetup : BlockBehaviour {
     if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
     {
       StartDrag();
+
+      // update for item selection
+      UpdateInfoPanel();
     }
   }
 
@@ -41,5 +44,10 @@ public class ItemSetup : BlockBehaviour {
     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     mousePos.z = 0.0f;
     transform.position = mousePos;
+  }
+
+  void UpdateInfoPanel()
+  {
+    GameObject.Find("info_panel").GetComponent<InfoPanel>().UpdateInfoPanel(gameObject, info);
   }
 }
