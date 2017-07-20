@@ -10,6 +10,7 @@ public class GridScript : MonoBehaviour {
   public GRID_TYPE gridType;    // dinner mechanic
   public int[] coordinates;
   public GameObject monsterServeObj;  // graphics to show that you can serve
+  public GameObject scoreText;
   public bool canServe;         // flag to indicate if this grid meets any requests
 
   private List<GameObject> stackObjs;
@@ -31,11 +32,13 @@ public class GridScript : MonoBehaviour {
     tmpHold = INGREDIENT_TYPE.EMPTY;
     sauceType = SAUCE_TYPE.EMPTY;
     maxIngredients = 5;
+    scoreText.SetActive(false);
 
     psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
     exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);
     monsterServeObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/monster_serve"), transform);
-    
+    monsterServeObj.transform.localPosition -= new Vector3(0, 0.25f, 0);
+
     // Init can serve variables
     SetCanServe(false);
   }
@@ -366,6 +369,23 @@ public class GridScript : MonoBehaviour {
   {
     canServe = flag;
     monsterServeObj.SetActive(flag);
+    monsterServeObj.GetComponent<SpriteRenderer>().sprite = setReq.monsterObj.GetComponent<SpriteRenderer>().sprite;
     monReq = setReq;
+  }
+
+  public void TriggerScoreText(int amt)
+  {
+    // set text display
+    TextMesh[] texts = scoreText.GetComponentsInChildren<TextMesh>();
+    foreach(TextMesh txt in texts) txt.text = "$" + amt.ToString();
+
+    // animate text
+    scoreText.SetActive(true);
+    scoreText.transform.localPosition = new Vector3(0, 0, 0);
+    LeanTween.moveLocalY(scoreText, 0.5f, 2.0f);
+    LeanTween.delayedCall(2.0f, ()=>
+    {
+      scoreText.SetActive(false);
+    });
   }
 }

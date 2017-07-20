@@ -209,8 +209,7 @@ public class MonsterManager : MonoBehaviour {
     GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
     PlayEatingSound();
 
-    // Increase score
-    GameManager.Instance.AddScore(1);
+    // get the next request
     UpdateReqeustMet(reqBox);
 
     // Animate monsters in/out
@@ -231,6 +230,16 @@ public class MonsterManager : MonoBehaviour {
 
     // update serve ability of grids;
     CheckRequestMetAll();
+
+    // update combo man with another combo
+    GameManager.Instance.comboMan.AddComboCount();
+
+    // Increase score
+    int scoreAdded = GameManager.Instance.AddScore(100);
+    GameManager.Instance.AddNumServed(1);
+
+    // update score text in grid
+    gs.TriggerScoreText(scoreAdded);
   }
 
   public void AddSauceToAllRequests()
@@ -248,16 +257,8 @@ public class MonsterManager : MonoBehaviour {
   {
     AudioProps clip = new AudioProps();
 
-    // Different sounds for diff monsters?
-    //int soundToPlay = Random.Range(0, 2);
-    //if (soundToPlay == 0) clip = GameManager.Instance.SFX().GetAudio("nom");
-    //else  clip = GameManager.Instance.SFX().GetAudio("bite");
-
     clip = GameManager.Instance.SFX().GetAudio("nom");
     clip.pitch = Random.Range(0.7f, 0.9f);
-    //clip.pitch = eatingSoundPitcher;
-    //eatingSoundPitcher += 0.05f;
-    //if (eatingSoundPitcher > 1.1f) eatingSoundPitcher = 0.75f;
 
     GameManager.Instance.SFX().PlaySound(clip);
   }
@@ -267,19 +268,6 @@ public class MonsterManager : MonoBehaviour {
     int index = requestBoxes.IndexOf(box);
     requestBoxes[index].request = new Request();
     requestBoxes[index].SetRequest(GenerateRandomRequest());
-  }
-
-  void AdvanceRequests()
-  {
-    for (int i = 0; i < requestBoxes.Count - 1; ++i)
-    {
-      requestBoxes[i].SetRequest(requestBoxes[i + 1].request);
-    }
-
-    requestBoxes[requestBoxes.Count - 1].SetRequest(GenerateRandomRequest());
-
-    // Reset the timer for next request
-    ResetRequestTimer();
   }
 
   void GenMonsterType(out Request req)
@@ -395,7 +383,7 @@ public class MonsterManager : MonoBehaviour {
 
   void ResetRequestTimer()
   {
-    int score = GameManager.Instance.scoreMan.score;
+    int score = GameManager.Instance.scoreMan.numServed;
     if (score > 0 && score % speedUpInterval == 0)
     {
       maxTimer -= 5.0f;

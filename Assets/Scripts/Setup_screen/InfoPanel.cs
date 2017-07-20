@@ -5,34 +5,58 @@ using UnityEngine.UI;
 
 public class InfoPanel : MonoBehaviour {
 
-  public GameObject info_icon;
+  public GameObject info_icon, upgradeButton;
+  public TextMesh currencyText;
   public Text info_text, detail_neg, detail_pos;
+
+  private bool panelTriggered;
 
 	// Use this for initialization
 	void Start () {
     EmptyInfoPanel();
+    panelTriggered = false;
 
+    UpdateCurrenyText();
   }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+  // Update is called once per frame
+  void Update()
+  {
+    if (InputMan.OnDown())
+    {
+      if (!panelTriggered) EmptyInfoPanel();
+      else panelTriggered = false;
+    }
+  }
+
+  void UpdateCurrenyText()
+  {
+    currencyText.text = "$" + GameManager.Instance.scoreMan.totalCurrency.ToString();
+  }
 
   void EmptyInfoPanel()
   {
-    info_text.text = "";
+    info_text.text = 
+      "Toggle contracts by tapping contracts above. \n\n\nChoose tools by dragging from toolbox into tool slots.";
     detail_neg.text = "";
     detail_pos.text = "";
     info_icon.GetComponent<SpriteRenderer>().enabled = false;
+    upgradeButton.SetActive(false);
+
   }
 
   public void UpdateInfoPanel(GameObject obj, Info info)
   {
+    // flag for when the panel is changed
+    panelTriggered = true;
+
     // update text
     ItemInfo item = info as ItemInfo;
     if (item != null)
     {
+      upgradeButton.SetActive(true);
+      upgradeButton.GetComponentInChildren<TextMesh>().text = "Upgrade";
+
       switch (item.type)
       {
         case ITEM_TYPE.EATER:
@@ -51,11 +75,22 @@ public class InfoPanel : MonoBehaviour {
     ContractInfo contract = info as ContractInfo;
     if (contract != null)
     {
+      // cant upgrade contracts
+      upgradeButton.SetActive(false);
+      if (contract.isActive)
+      {
+        upgradeButton.GetComponentInChildren<TextMesh>().text = "Active";
+      }
+      else
+      {
+        upgradeButton.GetComponentInChildren<TextMesh>().text = "Inactive";
+      }
+
       switch (contract.type)
       {
         case CONTRACT_TYPE.TIMER:
-          info_text.text = "Catering contract for impatient monsters who want their order quickly!";
-          detail_neg.text = "Chance for timed requests";
+          info_text.text = "Catering contract for impatient monsters who want their order quick!";
+          detail_neg.text = "Chance for timed requests\n30 seconds to serve request";
           detail_pos.text = "Cash+";
           break;
       }

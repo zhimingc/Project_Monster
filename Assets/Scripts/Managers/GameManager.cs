@@ -26,6 +26,7 @@ public class GameManager : Singleton<GameManager>
   public SFXManager sfxMan;
   public MonsterManager monsterMan;
   public GridManager gridMan;
+  public ComboManager comboMan;
 
   private LoadManager loadMan;
   private MusicManager musicMan;
@@ -39,51 +40,13 @@ public class GameManager : Singleton<GameManager>
 
   public void WakeUp() { }
 
-  public ItemInfo GetItemSlot(int num)
-  {
-    return itemSlots[num];
-  }
-
-  public void SetUpItemSlot(int num, ItemInfo info)
-  {
-    itemSlots[num] = info;
-  }
-
-  public void UpdateContracts(ContractInfo info)
-  {
-    if (!info.isActive)
-    {
-      if (contracts.ContainsKey(info.type))
-      {
-        contracts[info.type].isActive = false;
-      }
-    }
-    else if (info.isActive)
-    {
-      if (contracts.ContainsKey(info.type))
-      {
-        contracts[info.type].isActive = true;
-      }
-      else contracts.Add(info.type, info);
-    }
-  }
-
-  public bool CheckForContract(CONTRACT_TYPE type)
-  {
-    if (contracts.ContainsKey(type)) return contracts[type].isActive;
-    return false;
-  }
-    
-  public bool IsInGame()
-  {
-    return SceneManager.GetActiveScene().name.Contains("vertical-phone");
-  }
-
   void Awake()
   {
+    GameFeel.GameFeelInit();
+
     isPaused = false;
     startWithHelp = false;
-    scoreMan = new ScoreManager();
+    scoreMan = gameObject.AddComponent<ScoreManager>();
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
@@ -120,19 +83,41 @@ public class GameManager : Singleton<GameManager>
     });
   }
 
+  void InitContractIcons()
+  {
+    GameObject[] icons = GameObject.FindGameObjectsWithTag("ContractIcon");
+    foreach (GameObject obj in icons) obj.SetActive(false);
+
+    // iterate from back because find adds to the array from front?
+    int i = 0;
+    var ite = contracts.GetEnumerator();
+    while(ite.MoveNext())
+    {
+      if (!ite.Current.Value.isActive) continue;
+      icons[i].GetComponentsInChildren<SpriteRenderer>()[1].sprite = ite.Current.Value.contractIcon;
+      icons[i].SetActive(true);
+      ++i;
+    }
+  }
+
   void InitializeManagers()
   {
     turnCounter = 0;
     currentLevel = 0;
     helpToggler = true;
-    scoreMan.InitScore();
     if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
+      scoreMan.InitScore();
+
       dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
       uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
       gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
       monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
       backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
+      comboMan = GameObject.Find("combo_man").GetComponent<ComboManager>();
+
+      // contract icon display
+      InitContractIcons();
     }
   }
 
@@ -180,6 +165,206 @@ public class GameManager : Singleton<GameManager>
         }
         break;
     }
+  }
+
+  void LoadSceneVanilla(string name)
+  {
+    SceneManager.LoadScene(name);
+  }
+
+  void LoadSceneWithTransition(string name)
+  {
+    loadMan.LoadOut();
+    LeanTween.delayedCall(loadMan.loadSpeed, () =>
+    {
+      SceneManager.LoadScene(name);
+    });
+  }
+
+  void Update()
+  {
+    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
+    {
+      // Debug
+      if (Input.anyKeyDown)
+      {
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+          ToggleHelpScreen();
+        }
+        else if (uiMan.helpText.enabled == true)
+        {
+          if (helpToggler)
+          {
+            uiMan.ToggleHelpText(false);
+            gridMan.ToggleGrid(true);
+            helpToggler = false;
+          }
+          else
+          {
+            helpToggler = true;
+          }
+        }
+      }
+      if (Input.GetKeyDown(KeyCode.R))
+      {
+        // Resets level
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+      }
+
+      // Update to display score
+      //scoreMan.DisplayScore();
+    }
+
+    if (Input.GetKeyDown(KeyCode.Escape))
+    {
+      if (SceneManager.GetActiveScene().name == "vertical-phone")
+      {
+        SceneManager.LoadScene("screen-start");
+      }
+      else
+      {
+        Application.Quit();
+      }
+      
+    }
+  }
+
+  void ToggleHelpScreen()
+  {
+    if (SceneManager.GetActiveScene().name == "vertical-phone")
+    {
+      bool flag = uiMan.helpText.enabled;
+      uiMan.ToggleHelpText(!flag);
+      gridMan.ToggleGrid(flag);
+
+      // hack
+      helpToggler = false;
+    }
+  }
+
+  private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+  {
+    // start the scene with pause off
+    SetIsPaused(false);
+
+    InitializeManagers();
+    if (startWithHelp) ToggleHelpScreen();
+    helpToggler = true;
+
+    // load screen
+    loadMan.LoadIn();
+
+    // splash screen behaviour
+    if (SceneManager.GetActiveScene().name == "screen-splash")
+    {
+      ToggleSplashScreens();
+    }
+  }
+
+  public void InitItem(ItemSpawn spawner, int num)
+  {
+    spawner.info = itemSlots[num];
+  }
+
+  public void IncrementTurnCounter()
+  {
+    ++turnCounter;
+
+    // Whenever the turn counter increases reset the combo
+    comboMan.ResetComboCount();
+  }
+
+  public int AddScore(int amt)
+  {
+    return scoreMan.AddScore(amt);
+  }
+
+  public void AddNumServed(int amt)
+  {
+    scoreMan.AddNumberServed(amt);
+
+    // Check for day change
+    dayMan.UpdateProgressBar();
+    dayMan.CheckForShiftChange();
+  }
+
+  public void SetGameState(GAME_STATE state)
+  {
+    gameState = state;
+
+    // State being switched to
+    switch (gameState)
+    {
+      case GAME_STATE.PLAYING:
+
+        break;
+      case GAME_STATE.LOSE:
+        //SetLoseBehaviour();
+        break;
+    }
+  }
+
+  public void SetLoseBehaviour()
+  {
+    backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
+
+    // Turn on lose text
+    uiMan.ToggleLoseText(true);
+    // Turn off monster request boxes
+    monsterMan.ToggleMonsterRequests(false);
+
+    SetGameState(GAME_STATE.LOSE);
+    SetIsPaused(true);
+  }
+
+  public void CheckLevelComplete()
+  {
+    // Lose the game is a grid is full
+    if (gridMan && gridMan.IfGridFull())
+    {
+      SetLoseBehaviour();
+    }
+  }
+
+  public ItemInfo GetItemSlot(int num)
+  {
+    return itemSlots[num];
+  }
+
+  public void SetUpItemSlot(int num, ItemInfo info)
+  {
+    itemSlots[num] = info;
+  }
+
+  public void UpdateContracts(ContractInfo info)
+  {
+    if (!info.isActive)
+    {
+      if (contracts.ContainsKey(info.type))
+      {
+        contracts[info.type].isActive = false;
+      }
+    }
+    else if (info.isActive)
+    {
+      if (contracts.ContainsKey(info.type))
+      {
+        contracts[info.type].isActive = true;
+      }
+      else contracts.Add(info.type, info);
+    }
+  }
+
+  public bool CheckForContract(CONTRACT_TYPE type)
+  {
+    if (contracts.ContainsKey(type)) return contracts[type].isActive;
+    return false;
+  }
+
+  public bool IsInGame()
+  {
+    return SceneManager.GetActiveScene().name.Contains("vertical-phone");
   }
 
   public void ButtonBehaviour(BUTTON_TYPE type, ButtonBehaviour btn)
@@ -257,158 +442,6 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.TO_SETUP:
         LoadSceneWithTransition("screen-setup");
         break;
-    }
-  }
-
-  void LoadSceneVanilla(string name)
-  {
-    SceneManager.LoadScene(name);
-  }
-
-  void LoadSceneWithTransition(string name)
-  {
-    loadMan.LoadOut();
-    LeanTween.delayedCall(loadMan.loadSpeed, () =>
-    {
-      SceneManager.LoadScene(name);
-    });
-  }
-
-  void Update()
-  {
-    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
-    {
-      // Debug
-      if (Input.anyKeyDown)
-      {
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-          ToggleHelpScreen();
-        }
-        else if (uiMan.helpText.enabled == true)
-        {
-          if (helpToggler)
-          {
-            uiMan.ToggleHelpText(false);
-            gridMan.ToggleGrid(true);
-            helpToggler = false;
-          }
-          else
-          {
-            helpToggler = true;
-          }
-        }
-      }
-      if (Input.GetKeyDown(KeyCode.R))
-      {
-        // Resets level
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-      }
-
-      // Update to display score
-      scoreMan.DisplayScore();
-    }
-
-    if (Input.GetKeyDown(KeyCode.Escape))
-    {
-      if (SceneManager.GetActiveScene().name == "vertical-phone")
-      {
-        SceneManager.LoadScene("screen-start");
-      }
-      else
-      {
-        Application.Quit();
-      }
-      
-    }
-  }
-
-  void ToggleHelpScreen()
-  {
-    if (SceneManager.GetActiveScene().name == "vertical-phone")
-    {
-      bool flag = uiMan.helpText.enabled;
-      uiMan.ToggleHelpText(!flag);
-      gridMan.ToggleGrid(flag);
-
-      // hack
-      helpToggler = false;
-    }
-  }
-
-  private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-  {
-    // start the scene with pause off
-    SetIsPaused(false);
-
-    InitializeManagers();
-    if (startWithHelp) ToggleHelpScreen();
-    helpToggler = true;
-
-    // load screen
-    loadMan.LoadIn();
-
-    // splash screen behaviour
-    if (SceneManager.GetActiveScene().name == "screen-splash")
-    {
-      ToggleSplashScreens();
-    }
-  }
-
-  public void InitItem(ItemSpawn spawner, int num)
-  {
-    spawner.info = itemSlots[num];
-  }
-
-  public void IncrementTurnCounter()
-  {
-    ++turnCounter;
-  }
-
-  public void AddScore(int amt)
-  {
-    scoreMan.AddScore(amt);
-
-    // Check for day change
-    dayMan.UpdateProgressBar();
-    dayMan.CheckForShiftChange();
-  }
-
-  public void SetGameState(GAME_STATE state)
-  {
-    gameState = state;
-
-    // State being switched to
-    switch (gameState)
-    {
-      case GAME_STATE.PLAYING:
-
-        break;
-      case GAME_STATE.LOSE:
-        //SetLoseBehaviour();
-        break;
-    }
-  }
-
-  public void SetLoseBehaviour()
-  {
-    backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
-
-    // Turn on lose text
-    uiMan.ToggleLoseText(true);
-    // Turn off monster request boxes
-    monsterMan.ToggleMonsterRequests(false);
-
-    SetGameState(GAME_STATE.LOSE);
-    SetIsPaused(true);
-  }
-
-  public void CheckLevelComplete()
-  {
-    // Lose the game is a grid is full
-    if (gridMan && gridMan.IfGridFull())
-    {
-      SetLoseBehaviour();
     }
   }
 }

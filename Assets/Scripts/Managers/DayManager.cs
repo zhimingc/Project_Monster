@@ -111,17 +111,18 @@ public class DayManager : MonoBehaviour {
   public void UpdateProgressBar()
   {
     int curShift = Mathf.Min((int)DAY_STATE.DINNER, (int)dayState);
+    int numServed = GameManager.Instance.scoreMan.numServed;
 
     int curShiftBase = 0;
     if (curShift > 0) curShiftBase = shiftIntervals[curShift - 1];
 
     int curShiftLim = shiftIntervals[curShift];
 
-    float progressScaler = ((float)GameManager.Instance.scoreMan.score - curShiftBase) / (curShiftLim - curShiftBase);
+    float progressScaler = ((float)numServed - curShiftBase) / (curShiftLim - curShiftBase);
     if (progressScaler >= 1.0f) progressScaler = 1.0f;
     backMan.UpdateSunPosition(progressScaler);
 
-    progressScaler = (float)GameManager.Instance.scoreMan.score / shiftIntervals[2];
+    progressScaler = (float)numServed / shiftIntervals[2];
     if (progressScaler >= 1.0f) progressScaler = 1.0f;
     float progressSize = (progressScaler) * initialProgressSize;
     progressBar.transform.localScale = new Vector3(progressSize, 0.25f, 1.0f);
@@ -130,14 +131,14 @@ public class DayManager : MonoBehaviour {
 
   public void CheckForShiftChange()
   {
-    int score = GameManager.Instance.scoreMan.score;
-    if ((int)dayState < shiftIntervals.Length && score >= shiftIntervals[(int)dayState])
+    int numServed = GameManager.Instance.scoreMan.numServed;
+    if ((int)dayState < shiftIntervals.Length && numServed >= shiftIntervals[(int)dayState])
     {
       for (int i = 0; i < (int)DAY_STATE.NUM_SHIFTS; ++i)
       {
         if ((int)dayState == i) continue;
 
-        if (i >= shiftIntervals.Length || score < shiftIntervals[i])
+        if (i >= shiftIntervals.Length || numServed < shiftIntervals[i])
         {
           // Change the feedback text to reflect shift
           dayState = ((DAY_STATE)i);
@@ -163,6 +164,6 @@ public class DayManager : MonoBehaviour {
   {
     if (shift <= 0) return true;
     int shiftNum = shiftIntervals[(int)shift - 1];
-    return GameManager.Instance.scoreMan.score + 3 >= shiftNum;
+    return GameManager.Instance.scoreMan.numServed + 3 >= shiftNum;
   }
 }

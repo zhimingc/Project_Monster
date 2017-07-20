@@ -90,10 +90,18 @@ public class ContractInfo : Info
   {
     type = _type;
     isActive = true;
+
+    switch(type)
+    {
+      case CONTRACT_TYPE.TIMER:
+        contractIcon = Resources.Load<Sprite>("Sprites/UI/stopwatch_full");
+        break;
+    }
   }
 
   public CONTRACT_TYPE type;
   public bool isActive;
+  public Sprite contractIcon;
 }
 
 static public class ObjectFactory

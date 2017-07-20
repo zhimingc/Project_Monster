@@ -15,6 +15,8 @@ public class ContractSetup : MonoBehaviour {
       info = GameManager.Instance.contracts[info.type];
     }
     else info.isActive = false;
+
+    info.contractIcon = icon.GetComponent<SpriteRenderer>().sprite;
     UpdateDisplay();
   }
 	
@@ -26,9 +28,7 @@ public class ContractSetup : MonoBehaviour {
       GetComponent<SpriteRenderer>().color = newColor;
       feedback_box.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/tick_box");
       feedback_box.GetComponent<SpriteRenderer>().enabled = false;
-      //feedback_box.GetComponent<SpriteRenderer>().color = newColor - new Color(0, 0, 0, 0.75f);
       feedback_box.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.25f);
-
     }
     else
     {
@@ -36,8 +36,6 @@ public class ContractSetup : MonoBehaviour {
       GetComponent<SpriteRenderer>().color = newColor;
       feedback_box.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/cross_box");
       feedback_box.GetComponent<SpriteRenderer>().enabled = true;
-
-      //feedback_box.GetComponent<SpriteRenderer>().color = newColor - new Color(0, 0, 0, 0.75f);
       feedback_box.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.25f);
     }
 
