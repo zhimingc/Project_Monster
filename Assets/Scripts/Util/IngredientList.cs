@@ -260,7 +260,7 @@ static public class ObjectFactory
         ingredient.GetComponent<SpriteRenderer>().color = Color.green; 
         break; 
       case INGREDIENT_TYPE.MEAT:
-        sprite = Resources.Load<Sprite>("Sprites/meat_top");
+        sprite = Resources.Load<Sprite>("Sprites/meat_top4");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         break;
       case INGREDIENT_TYPE.CHEESE:
@@ -295,7 +295,7 @@ static public class ObjectFactory
         ingredient.GetComponent<SpriteRenderer>().color = Color.green;
         break;
       case INGREDIENT_TYPE.MEAT:
-        sprite = Resources.Load<Sprite>("Sprites/meat_side");
+        sprite = Resources.Load<Sprite>("Sprites/meat_side4");
         ingredient.GetComponent<SpriteRenderer>().sprite = sprite;
         ingredient.GetComponent<SpriteRenderer>().color = Color.white;
         break;
