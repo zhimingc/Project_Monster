@@ -205,7 +205,7 @@ static public class ObjectFactory
         //Utility.SetColorFromHex(plate, "#58EAFFFF");
         break;
       case SAUCE_TYPE.MUSTARD: // sauce_oj
-        Utility.SetColorFromHex(plate, "#F2D354FF");
+        Utility.SetColorFromHex(plate, "##e6880b");
         break;
       case SAUCE_TYPE.WASABI: // sauce_tomato
         Utility.SetColorFromHex(plate, "#E34B4BFF");
