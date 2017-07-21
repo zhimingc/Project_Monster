@@ -84,7 +84,7 @@ public class MonsterManager : MonoBehaviour {
     requestBoxes.Add(GameObject.Find("monster_request_0").GetComponent<MonsterRequest>());
     requestBoxes.Add(GameObject.Find("monster_request_1").GetComponent<MonsterRequest>());
     requestBoxes.Add(GameObject.Find("monster_request_2").GetComponent<MonsterRequest>());
-    GameObject monsterReq = Resources.Load<GameObject>("Prefabs/monster_holder");
+    GameObject monsterReq = Resources.Load<GameObject>("Prefabs/Gameplay/monster_holder");
     reserveMonsters.Add(Instantiate(monsterReq));
     reserveMonsters.Add(Instantiate(monsterReq));
     reserveMonsters.Add(Instantiate(monsterReq));
