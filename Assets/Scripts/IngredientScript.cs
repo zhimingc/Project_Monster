@@ -17,9 +17,11 @@ public class IngredientScript : MonoBehaviour {
 
     if (sauce != SAUCE_TYPE.EMPTY)
     {
-      Sprite sauceSprite = Resources.Load<Sprite>("Sprites/bottle_empty");
-      GetComponent<SpriteRenderer>().sprite = sauceSprite;
-      transform.localEulerAngles = new Vector3(0, 0, 45.0f);
+      //Sprite sauceSprite = Resources.Load<Sprite>("Sprites/bottle_empty");
+      //GetComponent<SpriteRenderer>().sprite = sauceSprite;
+
+      ObjectFactory.InitializeSauce(gameObject, sauceType);
+      //transform.localEulerAngles = new Vector3(0, 0, 45.0f);
     }
   }
 

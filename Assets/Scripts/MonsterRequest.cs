@@ -123,7 +123,7 @@ public class MonsterRequest : MonoBehaviour {
     }
 
     // Set display according to sauce type
-    ObjectFactory.InitializeSauce(gameObject, req.sauce);
+    ObjectFactory.InitializeSaucePlate(gameObject, req.sauce);
 
     // Set display according to grid type
     ObjectFactory.InitializeGrid(gameObject, req.gridType);

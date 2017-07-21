@@ -65,10 +65,11 @@ public class GridScript : MonoBehaviour {
       localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.5f, 1.0f));
       ingredient.transform.localScale = localScale;
 
-      //ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.0f + i * localScale.y * 2.0f, 0);
       ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.25f + i * localScale.y / 2.5f, 0);
-
       ingredient.transform.SetParent(transform);
+      //ingredient.transform.localPosition = new Vector3(0, -transform.localScale.y / 10.0f + i * localScale.y / 5.0f, 0);
+      //ingredient.transform.localPosition = new Vector3(0, i * localScale.y / 5.0f, 0);
+
       stackObjs.Add(ingredient);
     }
 
@@ -269,7 +270,8 @@ public class GridScript : MonoBehaviour {
     }
 
     // Update sauce feedback for grid
-    ObjectFactory.InitializeSauce(gameObject, sauceType);
+    ObjectFactory.InitializeSaucePlate(gameObject, sauceType);
+    //(gameObject, sauceType);
 
     // Update grid type feedback
     ObjectFactory.InitializeGrid(gameObject, gridType);
@@ -369,7 +371,10 @@ public class GridScript : MonoBehaviour {
   {
     canServe = flag;
     monsterServeObj.SetActive(flag);
-    monsterServeObj.GetComponent<SpriteRenderer>().sprite = setReq.monsterObj.GetComponent<SpriteRenderer>().sprite;
+    if (setReq)
+    {
+      monsterServeObj.GetComponent<SpriteRenderer>().sprite = setReq.monsterObj.GetComponent<SpriteRenderer>().sprite;
+    }
     monReq = setReq;
   }
 

@@ -9,7 +9,7 @@ public class ScoreManager : MonoBehaviour {
   public int numServed;
   public float scoreSpeed;  // how long it takes for the numbers to add
 
-  private GameObject scoreObj;
+  private GameObject scoreObj, numServedObj;
   // trueScore is the true amount, incScore is the amount to add per frame
   public int trueScore, incScore;
   public int totalCurrency;
@@ -37,14 +37,17 @@ public class ScoreManager : MonoBehaviour {
   public void AddNumberServed(int amt)
   {
     numServed += amt;
-  }
 
+    // Update text
+    numServedObj.GetComponent<TextMesh>().text = "Served: " + numServed.ToString();
+  }
 
   public void InitScore()
   {
     if (GameManager.Instance.IsInGame())
     {
       scoreObj = GameObject.Find("money_text");
+      numServedObj = GameObject.Find("served_text");
       scoreOriginalScale = scoreObj.transform.localScale;
     }
     numServed = 0;

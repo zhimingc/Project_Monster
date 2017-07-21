@@ -115,9 +115,9 @@ public class SauceScript : MonoBehaviour {
     }
     else
     {
-      Color sauceColor = sauceObj.GetComponentsInChildren<SpriteRenderer>()[1].color;
-      GetComponent<SpriteRenderer>().color = sauceColor;
-      sauceObj.GetComponent<SpriteRenderer>().color = sauceColor;
+      //Color sauceColor = sauceObj.GetComponentsInChildren<SpriteRenderer>()[1].color;
+      //GetComponent<SpriteRenderer>().color = sauceColor;
+      //sauceObj.GetComponent<SpriteRenderer>().color = sauceColor;
     }
   }
 
@@ -132,6 +132,9 @@ public class SauceScript : MonoBehaviour {
     sauceObj.GetComponent<IngredientBlock>().isUsable = true;
     sauceObj.transform.parent = transform;
     sauceObj.GetComponent<SpriteRenderer>().enabled = false;
+
+    // color grid
+    ObjectFactory.InitializeSaucePlate(sauceObj, sauceType);
 
     sauceObj.GetComponent<BoxCollider2D>().enabled = false;
   }

@@ -196,19 +196,48 @@ static public class ObjectFactory
     }
   }
 
-  static public void InitializeSauce(GameObject ingredient, SAUCE_TYPE type)
+  static public void InitializeSaucePlate(GameObject plate, SAUCE_TYPE type)
   {
     switch (type)
+    {  
+      case SAUCE_TYPE.SOYSAUCE: // sauce_grape
+        Utility.SetColorFromHex(plate, "#D453F0FF");
+        //Utility.SetColorFromHex(plate, "#58EAFFFF");
+        break;
+      case SAUCE_TYPE.MUSTARD: // sauce_oj
+        Utility.SetColorFromHex(plate, "#F2D354FF");
+        break;
+      case SAUCE_TYPE.WASABI: // sauce_tomato
+        Utility.SetColorFromHex(plate, "#E34B4BFF");
+        break;
+      case SAUCE_TYPE.EMPTY:
+        plate.GetComponent<SpriteRenderer>().color = Color.white;
+        break;
+    }
+  }
+
+  static public void InitializeSauce(GameObject ingredient, SAUCE_TYPE type)
+  {
+    Sprite sauceSprite = Resources.Load<Sprite>("Sprites/slot_square");
+
+    switch (type)
     {
+      // sauce_grape
       case SAUCE_TYPE.SOYSAUCE:
         //Utility.SetColorFromHex(ingredient, "#3C3C3CFF");
-        Utility.SetColorFromHex(ingredient, "#58EAFFFF");
+        //Utility.SetColorFromHex(ingredient, "#58EAFFFF");
+        sauceSprite = Resources.Load<Sprite>("Sprites/sauce_grape");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sauceSprite;
         break;
       case SAUCE_TYPE.MUSTARD:
-        Utility.SetColorFromHex(ingredient, "#ffc04c");
+        //Utility.SetColorFromHex(ingredient, "#ffc04c");
+        sauceSprite = Resources.Load<Sprite>("Sprites/sauce_oj");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sauceSprite;
         break;
       case SAUCE_TYPE.WASABI:
-        Utility.SetColorFromHex(ingredient, "#58FF6EFF");
+        //Utility.SetColorFromHex(ingredient, "#58FF6EFF");
+        sauceSprite = Resources.Load<Sprite>("Sprites/sauce_tomato");
+        ingredient.GetComponent<SpriteRenderer>().sprite = sauceSprite;
         break;
       case SAUCE_TYPE.EMPTY:
         ingredient.GetComponent<SpriteRenderer>().color = Color.white;
@@ -279,7 +308,7 @@ static public class ObjectFactory
         ingredient.GetComponent<SpriteRenderer>().color = Color.red;
         break;
       case INGREDIENT_TYPE.SAUCE:
-        InitializeSauce(ingredient, sauce);
+        //InitializeSaucePlate(ingredient, sauce);
         break;
       case INGREDIENT_TYPE.EMPTY:
         sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
