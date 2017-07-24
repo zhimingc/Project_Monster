@@ -12,20 +12,14 @@ public class ScoreManager : MonoBehaviour {
   private GameObject scoreObj, numServedObj;
   // trueScore is the true amount, incScore is the amount to add per frame
   public int trueScore, incScore;
-  public int totalCurrency;
   private int curScore;
   private Vector3 scoreOriginalScale;
-
-  void Start()
-  {
-    totalCurrency = 0;
-  }
 
   public int AddScore(int amt)
   {
     amt = (int) (amt * GameManager.Instance.comboMan.GetComboMultiplier());
     trueScore += amt;
-    totalCurrency += amt;
+    //GameManager.Instance.AddTotalPopularity(amt);
 
     // compute the amount of be added every frame
     ComputeIncScore();
@@ -89,7 +83,7 @@ public class ScoreManager : MonoBehaviour {
 
   public void DisplayScore()
   {
-    scoreObj.GetComponent<TextMesh>().text = "$" + curScore.ToString();
+    scoreObj.GetComponent<TextMesh>().text = curScore.ToString();
   }
 
 }

@@ -165,7 +165,9 @@ static public class ObjectFactory
     switch (type)
     {
       case ITEM_TYPE.EMPTY:
-        block.GetComponent<SpriteRenderer>().enabled = false;
+        itemSprite = Resources.Load<Sprite>("Sprites/UI/locked");
+        block.GetComponent<SpriteRenderer>().sprite = itemSprite;
+        block.GetComponent<SpriteRenderer>().color = Color.black;
         break;
       case ITEM_TYPE.EATER:
         itemSprite = Resources.Load<Sprite>("Sprites/cross");
@@ -202,10 +204,9 @@ static public class ObjectFactory
     {  
       case SAUCE_TYPE.SOYSAUCE: // sauce_grape
         Utility.SetColorFromHex(plate, "#D453F0FF");
-        //Utility.SetColorFromHex(plate, "#58EAFFFF");
         break;
       case SAUCE_TYPE.MUSTARD: // sauce_oj
-        Utility.SetColorFromHex(plate, "##e6880b");
+        Utility.SetColorFromHex(plate, "#e6880b");
         break;
       case SAUCE_TYPE.WASABI: // sauce_tomato
         Utility.SetColorFromHex(plate, "#E34B4BFF");

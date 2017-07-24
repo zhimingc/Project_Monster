@@ -20,7 +20,7 @@ public class IngredientScript : MonoBehaviour {
       //Sprite sauceSprite = Resources.Load<Sprite>("Sprites/bottle_empty");
       //GetComponent<SpriteRenderer>().sprite = sauceSprite;
 
-      ObjectFactory.InitializeSauce(gameObject, sauceType);
+      //ObjectFactory.InitializeSauce(gameObject, sauceType);
       //transform.localEulerAngles = new Vector3(0, 0, 45.0f);
     }
   }

@@ -21,6 +21,8 @@ public class ItemSetup : BlockBehaviour {
 
   public void OnTouchStay()
   {
+    if (info.type == ITEM_TYPE.EMPTY) return;
+
     // for items to be dragged and used
     if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
     {

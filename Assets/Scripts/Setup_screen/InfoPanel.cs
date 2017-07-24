@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class InfoPanel : MonoBehaviour {
 
-  public GameObject info_icon, upgradeButton;
+  public GameObject info_icon;
   public TextMesh currencyText;
   public Text info_text, detail_neg, detail_pos;
 
@@ -31,18 +31,16 @@ public class InfoPanel : MonoBehaviour {
 
   void UpdateCurrenyText()
   {
-    currencyText.text = "$" + GameManager.Instance.scoreMan.totalCurrency.ToString();
+    currencyText.text = GameManager.Instance.gameData.popularity_total.ToString();
   }
 
   void EmptyInfoPanel()
   {
     info_text.text = 
-      "Toggle contracts by tapping contracts above. \n\n\nChoose tools by dragging from toolbox into tool slots.";
+      "Tap icons to see more info";
     detail_neg.text = "";
     detail_pos.text = "";
     info_icon.GetComponent<SpriteRenderer>().enabled = false;
-    upgradeButton.SetActive(false);
-
   }
 
   public void UpdateInfoPanel(GameObject obj, Info info)
@@ -54,9 +52,6 @@ public class InfoPanel : MonoBehaviour {
     ItemInfo item = info as ItemInfo;
     if (item != null)
     {
-      upgradeButton.SetActive(true);
-      upgradeButton.GetComponentInChildren<TextMesh>().text = "Upgrade";
-
       switch (item.type)
       {
         case ITEM_TYPE.EATER:
@@ -75,17 +70,6 @@ public class InfoPanel : MonoBehaviour {
     ContractInfo contract = info as ContractInfo;
     if (contract != null)
     {
-      // cant upgrade contracts
-      upgradeButton.SetActive(false);
-      if (contract.isActive)
-      {
-        upgradeButton.GetComponentInChildren<TextMesh>().text = "Active";
-      }
-      else
-      {
-        upgradeButton.GetComponentInChildren<TextMesh>().text = "Inactive";
-      }
-
       switch (contract.type)
       {
         case CONTRACT_TYPE.TIMER:
@@ -94,7 +78,6 @@ public class InfoPanel : MonoBehaviour {
           detail_pos.text = "Cash+";
           break;
       }
-
     }
 
     // update icon

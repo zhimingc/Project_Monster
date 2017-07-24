@@ -16,7 +16,8 @@ public enum BUTTON_TYPE
   TOG_MUSIC,
   TOG_SFX,
   CONTINUE_GAME,
-  TO_SETUP
+  TO_SETUP,
+  SETUP_TOGGLE
 }
 
 public class ButtonBehaviour : MonoBehaviour {

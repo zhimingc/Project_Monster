@@ -10,6 +10,14 @@ public enum GAME_STATE
   LOSE,
 }
 
+// data which determines player progress in the game 
+[System.Serializable]
+public class GameData
+{
+  public int popularity_total;
+
+}
+
 public class GameManager : Singleton<GameManager>
 {
   // guarantee this will be always a singleton only - can't use the constructor!
@@ -20,6 +28,7 @@ public class GameManager : Singleton<GameManager>
   public bool levelCompleted;
   public int currentLevel;
   public int turnCounter;
+  public GameData gameData;
 
   public ScoreManager scoreMan;
   public DayManager dayMan;
@@ -50,8 +59,9 @@ public class GameManager : Singleton<GameManager>
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
-    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EATER), new ItemInfo(ITEM_TYPE.BIN) };
+    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
+    gameData = new GameData();
 
     // DEBUG HACK TO ADD CONTRACTS
     contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
@@ -442,7 +452,27 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.TO_SETUP:
         LoadSceneWithTransition("screen-setup");
         break;
+      case BUTTON_TYPE.SETUP_TOGGLE:
+        GameObject counter = GameObject.Find("counter_parent");
+        bool flipped = btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX;
+        btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX = !flipped;
+        LeanTween.cancel(counter);
+
+        if (!flipped)
+        {
+          LeanTween.moveY(counter, -2.0f, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+        }
+        else
+        {
+          LeanTween.moveY(counter, -5.0f, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+        }
+        break;
     }
+  }
+
+  public void AddTotalPopularity(int amt)
+  {
+    gameData.popularity_total += amt;
   }
 }
 
