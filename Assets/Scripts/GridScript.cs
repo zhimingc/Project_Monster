@@ -382,7 +382,7 @@ public class GridScript : MonoBehaviour {
   {
     // set text display
     TextMesh[] texts = scoreText.GetComponentsInChildren<TextMesh>();
-    foreach(TextMesh txt in texts) txt.text = "$" + amt.ToString();
+    foreach(TextMesh txt in texts) txt.text = amt.ToString();
 
     // animate text
     scoreText.SetActive(true);

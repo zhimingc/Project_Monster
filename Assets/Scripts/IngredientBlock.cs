@@ -21,14 +21,8 @@ public class IngredientBlock : BlockBehaviour
   public void AddIngredient(GameObject ingredient) 
   { 
     ingredients.Add(ingredient);
-    childenObjs.Add(ingredient);
+    childrenObjs.Add(ingredient);
   }
-
-  //public void ToggleIngredients(bool flag)
-  //{
-  //  foreach (GameObject obj in ingredients)
-  //    obj.GetComponent<SpriteRenderer>().enabled = flag;
-  //}
 
   public IngredientScript GetIngredientScript(int index)
   {
@@ -105,6 +99,35 @@ public class IngredientBlock : BlockBehaviour
     if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
     {
       StartDrag();
+    }
+  }
+
+  new public void ToggleUsability(bool flag)
+  {
+    isUsable = flag;
+    if (isUsable == true)
+    {
+      GetComponent<BoxCollider2D>().enabled = true;
+      GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+      foreach (GameObject obj in childrenObjs)
+      {
+        obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        obj.GetComponent<Animator>().SetBool("idle_anim", true);
+      }
+
+      transform.localScale = idleScale;
+    }
+    else
+    {
+      GetComponent<BoxCollider2D>().enabled = false;
+      GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+      foreach (GameObject obj in childrenObjs)
+      {
+        obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+        obj.GetComponent<Animator>().SetBool("idle_anim", false);
+      }
+
+      transform.localScale = idleScale * 0.75f;
     }
   }
 }

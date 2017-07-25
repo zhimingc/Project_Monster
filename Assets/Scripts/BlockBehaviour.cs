@@ -8,7 +8,7 @@ public class BlockBehaviour : MonoBehaviour
   public Vector2[] layout;
   public Vector3 oldPos;
   public bool isReverseLayout;
-  public List<GameObject> childenObjs;
+  public List<GameObject> childrenObjs;
 
   protected PlayerScript playerScript;
 
@@ -21,7 +21,7 @@ public class BlockBehaviour : MonoBehaviour
     isReverseLayout = false;
     //isBigScale = false;
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
-    childenObjs = new List<GameObject>();
+    childrenObjs = new List<GameObject>();
   }
 
   // Use this for initialization
@@ -47,7 +47,7 @@ public class BlockBehaviour : MonoBehaviour
 
   public void ToggleObjects(bool flag)
   {
-    foreach (GameObject obj in childenObjs)
+    foreach (GameObject obj in childrenObjs)
       obj.GetComponent<SpriteRenderer>().enabled = flag;
   }
 

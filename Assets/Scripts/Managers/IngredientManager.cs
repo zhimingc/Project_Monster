@@ -11,7 +11,7 @@ public class IngredientDistribution
 public class IngredientManager : MonoBehaviour {
 
   public bool isSpawnHorizontal, isSpawnLeft;
-  public GameObject block, center, connector; 
+  public GameObject block, center; 
   public List<GameObject> ingredientList;
   public int numberOfIngredients;
   public IngredientDistribution distribution;
@@ -29,9 +29,6 @@ public class IngredientManager : MonoBehaviour {
   private int ingredientFlipflop;
   private int ingredientCountdown; // Spawns bread until countdown is up
   private int maxCountdown;
-  //private int ingredientCountup;   // For specific ingredients spawn, e.g. eater
-                                   //private int sauceFlipflop;       // Switches between all sauce types
-
   private int maxLayout;
 
   // Use this for initialization 
@@ -120,20 +117,14 @@ public class IngredientManager : MonoBehaviour {
     int layout = GenerateLayout();
 
     // Generate ingredient 
-    return GenerateIngredient(type, sauce, layout, transform);
-  }
+    GameObject genIngredient = GenerateIngredient(type, sauce, layout, transform);
+    BlockBehaviour genScript = genIngredient.GetComponent<BlockBehaviour>();
+    foreach(GameObject obj in genScript.childrenObjs)
+    {
+      obj.GetComponent<Animator>().SetBool("idle_anim", true);
+    }
 
-  GameObject RandomizeIngredient() 
-  { 
-    // Get random type 
-    INGREDIENT_TYPE type = (INGREDIENT_TYPE)Random.Range(0, numberOfIngredients);
-    SAUCE_TYPE sauce = SAUCE_TYPE.EMPTY;
-
-    // Get random layout 
-    int layout = Random.Range(0, ObjectFactory.blockLayouts.Length); 
- 
-    // Generate ingredient 
-    return GenerateIngredient(type, sauce, layout, transform); 
+    return genIngredient;
   }
 
   void AddIngredientToList(GameObject ingredient) 

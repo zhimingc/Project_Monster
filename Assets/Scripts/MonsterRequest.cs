@@ -6,6 +6,10 @@ public enum MONSTER_TYPE
 {
   NORMAL,
   TIMED,
+  PICKY,
+  RUDE,
+  GREEDY,
+  NUM_TYPES
 };
 
 public struct MonsterTypeParams
@@ -18,7 +22,6 @@ public class MonsterRequest : MonoBehaviour {
 
   public GameObject ingredientObj, speechBubble, monsterObj;
   public Request request;
-  public MONSTER_TYPE monsterType;
 
   private List<GameObject> ingredientStackObjs;
   private Vector3 originScale;
@@ -42,7 +45,7 @@ public class MonsterRequest : MonoBehaviour {
   {
     if (GameManager.Instance.IsPaused()) return;
 
-    switch (monsterType)
+    switch (request.monsterType)
     {
       case MONSTER_TYPE.TIMED:
         if (typeParams.curTimer <= 0.0f)
@@ -68,11 +71,11 @@ public class MonsterRequest : MonoBehaviour {
 
   void SetMonsterType(Request req)
   {
-    monsterType = req.monsterType;
+    request.monsterType = req.monsterType;
     typeParams = req.typeParams;
 
     // init depending on monster type
-    switch (monsterType)
+    switch (request.monsterType)
     {
       case MONSTER_TYPE.NORMAL:
         stopwatch.SetActive(false);

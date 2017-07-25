@@ -19,6 +19,7 @@ public class RequestParameters
   public int[] sauceDist = new int[] { 33, 33, 34 };
   public int[] waresDist = new int[] { 50, 50 };
   public int[] ingredientDist = new int[] { 50, 50 };
+  //public int[] ingredientDist = new int[] { 33, 33, 33 };
   public int weightSwing = 10;  // swings the weight of the other distributions by this amt
 
   // Contract parameters
@@ -108,19 +109,19 @@ public class MonsterManager : MonoBehaviour {
     // Timer for requests
     //if (rp.isTimerOn) UpdateRequestTimer();
 
-    if (Input.GetKeyDown(KeyCode.R))
-    {
-      foreach (MonsterRequest box in requestBoxes)
-      {
-        Request req = GenerateRandomRequest();
-        box.SetRequest(req);
-      }
-    }
+    //if (Input.GetKeyDown(KeyCode.R))
+    //{
+    //  foreach (MonsterRequest box in requestBoxes)
+    //  {
+    //    Request req = GenerateRandomRequest();
+    //    box.SetRequest(req);
+    //  }
+    //}
 
-    if (Input.GetKeyDown(KeyCode.S))
-    {
-      PlayEatingSound();
-    }
+    //if (Input.GetKeyDown(KeyCode.S))
+    //{
+    //  PlayEatingSound();
+    //}
 	}
 
   public void UpdateMonsterRP()
@@ -235,7 +236,7 @@ public class MonsterManager : MonoBehaviour {
     GameManager.Instance.comboMan.AddComboCount();
 
     // Increase score
-    int scoreAdded = GameManager.Instance.AddScore(100);
+    int scoreAdded = GameManager.Instance.AddScore(10);
     GameManager.Instance.AddNumServed(1);
 
     // update score text in grid
@@ -276,11 +277,12 @@ public class MonsterManager : MonoBehaviour {
 
     List<int> allMonsterTypes = new List<int>();
     // List of contracted monsters
-    allMonsterTypes.Add(0);
-    if (rp.timerContractOn) allMonsterTypes.Add((int)MONSTER_TYPE.TIMED);
+    //allMonsterTypes.Add(0);
+    //if (rp.timerContractOn) allMonsterTypes.Add((int)MONSTER_TYPE.TIMED);
 
     // Generate monster type
-    req.monsterType = (MONSTER_TYPE) allMonsterTypes[Random.Range(0, allMonsterTypes.Count)];
+    //req.monsterType = (MONSTER_TYPE) allMonsterTypes[Random.Range(0, allMonsterTypes.Count)];
+    req.monsterType = RollMonsterType();
 
     switch (req.monsterType)
     {
@@ -289,6 +291,25 @@ public class MonsterManager : MonoBehaviour {
         req.typeParams.curTimer = rp.timerMax;
         break;
     }
+  }
+
+  MONSTER_TYPE RollMonsterType()
+  {
+    int roll = Random.Range(0, 100);
+    MONSTER_TYPE ret = MONSTER_TYPE.NORMAL;
+    float odds = 0;
+
+    for (int i = 0; i < (int)MONSTER_TYPE.NUM_TYPES; ++i)
+    {
+      odds += GameManager.Instance.gameData.pop_monsters[i];
+      if (roll < odds)
+      {
+        ret = (MONSTER_TYPE)i;
+        break;
+      }
+    }
+
+    return ret;
   }
   
 

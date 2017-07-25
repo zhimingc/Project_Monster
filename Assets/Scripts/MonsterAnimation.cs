@@ -49,8 +49,8 @@ public class MonsterAnimation : MonoBehaviour {
   public void MoveInFrom(Vector3 from)
   {
     // monsters moving out are angry (sprite)
-    int randomSprite = Random.Range(0, 2);
-    GetComponent<SpriteRenderer>().sprite = monsterStates[randomSprite];
+    int spriteIndex = (int)requestObj.GetComponent<MonsterRequest>().request.monsterType;
+    GetComponent<SpriteRenderer>().sprite = monsterStates[spriteIndex];
 
     GetComponent<Animator>().SetBool("isMoving", true);
     parent.transform.position = from;

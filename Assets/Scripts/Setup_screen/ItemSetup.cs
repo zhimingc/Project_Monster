@@ -14,6 +14,12 @@ public class ItemSetup : BlockBehaviour {
     draggedScale = idleScale * 1.5f;
   }
 
+  public void SetItemType(ITEM_TYPE item)
+  {
+    info.type = item;
+    ObjectFactory.InitializeItem(gameObject, info.type);
+  }
+
   void OnMouseOver()
   {
     OnTouchStay();
@@ -31,6 +37,24 @@ public class ItemSetup : BlockBehaviour {
       // update for item selection
       UpdateInfoPanel();
     }
+  }
+
+  new public void StartDrag()
+  {
+    beingDragged = true;
+    GetComponent<BoxCollider2D>().enabled = false;
+
+    // Update player script
+    GameObject.Find("player").GetComponent<PlayerScript>().DragIngredientBlock(this);
+    playerScript.SetPlayerState(PLAYER_STATE.DRAGGING);
+
+    // Original scale when dragging
+    ToggleScale();
+
+    oldPos = transform.position;
+
+    // update tool box manager if this is a new tool
+    GetComponentInParent<ToolManager>().OffNewToolIndicator(gameObject);
   }
 
   new protected void Update()

@@ -5,9 +5,9 @@ using UnityEngine;
 public enum RANKS
 {
   BIN_TOOL,
-  LUNCH,
+  //LUNCH,
   EATER_TOOL,
-  DINNER,
+  //DINNER,
   IMPATIENT_MON,
   TURNTABLE_TOOL,
   PICKY_MON,
@@ -18,12 +18,12 @@ public static class GameProgression {
   public static int[] rankReq = new int[(int)RANKS.NUM_MILESTONES]
   {
     200,  // bin
-    400,  // lunch
-    800,  // eater
-    1200, // dinner
-    2000, // impatient
-    3000, // turntable
-    4500, // picky 
+    //400,  // lunch
+    400,  // eater
+    //1200, // dinner
+    800, // impatient
+    1500, // turntable
+    2500, // picky 
   };
 	
 }

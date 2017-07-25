@@ -15,8 +15,6 @@ public class InfoPanel : MonoBehaviour {
 	void Start () {
     EmptyInfoPanel();
     panelTriggered = false;
-
-    UpdateCurrenyText();
   }
 
   // Update is called once per frame
@@ -27,11 +25,6 @@ public class InfoPanel : MonoBehaviour {
       if (!panelTriggered) EmptyInfoPanel();
       else panelTriggered = false;
     }
-  }
-
-  void UpdateCurrenyText()
-  {
-    currencyText.text = GameManager.Instance.gameData.popularity_total.ToString();
   }
 
   void EmptyInfoPanel()

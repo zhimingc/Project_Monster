@@ -11,15 +11,15 @@ public class ScoreManager : MonoBehaviour {
 
   private GameObject scoreObj, numServedObj;
   // trueScore is the true amount, incScore is the amount to add per frame
-  public int trueScore, incScore;
-  private int curScore;
+  public int totalScore, incScore;
+  public int curScore, curInstantScore;
   private Vector3 scoreOriginalScale;
 
   public int AddScore(int amt)
   {
     amt = (int) (amt * GameManager.Instance.comboMan.GetComboMultiplier());
-    trueScore += amt;
-    //GameManager.Instance.AddTotalPopularity(amt);
+    totalScore += amt;
+    curInstantScore += amt;
 
     // compute the amount of be added every frame
     ComputeIncScore();
@@ -44,20 +44,24 @@ public class ScoreManager : MonoBehaviour {
       numServedObj = GameObject.Find("served_text");
       scoreOriginalScale = scoreObj.transform.localScale;
     }
-    numServed = 0;
-    curScore = 0;
-    trueScore = 0;
 
-    scoreSpeed = 0.25f;
+    // for kitchen setup scene
+    numServed = 0;
+    incScore = 0;
+    curScore = 0;
+    curInstantScore = 0;
+    totalScore = GameManager.Instance.GetTotalPopularity();
+
+    scoreSpeed = 0.5f;
     DisplayScore();
   }
 
   void Update()
   {
-    if (curScore != trueScore)
+    if (curScore != curInstantScore)
     {
       curScore += incScore;
-      if (curScore >= trueScore) curScore = trueScore;
+      if (curScore >= curInstantScore) curScore = curInstantScore;
       DisplayScore();
     }
   }
@@ -76,14 +80,15 @@ public class ScoreManager : MonoBehaviour {
 
   void ComputeIncScore()
   {
-    int diff = trueScore - curScore;
-    int tmpInc = (int) ((diff * Time.deltaTime) / scoreSpeed);
+    int diff = curInstantScore - curScore;
+    int tmpInc = (int)Mathf.Ceil((diff * Time.deltaTime) / scoreSpeed);
     if (tmpInc > incScore) incScore = tmpInc;
   }
 
   public void DisplayScore()
   {
-    scoreObj.GetComponent<TextMesh>().text = curScore.ToString();
+    if (scoreObj)
+      scoreObj.GetComponent<TextMesh>().text = curScore.ToString();
   }
 
 }

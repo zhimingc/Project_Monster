@@ -133,7 +133,7 @@ static public class ObjectFactory
     ingredientObj.transform.position = ingredientHolder.transform.position;
     ingredientObj.transform.localScale = newScale;
     ingredientObj.transform.SetParent(ingredientHolder.transform);
-    parent.childenObjs.Add(ingredientObj);
+    parent.childrenObjs.Add(ingredientObj);
 
     // Create ingredient layout 
     foreach (Vector2 vec in parent.layout)
@@ -146,7 +146,7 @@ static public class ObjectFactory
       // Create ingredients within connection 
       GameObject newIngredient = new GameObject("Object");
       newIngredient.transform.localScale = newScale;
-      parent.childenObjs.Add(newIngredient);
+      parent.childrenObjs.Add(newIngredient);
 
       // Initialize new ingredient 
       Vector3 offset = Vector2.Scale(vec, newScale);

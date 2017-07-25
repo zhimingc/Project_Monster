@@ -14,8 +14,17 @@ public enum GAME_STATE
 [System.Serializable]
 public class GameData
 {
-  public int popularity_total;
+  // initialize game data with serialization later
+  public GameData()
+  {
+    pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+    pop_monsters[0] = 100.0f;
+  }
 
+  public int pop_total;
+  public int pop_rank;
+  public float[] pop_monsters;
+  public bool indicator_newTool;
 }
 
 public class GameManager : Singleton<GameManager>
@@ -64,7 +73,7 @@ public class GameManager : Singleton<GameManager>
     gameData = new GameData();
 
     // DEBUG HACK TO ADD CONTRACTS
-    contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
+    //contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
 
     // Init for when scene loads
     if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
@@ -187,6 +196,7 @@ public class GameManager : Singleton<GameManager>
     loadMan.LoadOut();
     LeanTween.delayedCall(loadMan.loadSpeed, () =>
     {
+      LeanTween.cancelAll();
       SceneManager.LoadScene(name);
     });
   }
@@ -264,6 +274,13 @@ public class GameManager : Singleton<GameManager>
 
     // load screen
     loadMan.LoadIn();
+
+    // behaviour once scene is loaded
+    LeanTween.delayedCall(loadMan.loadSpeed, () =>
+    {
+      if (GameObject.FindWithTag("PopularityMan"))
+        GameObject.FindWithTag("PopularityMan").GetComponent<PopularityManager>().TriggerPopularityUpdate();
+    });
 
     // splash screen behaviour
     if (SceneManager.GetActiveScene().name == "screen-splash")
@@ -453,26 +470,27 @@ public class GameManager : Singleton<GameManager>
         LoadSceneWithTransition("screen-setup");
         break;
       case BUTTON_TYPE.SETUP_TOGGLE:
-        GameObject counter = GameObject.Find("counter_parent");
-        bool flipped = btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX;
+        var setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
+        bool flipped = setupMan.isCounterUp;
         btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX = !flipped;
-        LeanTween.cancel(counter);
-
-        if (!flipped)
-        {
-          LeanTween.moveY(counter, -2.0f, 0.75f).setEase(LeanTweenType.easeInOutQuad);
-        }
-        else
-        {
-          LeanTween.moveY(counter, -5.0f, 0.75f).setEase(LeanTweenType.easeInOutQuad);
-        }
+        setupMan.ToggleCounter(!flipped);
         break;
     }
   }
 
   public void AddTotalPopularity(int amt)
   {
-    gameData.popularity_total += amt;
+    gameData.pop_total += amt;
+  }
+
+  public void SetTotalPopularity(int amt)
+  {
+    gameData.pop_total = amt;
+  }
+
+  public int GetTotalPopularity()
+  {
+    return gameData.pop_total;
   }
 }
 

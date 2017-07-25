@@ -103,7 +103,7 @@ public class ItemSpawn : MonoBehaviour {
         // Bins have no layout so it stays 0
         GenerateItemSingle(blockScript, transform);
 
-        ObjectFactory.InitializeItem(blockScript.childenObjs[0], info.type);
+        ObjectFactory.InitializeItem(blockScript.childrenObjs[0], info.type);
         break;
       case ITEM_TYPE.EATER:
         // Get random layout 
@@ -111,10 +111,18 @@ public class ItemSpawn : MonoBehaviour {
         blockScript.layout = ObjectFactory.blockLayouts[layout];
 
         GenerateItemBlock(blockScript, transform);
-        foreach (GameObject child in blockScript.childenObjs)
+        foreach (GameObject child in blockScript.childrenObjs)
         {
           ObjectFactory.InitializeItem(child, info.type);
         }
+        break;
+      case ITEM_TYPE.EMPTY:
+        // Bins have no layout so it stays 0
+        GenerateItemSingle(blockScript, transform);
+        blockScript.childrenObjs[0].transform.localScale = new Vector3(0.75f, 0.75f, 1.0f);
+        blockScript.childrenObjs[0].GetComponent<Animator>().SetBool("idle_anim", false);
+
+        ObjectFactory.InitializeItem(blockScript.childrenObjs[0], info.type);
         break;
     }
 
@@ -134,7 +142,7 @@ public class ItemSpawn : MonoBehaviour {
     ingredientHolder.transform.SetParent(parent.transform);
 
     GameObject ingredientObj = Instantiate(itemPrefab, ingredientHolder.transform);
-    parent.childenObjs.Add(ingredientObj);
+    parent.childrenObjs.Add(ingredientObj);
   }
 
   void GenerateItemBlock(BlockBehaviour parent, Transform t)
@@ -150,7 +158,7 @@ public class ItemSpawn : MonoBehaviour {
     ingredientHolder.transform.SetParent(parent.transform);
 
     GameObject ingredientObj = Instantiate(itemPrefab, ingredientHolder.transform);
-    parent.childenObjs.Add(ingredientObj);
+    parent.childrenObjs.Add(ingredientObj);
 
     // Create ingredient layout 
     foreach (Vector2 vec in parent.layout)
@@ -165,7 +173,7 @@ public class ItemSpawn : MonoBehaviour {
 
       // Create ingredients within connection 
       GameObject newIngredient = Instantiate(itemPrefab, ingredientHolder2.transform);
-      parent.childenObjs.Add(newIngredient);
+      parent.childrenObjs.Add(newIngredient);
     }
   }
 }
