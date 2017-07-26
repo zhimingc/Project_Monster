@@ -105,6 +105,7 @@ public class MonsterRequest : MonoBehaviour {
 
     // Set new monster type
     SetMonsterType(req);
+    monsterObj.GetComponent<MonsterAnimation>().InitSprite();
 
     // reset ingredient stack obj
     for (int i = 0; i < ingredientStackObjs.Count; ++i)

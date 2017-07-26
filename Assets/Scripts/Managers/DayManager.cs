@@ -42,15 +42,9 @@ public class DayManager : MonoBehaviour {
     //UpdateProgressBar();
     CheckForShiftChange();
     backMan.ChangeSignColors(shiftChangeObj, DAY_STATE.BREAKFAST);
-  }
 
-  void Update()
-  {
-    // debug
-    if (Input.GetKeyDown(KeyCode.K))
-    {
-      PlayShiftSign();
-    }
+    // update day counter
+    GameObject.Find("dayCount_text").GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
   }
 
   void ShiftTrigger(DAY_STATE shift)
@@ -62,10 +56,13 @@ public class DayManager : MonoBehaviour {
         break;
       case DAY_STATE.DINNER:
         break;
+      case DAY_STATE.WIN:
+        GameManager.Instance.AddToDayCount(1);
+        break;
     }
   }
 
-  void PlayShiftSign()
+  void PlayShiftSign(DAY_STATE color)
   {
     // play sfx
     GameManager.Instance.SFX().PlaySound("good");
@@ -73,7 +70,7 @@ public class DayManager : MonoBehaviour {
     switch (dayState)
     {
       case DAY_STATE.LUNCH:
-        backMan.ChangeSignColors(shiftChangeObj, dayState);
+        backMan.ChangeSignColors(shiftChangeObj, color);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
         shiftChangeObj.GetComponentInChildren<Text>().text = "LUNCH!";
         LeanTween.delayedCall(1.5f, () =>
@@ -87,7 +84,7 @@ public class DayManager : MonoBehaviour {
 
         break;
       case DAY_STATE.DINNER:
-        backMan.ChangeSignColors(shiftChangeObj, dayState);
+        backMan.ChangeSignColors(shiftChangeObj, color);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
         shiftChangeObj.GetComponentInChildren<Text>().text = "DINNER!";
         LeanTween.delayedCall(1.5f, () =>
@@ -101,7 +98,7 @@ public class DayManager : MonoBehaviour {
         });
         break;
       case DAY_STATE.WIN:
-        backMan.ChangeSignColors(endOfDaySign, DAY_STATE.DINNER);
+        backMan.ChangeSignColors(endOfDaySign, color);
         endOfDaySign.GetComponent<Animator>().SetTrigger("isEnter");
         GameManager.Instance.SetIsPaused(true);
         break;
@@ -142,8 +139,16 @@ public class DayManager : MonoBehaviour {
         {
           // Change the feedback text to reflect shift
           dayState = ((DAY_STATE)i);
+          DAY_STATE dayColor = (DAY_STATE)Mathf.Min((int)DAY_STATE.DINNER, i);
+
+          // check if day ends early for day 1/2
+          if (GameManager.Instance.CheckIfDayEnds(dayState))
+          {
+            dayState = DAY_STATE.WIN;
+          }
+
           ShiftTrigger(dayState);
-          PlayShiftSign();
+          PlayShiftSign(dayColor);
 
           backMan.ChangeTimeState(i); // update bg
 

@@ -29,8 +29,8 @@ public class InfoPanel : MonoBehaviour {
 
   void EmptyInfoPanel()
   {
-    info_text.text = 
-      "Tap icons to see more info";
+    info_text.text =
+      "Tap icons to see more info.\n\nDrag from toolbox into tools to use tool.";
     detail_neg.text = "";
     detail_pos.text = "";
     info_icon.GetComponent<SpriteRenderer>().enabled = false;
@@ -60,15 +60,33 @@ public class InfoPanel : MonoBehaviour {
       detail_neg.text = "Cooldown: " + item.itemCooldown.ToString() + " moves";
     }
 
-    ContractInfo contract = info as ContractInfo;
-    if (contract != null)
+    //ContractInfo contract = info as ContractInfo;
+    //if (contract != null)
+    //{
+    //  switch (contract.type)
+    //  {
+    //    case CONTRACT_TYPE.TIMER:
+    //      info_text.text = "Catering contract for impatient monsters who want their order quick!";
+    //      detail_neg.text = "Chance for timed requests\n30 seconds to serve request";
+    //      detail_pos.text = "Cash+";
+    //      break;
+    //  }
+    //}
+
+    MonsterInfo monster = info as MonsterInfo;
+    if (monster != null)
     {
-      switch (contract.type)
+      switch(monster.type)
       {
-        case CONTRACT_TYPE.TIMER:
+        case MONSTER_TYPE.NORMAL:
+          info_text.text = "Average dune monster just looking for a quick bite of some human food.";
+          detail_neg.text = "";
+          detail_pos.text = "Popularity+";
+          break;
+        case MONSTER_TYPE.TIMED:
           info_text.text = "Catering contract for impatient monsters who want their order quick!";
           detail_neg.text = "Chance for timed requests\n30 seconds to serve request";
-          detail_pos.text = "Cash+";
+          detail_pos.text = "Popularity++";
           break;
       }
     }
@@ -79,6 +97,7 @@ public class InfoPanel : MonoBehaviour {
 
   void UpdateInfoIcon(GameObject updateTo)
   {
+    info_icon.transform.localScale = updateTo.transform.localScale;
     info_icon.GetComponent<SpriteRenderer>().enabled = true;
     info_icon.GetComponent<SpriteRenderer>().sprite = updateTo.GetComponent<SpriteRenderer>().sprite;
     info_icon.GetComponent<SpriteRenderer>().color = updateTo.GetComponent<SpriteRenderer>().color;

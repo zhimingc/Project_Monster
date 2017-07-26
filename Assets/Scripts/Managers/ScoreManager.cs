@@ -15,6 +15,15 @@ public class ScoreManager : MonoBehaviour {
   public int curScore, curInstantScore;
   private Vector3 scoreOriginalScale;
 
+  public void Reset()
+  {
+    numServed = 0;
+    incScore = 0;
+    curScore = 0;
+    curInstantScore = 0;
+    totalScore = 0;
+  }
+
   public int AddScore(int amt)
   {
     amt = (int) (amt * GameManager.Instance.comboMan.GetComboMultiplier());

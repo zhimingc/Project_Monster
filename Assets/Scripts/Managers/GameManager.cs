@@ -19,12 +19,28 @@ public class GameData
   {
     pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
     pop_monsters[0] = 100.0f;
+
+    // flags
+    flag_firstPlay = true;
+  }
+
+  public void Reset()
+  {
+    pop_total = 0;
+    pop_rank = 0;
+    count_days = 0;
+    pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+    pop_monsters[0] = 100.0f;
+
+    // flags
+    flag_firstPlay = true;
   }
 
   public int pop_total;
-  public int pop_rank;
+  public int pop_rank, count_days;
   public float[] pop_monsters;
   public bool indicator_newTool;
+  public bool flag_firstPlay;
 }
 
 public class GameManager : Singleton<GameManager>
@@ -468,12 +484,31 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.TO_SETUP:
         LoadSceneWithTransition("screen-setup");
+        musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
         break;
       case BUTTON_TYPE.SETUP_TOGGLE:
         var setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
         bool flipped = setupMan.isCounterUp;
         btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX = !flipped;
         setupMan.ToggleCounter(!flipped);
+        break;
+      case BUTTON_TYPE.TO_FIRSTTIME:
+        if (gameData.flag_firstPlay)
+        {
+          gameData.flag_firstPlay = false;
+          LoadSceneWithTransition("screen-first-timer");
+        }
+        else
+        {
+          LoadSceneWithTransition("vertical-phone");
+          musicMan.ToggleBGM(BGM_CLIPS.LEVEL);
+        }
+        break;
+      case BUTTON_TYPE.RESET_DATA:
+        gameData.Reset();
+        scoreMan.Reset();
+        itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
+
         break;
     }
   }
@@ -491,6 +526,22 @@ public class GameManager : Singleton<GameManager>
   public int GetTotalPopularity()
   {
     return gameData.pop_total;
+  }
+
+  // to check for days ending early for day 1/2
+  public bool CheckIfDayEnds(DAY_STATE state)
+  {
+    if ((DAYS)gameData.count_days == DAYS.BREAKFAST 
+      && state == DAY_STATE.LUNCH) return true;
+    if ((DAYS)gameData.count_days == DAYS.LUNCH
+      && state == DAY_STATE.DINNER) return true;
+
+    return false;
+  }
+
+  public void AddToDayCount(int amt)
+  {
+    gameData.count_days += amt;
   }
 }
 

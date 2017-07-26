@@ -104,6 +104,13 @@ public class ContractInfo : Info
   public Sprite contractIcon;
 }
 
+[System.Serializable]
+
+public class MonsterInfo : Info
+{
+  public MONSTER_TYPE type;
+};
+
 static public class ObjectFactory
 {
   // Ingredient block layouts 

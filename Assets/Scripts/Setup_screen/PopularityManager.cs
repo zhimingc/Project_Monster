@@ -64,7 +64,7 @@ public class PopularityManager : MonoBehaviour {
     rankIndex = -1;
     for (int i = 0; i < GameProgression.rankReq.Length; ++i)
     {
-      if (GameProgression.rankReq[i] >= GameManager.Instance.GetTotalPopularity())
+      if (GameProgression.rankReq[i] > GameManager.Instance.GetTotalPopularity())
       {
         rankIndex = i;
         break;
@@ -124,6 +124,7 @@ public class PopularityManager : MonoBehaviour {
     {
       if (pop_monsters[i] > 0.0f)
       {
+        pop_monsters_obj[i].GetComponent<MonsterSetup>().ActivateMonster();
         pop_monsters_obj[i].GetComponentsInChildren<SpriteRenderer>()[1].color = Color.white;
         pop_monsters_obj[i].GetComponentInChildren<TextMesh>().text = pop_monsters[i].ToString("0") + "%";
       }
@@ -145,6 +146,7 @@ public class PopularityManager : MonoBehaviour {
       case RANKS.IMPATIENT_MON:
         pop_monsters[0] -= FIRST_TIME_PERCENTAGE;
         pop_monsters[1] = FIRST_TIME_PERCENTAGE;
+        pop_monsters_obj[1].GetComponent<MonsterSetup>().SetMonsterBubble();
         break;
       case RANKS.PICKY_MON:
         // take the first time percentage out of each active monster
