@@ -94,7 +94,7 @@ public class GameManager : Singleton<GameManager>
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
     cursorScript = gameObject.AddComponent<Cursor>();
-    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.TURNTABLE), new ItemInfo(ITEM_TYPE.EMPTY) };
+    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
     gameData = new GameData();
 

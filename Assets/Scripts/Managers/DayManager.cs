@@ -84,7 +84,7 @@ public class DayManager : MonoBehaviour {
       case DAY_STATE.BREAKFAST:
         backMan.ChangeSignColors(startDaySign, color);
         startDaySign.GetComponentsInChildren<Text>()[0].text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
-        startDaySign.GetComponentsInChildren<Text>()[1].text = "Serve: " + toServe.ToString();
+        startDaySign.GetComponentsInChildren<Text>()[1].text = "Goal: " + toServe.ToString();
         startDaySign.GetComponent<Animator>().SetTrigger("isEnter");
         GameManager.Instance.SetIsPaused(true);
         LeanTween.delayedCall(1.0f, () =>
