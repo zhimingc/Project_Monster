@@ -51,7 +51,7 @@ public class MonsterRequest : MonoBehaviour {
         if (typeParams.curTimer <= 0.0f)
         {
           // times up
-          GameManager.Instance.SetLoseBehaviour();
+          GameManager.Instance.SetLoseBehaviour(LOSE_REASON.TIME_UP);
         }
         else
         {

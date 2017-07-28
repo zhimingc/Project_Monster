@@ -20,6 +20,7 @@ public enum BUTTON_TYPE
   SETUP_TOGGLE,
   TO_FIRSTTIME,
   RESET_DATA,
+  TO_GAME,
 }
 
 public class ButtonBehaviour : MonoBehaviour {

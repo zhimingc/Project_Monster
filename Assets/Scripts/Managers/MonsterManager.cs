@@ -275,7 +275,7 @@ public class MonsterManager : MonoBehaviour {
   {
     req = new Request();
 
-    List<int> allMonsterTypes = new List<int>();
+    //List<int> allMonsterTypes = new List<int>();
     // List of contracted monsters
     //allMonsterTypes.Add(0);
     //if (rp.timerContractOn) allMonsterTypes.Add((int)MONSTER_TYPE.TIMED);

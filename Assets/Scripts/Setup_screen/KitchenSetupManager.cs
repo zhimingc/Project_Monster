@@ -42,4 +42,16 @@ public class KitchenSetupManager : MonoBehaviour {
       LeanTween.moveY(counterObj, -5.0f, 0.75f).setEase(LeanTweenType.easeInOutQuad);
     }
   }
+
+  public void RaiseCounter()
+  {
+    if (isCounterUp == true) return;
+    ToggleCounter(true);
+  }
+
+  public void LowerCounter()
+  {
+    if (isCounterUp == false) return;
+    ToggleCounter(false);
+  }
 }

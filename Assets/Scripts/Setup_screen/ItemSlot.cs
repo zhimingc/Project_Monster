@@ -11,7 +11,16 @@ public class ItemSlot : MonoBehaviour {
 
   // Use this for initialization
   void Start () {
-    info = GameManager.Instance.GetItemSlot(slotNum);
+    info = new ItemInfo(GameManager.Instance.GetItemSlot(slotNum));
+    if (info.type == ITEM_TYPE.EMPTY)
+    {
+      info.type = ITEM_TYPE.SLOT;
+    }
+    else
+    {
+      GetComponentInChildren<TextMesh>().text = "";
+    }
+
     ObjectFactory.InitializeItem(itemObj, info.type);
     playerScript = GameObject.Find("player").GetComponent<PlayerScript>();
   }
@@ -53,6 +62,7 @@ public class ItemSlot : MonoBehaviour {
 
       // apply change in item
       info = setup.info;
+      if (info.type != ITEM_TYPE.SLOT) GetComponentInChildren<TextMesh>().text = "";
       GameManager.Instance.SetUpItemSlot(slotNum, info);
       ObjectFactory.InitializeItem(itemObj, info.type);
     }

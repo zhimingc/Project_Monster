@@ -15,7 +15,7 @@ public class MonsterSetup : MonoBehaviour {
 
   void Start()
   {
-    isActive = false;
+    //isActive = false;
   }
 
   void OnMouseOver()
@@ -46,7 +46,14 @@ public class MonsterSetup : MonoBehaviour {
   public void SetMonsterBubble()
   {
     isNewMonster = true;
+    monster_bubble.GetComponentInChildren<NewIndicatorBubble>().SetClickFn(ClickBehaviour);
     monster_bubble.SetActive(true);
     monster_bubble.transform.localPosition = transform.localPosition + new Vector3(0, 1, 0);
+  }
+
+  public void ClickBehaviour()
+  {
+    GameManager.Instance.setupMan.LowerCounter();
+    UpdateInfoPanel();
   }
 }

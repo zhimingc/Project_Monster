@@ -7,7 +7,7 @@ public class InfoPanel : MonoBehaviour {
 
   public GameObject info_icon;
   public TextMesh currencyText;
-  public Text info_text, detail_neg, detail_pos;
+  public Text info_text, detail_neg, detail_pos, name_text;
 
   private bool panelTriggered;
 
@@ -33,6 +33,7 @@ public class InfoPanel : MonoBehaviour {
       "Tap icons to see more info.\n\nDrag from toolbox into tools to use tool.";
     detail_neg.text = "";
     detail_pos.text = "";
+    name_text.text = "";
     info_icon.GetComponent<SpriteRenderer>().enabled = false;
   }
 
@@ -40,6 +41,7 @@ public class InfoPanel : MonoBehaviour {
   {
     // flag for when the panel is changed
     panelTriggered = true;
+    if (info.name != null) name_text.text = info.name;
 
     // update text
     ItemInfo item = info as ItemInfo;
@@ -49,11 +51,15 @@ public class InfoPanel : MonoBehaviour {
       {
         case ITEM_TYPE.EATER:
           info_text.text = "The eater will remove the top most ingredient from the plate.";
-          detail_pos.text = "Clears ingredient on plate";
+          detail_pos.text = "Clears ingredient on plate\nUse: Drag eater onto plate";
           break;
         case ITEM_TYPE.BIN:
           info_text.text = "Throw away unwanted ingredients in the queue into the bin.";
-          detail_pos.text = "Clears ingredient in queue";
+          detail_pos.text = "Clears ingredient in queue\nUse: Drag ingredients into bin slot";
+          break;
+        case ITEM_TYPE.TURNTABLE:
+          info_text.text = "Turn the table and rotate the ingredients on the table.";
+          detail_pos.text = "Rotates ingredient stacks clockwise\nUse: Drag turn table onto any plate";
           break;
       }
 
@@ -84,7 +90,7 @@ public class InfoPanel : MonoBehaviour {
           detail_pos.text = "Popularity+";
           break;
         case MONSTER_TYPE.TIMED:
-          info_text.text = "Catering contract for impatient monsters who want their order quick!";
+          info_text.text = "The Lizmen are always in a hurry. They must have their order quick!";
           detail_neg.text = "Chance for timed requests\n30 seconds to serve request";
           detail_pos.text = "Popularity++";
           break;

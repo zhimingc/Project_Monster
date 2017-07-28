@@ -12,7 +12,7 @@ public class GridScript : MonoBehaviour {
   public GameObject monsterServeObj;  // graphics to show that you can serve
   public GameObject scoreText;
   public bool canServe;         // flag to indicate if this grid meets any requests
-
+  
   private List<GameObject> stackObjs;
   private PlayerScript playerScript;
   private GridManager gridMan;
@@ -24,6 +24,13 @@ public class GridScript : MonoBehaviour {
   // feedback
   private ParticleSystem psObj;
   private GameObject exclaimObj;
+
+  // turntable variables
+  private float turnSpeed;
+  private Vector3[] rotateFromPos;
+  private List<INGREDIENT_TYPE> tmpIngredientStack;
+  private List<GameObject> tmpStackObjs;
+
 
   void Awake()
   {
@@ -41,6 +48,9 @@ public class GridScript : MonoBehaviour {
 
     // Init can serve variables
     SetCanServe(false);
+
+    // turntable variables
+    turnSpeed = 0.25f;
   }
 
 	// Use this for initialization
@@ -57,6 +67,7 @@ public class GridScript : MonoBehaviour {
   void GenerateIngredientMold()
   {
     stackObjs = new List<GameObject>();
+    rotateFromPos = new Vector3[maxIngredients];
 
     for (int i = 0; i < maxIngredients; ++i)
     {
@@ -71,6 +82,7 @@ public class GridScript : MonoBehaviour {
       //ingredient.transform.localPosition = new Vector3(0, i * localScale.y / 5.0f, 0);
 
       stackObjs.Add(ingredient);
+      rotateFromPos[i] = ingredient.transform.position; 
     }
 
     // Deactivate the top ingredient
@@ -118,6 +130,8 @@ public class GridScript : MonoBehaviour {
 
   public void OnTouchDown()
   {
+    if (GameManager.Instance.IsPaused()) return;
+
     // Update the grid if an ingredient block is being dragged
     if (playerScript.blockBeingDragged != null)
     {
@@ -129,7 +143,6 @@ public class GridScript : MonoBehaviour {
 
         // Stop grid from moving
         ingredientBlock.beingDragged = false;
-        //ingredientBlock.ToggleIngredients(false);
       }
 
       // Toggle object visuals
@@ -184,6 +197,9 @@ public class GridScript : MonoBehaviour {
             ingredientStack[ingredientStack.Count - 1] = INGREDIENT_TYPE.EATER;
           }
           break;
+        case ITEM_TYPE.TURNTABLE:
+          gridMan.ApplyTurntable(true);
+          break;
       }
     }
 
@@ -228,6 +244,9 @@ public class GridScript : MonoBehaviour {
           {
             ingredientStack.Remove(INGREDIENT_TYPE.EATER);
           }
+          break;
+        case ITEM_TYPE.TURNTABLE:
+          gridMan.ApplyTurntable(false);
           break;
       }
     }
@@ -275,6 +294,9 @@ public class GridScript : MonoBehaviour {
 
     // Update grid type feedback
     ObjectFactory.InitializeGrid(gameObject, gridType);
+
+    // Update ability to serve
+    GameManager.Instance.monsterMan.CheckRequestMetAll();
   }
 
   void RemoveEaterIngredient()
@@ -295,6 +317,8 @@ public class GridScript : MonoBehaviour {
 
   public void OnTouchExit()
   {
+    if (GameManager.Instance.IsPaused()) return;
+
     // Update the grid if an ingredient block is being dragged
     if (playerScript.blockBeingDragged != null && playerScript.hoveredGrid == this)
     {
@@ -305,8 +329,6 @@ public class GridScript : MonoBehaviour {
         IngredientBlock ingredientBlock = (IngredientBlock)playerScript.blockBeingDragged;
         // Stop grid from moving
         ingredientBlock.beingDragged = true;
-        //ingredientBlock.ToggleIngredients(true);
-        //ingredientBlock.ToggleObjects(true);
       }
 
       // Toggle object visuals
@@ -392,5 +414,48 @@ public class GridScript : MonoBehaviour {
     {
       scoreText.SetActive(false);
     });
+  }
+
+  public void MoveStackTo(GameObject toObj)
+  {
+    LeanTween.cancel(gameObject);
+
+    GridScript toScript = toObj.GetComponent<GridScript>();
+
+    for (int i = 0; i < stackObjs.Count; ++i)
+    {
+      LeanTween.cancel(stackObjs[i]);
+
+      LeanTween.move(stackObjs[i], toScript.rotateFromPos[i], turnSpeed).setEase(LeanTweenType.easeOutQuad);
+      toScript.tmpIngredientStack = ingredientStack;
+      toScript.tmpStackObjs = stackObjs;
+    }
+    LeanTween.delayedCall(gameObject, turnSpeed, () =>
+    {
+      Utility.Swap(ref stackObjs, ref tmpStackObjs);
+      Utility.Swap(ref ingredientStack, ref tmpIngredientStack);
+
+      UpdateStackDisplay();
+    });
+  }
+
+  public void MoveStackBack()
+  {
+    // if the delayed call is not done then transfer was not complete
+    if (!LeanTween.isTweening(gameObject))
+    {
+      // else undo the transfer
+      Utility.Swap(ref stackObjs, ref tmpStackObjs);
+      Utility.Swap(ref ingredientStack, ref tmpIngredientStack);
+      UpdateStackDisplay();
+    }
+
+    LeanTween.cancel(gameObject);
+
+    for (int i = 0; i < stackObjs.Count; ++i)
+    {
+      LeanTween.cancel(stackObjs[i]);
+      LeanTween.move(stackObjs[i], rotateFromPos[i], turnSpeed).setEase(LeanTweenType.easeOutQuad);
+    }
   }
 }

@@ -100,6 +100,7 @@ public class ItemSpawn : MonoBehaviour {
     switch (info.type)
     {
       case ITEM_TYPE.BIN:
+      case ITEM_TYPE.TURNTABLE:
         // Bins have no layout so it stays 0
         GenerateItemSingle(blockScript, transform);
 

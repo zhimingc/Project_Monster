@@ -16,7 +16,7 @@ public class ItemSetup : BlockBehaviour {
 
   public void SetItemType(ITEM_TYPE item)
   {
-    info.type = item;
+    info = new ItemInfo(item);
     ObjectFactory.InitializeItem(gameObject, info.type);
   }
 
@@ -27,7 +27,7 @@ public class ItemSetup : BlockBehaviour {
 
   public void OnTouchStay()
   {
-    if (info.type == ITEM_TYPE.EMPTY) return;
+    if (info.type == ITEM_TYPE.EMPTY || GameManager.Instance.IsPaused()) return;
 
     // for items to be dragged and used
     if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
@@ -75,5 +75,11 @@ public class ItemSetup : BlockBehaviour {
   void UpdateInfoPanel()
   {
     GameObject.Find("info_panel").GetComponent<InfoPanel>().UpdateInfoPanel(gameObject, info);
+  }
+
+  public void ClickBehaviour()
+  {
+    GameManager.Instance.setupMan.RaiseCounter();
+    UpdateInfoPanel();
   }
 }

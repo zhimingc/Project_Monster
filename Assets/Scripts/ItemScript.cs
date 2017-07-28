@@ -19,6 +19,7 @@ public class ItemScript : BlockBehaviour
         ToggleCanDrag(false);
         break;
       case ITEM_TYPE.EATER:
+      case ITEM_TYPE.TURNTABLE:
         isStaticUse = false;
         ToggleCanDrag(true);
         break;

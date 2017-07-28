@@ -34,6 +34,9 @@ public enum ITEM_TYPE
 {
   EATER,
   BIN,
+  TURNTABLE,
+  MAGIC,
+  SLOT,
   EMPTY
 };
 
@@ -46,28 +49,39 @@ public enum CONTRACT_TYPE
 // to be able to pass item and contract info as a base
 public class Info
 {
-
+  public string name;
 };
 
 [System.Serializable]
 public class ItemInfo : Info
 {
-  public ItemInfo()
+  public ItemInfo (ItemInfo copy)
   {
-    type = ITEM_TYPE.EATER;
-    itemCooldown = 6;
+    type = copy.type;
+    InitItemSpecfic();
   }
 
   public ItemInfo(ITEM_TYPE _type)
   {
     type = _type;
+    InitItemSpecfic();
+  }
+
+  public void InitItemSpecfic()
+  {
     switch (type)
     {
       case ITEM_TYPE.EATER:
+        name = "Eater";
         itemCooldown = 5;
         break;
       case ITEM_TYPE.BIN:
+        name = "Bin";
         itemCooldown = 3;
+        break;
+      case ITEM_TYPE.TURNTABLE:
+        name = "Turntable";
+        itemCooldown = 4;
         break;
     }
   }
@@ -176,6 +190,10 @@ static public class ObjectFactory
         block.GetComponent<SpriteRenderer>().sprite = itemSprite;
         block.GetComponent<SpriteRenderer>().color = Color.black;
         break;
+      case ITEM_TYPE.SLOT:
+        block.GetComponent<SpriteRenderer>().sprite = null;
+        //block.GetComponent<SpriteRenderer>().color = Color.black;
+        break;
       case ITEM_TYPE.EATER:
         itemSprite = Resources.Load<Sprite>("Sprites/cross");
         block.GetComponent<SpriteRenderer>().sprite = itemSprite;
@@ -185,6 +203,11 @@ static public class ObjectFactory
         itemSprite = Resources.Load<Sprite>("Sprites/UI/trashcanOpen");
         block.GetComponent<SpriteRenderer>().sprite = itemSprite;
         block.GetComponent<SpriteRenderer>().color = Color.black;
+        break;
+      case ITEM_TYPE.TURNTABLE:
+        itemSprite = Resources.Load<Sprite>("Sprites/UI/tool_turntable2");
+        block.GetComponent<SpriteRenderer>().sprite = itemSprite;
+        block.GetComponent<SpriteRenderer>().color = Color.white;
         break;
     }
   }

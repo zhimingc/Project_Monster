@@ -7,7 +7,7 @@ public class PopularityManager : MonoBehaviour {
 
   public ToolManager toolMan;
   public TextMesh popTotal, popNext, rankText;
-  public GameObject progressBar;
+  public GameObject progressBar, dayText;
   public float addingSpeed;
 
   public int incScore, rankIndex;
@@ -19,6 +19,8 @@ public class PopularityManager : MonoBehaviour {
 	void Start () {
     //pop_monsters_obj = GameObject.FindGameObjectsWithTag("PopMonster");
     popTotal.text = GameManager.Instance.GetTotalPopularity().ToString();
+
+    dayText.GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days).ToString();
     InitRankTracking();
     InitPopMonsters();
   }

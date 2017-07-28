@@ -19,7 +19,7 @@ public class DayManager : MonoBehaviour {
   public int[] shiftIntervals;
   public float shiftChangeSpeed;
   public GameObject shiftChangeObj;
-  public GameObject endOfDaySign;
+  public GameObject endOfDaySign, startDaySign;
 
   private MonsterManager monsterMan;
   private BackgroundManager backMan;  // To update background graphics
@@ -35,8 +35,6 @@ public class DayManager : MonoBehaviour {
     backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
     sauceMan = GameObject.Find("sauce_man").GetComponent<SauceManager>();
     gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
-    shiftChangeObj = GameObject.Find("shift_object");
-    endOfDaySign = GameObject.Find("win_sign");
 
     initialProgressSize = progressBar.transform.localScale.x;
     //UpdateProgressBar();
@@ -62,13 +60,39 @@ public class DayManager : MonoBehaviour {
     }
   }
 
-  void PlayShiftSign(DAY_STATE color)
+  public void PlayShiftSign(DAY_STATE color)
   {
-    // play sfx
-    GameManager.Instance.SFX().PlaySound("good");
+    if (dayState != DAY_STATE.BREAKFAST)
+    {
+      // play sfx
+      GameManager.Instance.SFX().PlaySound("good");
+    }
+
+    // hack to count how many needed to serve
+    int toServe = 10;
+    if (GameManager.Instance.gameData.count_days == 1)
+    {
+      toServe = 20;
+    }
+    else if (GameManager.Instance.gameData.count_days > 1)
+    {
+      toServe = 30;
+    }
 
     switch (dayState)
     {
+      case DAY_STATE.BREAKFAST:
+        backMan.ChangeSignColors(startDaySign, color);
+        startDaySign.GetComponentsInChildren<Text>()[0].text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
+        startDaySign.GetComponentsInChildren<Text>()[1].text = "Serve: " + toServe.ToString();
+        startDaySign.GetComponent<Animator>().SetTrigger("isEnter");
+        GameManager.Instance.SetIsPaused(true);
+        LeanTween.delayedCall(1.0f, () =>
+        {
+          GameManager.Instance.SetIsPaused(false);
+          startDaySign.GetComponent<Animator>().SetTrigger("isExit");
+        });
+        break;
       case DAY_STATE.LUNCH:
         backMan.ChangeSignColors(shiftChangeObj, color);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");

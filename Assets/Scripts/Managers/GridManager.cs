@@ -15,6 +15,19 @@ public class GridManager : MonoBehaviour {
     ConstructLevel();
   }
 
+  void Update()
+  {
+    //DEBUG
+    if (Input.GetKeyDown(KeyCode.T))
+    {
+      ApplyTurntable(true);
+    }
+    if (Input.GetKeyUp(KeyCode.T))
+    {
+      ApplyTurntable(false);
+    }
+  }
+
   GameObject GetGrid(int x, int y)
   {
     return grid[x][y];
@@ -102,6 +115,12 @@ public class GridManager : MonoBehaviour {
 
     return canFit;
   }
+
+  //// for a single block which affects the grid/board
+  //public void AddBlockToGridSingle(GridScript singleGrid, BlockBehaviour block)
+  //{
+  //  singleGrid.AddToStack(0);
+  //}
 
   public void AddBlockToGrid(GridScript singleGrid, BlockBehaviour block)
   {
@@ -199,6 +218,26 @@ public class GridManager : MonoBehaviour {
         gs.coordinates = new int[] { x + halfGridX, y + halfGridY };
         grid[x + halfGridX].Add(curGridBlock);
       }
+    }
+  }
+
+  public void ApplyTurntable(bool direction)
+  {
+    // applies turntable
+    if (direction)
+    {
+      GetGrid(0, 0).GetComponent<GridScript>().MoveStackTo(GetGrid(0, 1));
+      GetGrid(0, 1).GetComponent<GridScript>().MoveStackTo(GetGrid(1, 1));
+      GetGrid(1, 0).GetComponent<GridScript>().MoveStackTo(GetGrid(0, 0));
+      GetGrid(1, 1).GetComponent<GridScript>().MoveStackTo(GetGrid(1, 0));
+    }
+    else
+    {
+      // reverts turntable
+      GetGrid(0, 0).GetComponent<GridScript>().MoveStackBack();
+      GetGrid(0, 1).GetComponent<GridScript>().MoveStackBack();
+      GetGrid(1, 1).GetComponent<GridScript>().MoveStackBack();
+      GetGrid(1, 0).GetComponent<GridScript>().MoveStackBack();
     }
   }
 }

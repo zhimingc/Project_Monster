@@ -12,7 +12,7 @@ public class ToolManager : MonoBehaviour {
     int rank = GameManager.Instance.gameData.pop_rank;
     if (rank > (int)RANKS.BIN_TOOL) toolBox[0].SetItemType(ITEM_TYPE.BIN);
     if (rank > (int)RANKS.EATER_TOOL) toolBox[1].SetItemType(ITEM_TYPE.EATER);
-    //if (rank > (int)RANKS.BIN_TOOL) toolBox[2].SetItemType(ITEM_TYPE.BIN);
+    if (rank > (int)RANKS.TURNTABLE_TOOL) toolBox[2].SetItemType(ITEM_TYPE.TURNTABLE);
     //if (rank > (int)RANKS.BIN_TOOL) toolBox[3].SetItemType(ITEM_TYPE.BIN);
 
     //ToggleNewToolIndicator(GameManager.Instance.gameData.indicator_newTool);
@@ -30,6 +30,10 @@ public class ToolManager : MonoBehaviour {
         toolBox[1].SetItemType(ITEM_TYPE.EATER);
         SetNewToolIndicator(toolBox[1].gameObject);
         break;
+      case RANKS.TURNTABLE_TOOL:
+        toolBox[2].SetItemType(ITEM_TYPE.TURNTABLE);
+        SetNewToolIndicator(toolBox[2].gameObject);
+        break;
     }
   }
 
@@ -44,6 +48,9 @@ public class ToolManager : MonoBehaviour {
   void SetNewToolIndicator(GameObject obj)
   {
     newTool = obj;
+
+    // set the click behaviour of the indicator
+    newTool_indicator.GetComponent<NewIndicatorBubble>().SetClickFn(newTool.GetComponent<ItemSetup>().ClickBehaviour);
 
     // change this to animation later
     newTool_indicator.SetActive(true);

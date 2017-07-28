@@ -95,6 +95,8 @@ public class IngredientBlock : BlockBehaviour
 
   public void OnTouchStay()
   {
+    if (GameManager.Instance.IsPaused()) return;
+
     //if (Input.GetMouseButtonDown(0) && playerScript.GetPlayerState() == PLAYER_STATE.IDLE) 
     if (InputMan.OnDown() && playerScript.GetPlayerState() == PLAYER_STATE.IDLE)
     {

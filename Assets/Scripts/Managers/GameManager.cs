@@ -4,6 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public enum LOSE_REASON
+{
+  OVERFLOW,
+  TIME_UP,
+
+}
+
 public enum GAME_STATE
 {
   PLAYING,
@@ -61,14 +68,16 @@ public class GameManager : Singleton<GameManager>
   public MonsterManager monsterMan;
   public GridManager gridMan;
   public ComboManager comboMan;
+  public KitchenSetupManager setupMan;  // only in setup screen
 
   private LoadManager loadMan;
   private MusicManager musicMan;
   private UIManager uiMan;
   private BackgroundManager backMan;
+  private Cursor cursorScript;
+  private bool isPaused;
 
   public bool startWithHelp, helpToggler;
-  private bool isPaused;
   public ItemInfo[] itemSlots;
   public Dictionary<CONTRACT_TYPE, ContractInfo> contracts;
 
@@ -84,7 +93,8 @@ public class GameManager : Singleton<GameManager>
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
-    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
+    cursorScript = gameObject.AddComponent<Cursor>();
+    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.TURNTABLE), new ItemInfo(ITEM_TYPE.EMPTY) };
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
     gameData = new GameData();
 
@@ -92,13 +102,7 @@ public class GameManager : Singleton<GameManager>
     //contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
 
     // Init for when scene loads
-    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
-    {
-      InitializeManagers();
-
-      if (startWithHelp) ToggleHelpScreen();
-      helpToggler = true;
-    }
+    InitializeManagers();
 
     // Delegate which gets called ever time a scene loads
     SceneManager.sceneLoaded += OnSceneLoaded;
@@ -107,6 +111,11 @@ public class GameManager : Singleton<GameManager>
     Screen.SetResolution(540, 960, false);
 
     InputMan.platform = Application.platform;
+  }
+
+  void ResetToDayOne()
+  {
+    gameData.count_days = 0;
   }
 
   void ToggleSplashScreens()
@@ -153,6 +162,14 @@ public class GameManager : Singleton<GameManager>
 
       // contract icon display
       InitContractIcons();
+
+      if (startWithHelp) ToggleHelpScreen();
+    }
+
+    // Manager in Setup screen
+    if (SceneManager.GetActiveScene().name.Contains("screen-setup"))
+    {
+      setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
     }
   }
 
@@ -296,6 +313,9 @@ public class GameManager : Singleton<GameManager>
     {
       if (GameObject.FindWithTag("PopularityMan"))
         GameObject.FindWithTag("PopularityMan").GetComponent<PopularityManager>().TriggerPopularityUpdate();
+
+      // animate day sign
+      if (dayMan) dayMan.PlayShiftSign(DAY_STATE.BREAKFAST);
     });
 
     // splash screen behaviour
@@ -348,8 +368,19 @@ public class GameManager : Singleton<GameManager>
     }
   }
 
-  public void SetLoseBehaviour()
+  public void SetLoseBehaviour(LOSE_REASON reason)
   {
+    // change sign text
+    switch(reason)
+    {
+      case LOSE_REASON.OVERFLOW:
+        uiMan.loseSign.GetComponentInChildren<Text>().text = "Sandwich overflow! Kitchen closed.";
+        break;
+      case LOSE_REASON.TIME_UP:
+        uiMan.loseSign.GetComponentInChildren<Text>().text = "Time up!\nKitchen closed.";
+        break;
+    }
+
     backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
 
     // Turn on lose text
@@ -359,6 +390,9 @@ public class GameManager : Singleton<GameManager>
 
     SetGameState(GAME_STATE.LOSE);
     SetIsPaused(true);
+
+    // reset to day 1
+    ResetToDayOne();
   }
 
   public void CheckLevelComplete()
@@ -366,7 +400,7 @@ public class GameManager : Singleton<GameManager>
     // Lose the game is a grid is full
     if (gridMan && gridMan.IfGridFull())
     {
-      SetLoseBehaviour();
+      SetLoseBehaviour(LOSE_REASON.OVERFLOW);
     }
   }
 
@@ -427,9 +461,15 @@ public class GameManager : Singleton<GameManager>
         AudioListener.volume = invert ? 0 : 1;
         break;
       case BUTTON_TYPE.START:
-        // Resets level
-        LoadSceneWithTransition("vertical-phone");
-        musicMan.ToggleBGM(BGM_CLIPS.LEVEL);
+        if (gameData.pop_total == 0)
+        {
+          gameData.flag_firstPlay = false;
+          LoadSceneWithTransition("screen-first-timer");
+        }
+        else
+        {
+          Button_ToSetup();
+        }
         break;
       case BUTTON_TYPE.CREDITS:
         LoadSceneWithTransition("screen-credits");
@@ -483,11 +523,9 @@ public class GameManager : Singleton<GameManager>
         SetIsPaused(false);
         break;
       case BUTTON_TYPE.TO_SETUP:
-        LoadSceneWithTransition("screen-setup");
-        musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
+        Button_ToSetup();
         break;
       case BUTTON_TYPE.SETUP_TOGGLE:
-        var setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
         bool flipped = setupMan.isCounterUp;
         btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX = !flipped;
         setupMan.ToggleCounter(!flipped);
@@ -500,17 +538,30 @@ public class GameManager : Singleton<GameManager>
         }
         else
         {
-          LoadSceneWithTransition("vertical-phone");
-          musicMan.ToggleBGM(BGM_CLIPS.LEVEL);
+          Button_ToGame();
         }
         break;
       case BUTTON_TYPE.RESET_DATA:
         gameData.Reset();
         scoreMan.Reset();
         itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
-
+        break;
+      case BUTTON_TYPE.TO_GAME:
+        Button_ToGame();
         break;
     }
+  }
+
+  void Button_ToGame()
+  {
+    LoadSceneWithTransition("vertical-phone");
+    musicMan.ToggleBGM(BGM_CLIPS.LEVEL);
+  }
+  
+  void Button_ToSetup()
+  {
+    LoadSceneWithTransition("screen-setup");
+    musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
   }
 
   public void AddTotalPopularity(int amt)
