@@ -55,7 +55,15 @@ public class Request
   public GRID_TYPE gridType;
   public MONSTER_TYPE monsterType;
   public MonsterTypeParams typeParams;
+  public Color chairColor;
 };
+
+// debug data
+public class Debug_MonsterManager
+{
+  public bool force_nextMonster;
+  public MONSTER_TYPE next_type;
+}
 
 public class MonsterManager : MonoBehaviour {
 
@@ -72,8 +80,12 @@ public class MonsterManager : MonoBehaviour {
   private IngredientManager ingredientMan;
   private List<GameObject> reserveMonsters;
 
+  // for debugging
+  private Debug_MonsterManager debug_data;
+
   void Awake()
   {
+    debug_data = new Debug_MonsterManager();
     ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
   }
 
@@ -101,28 +113,28 @@ public class MonsterManager : MonoBehaviour {
 
       box.InitStack();
       box.SetRequest(req);
+
+      // apply any grid effects
+      GameManager.Instance.gridMan.MonsterAffectGrid(box.request);
     }
   }
 	
 	// Update is called once per frame
 	void Update () {
-    // Timer for requests
-    //if (rp.isTimerOn) UpdateRequestTimer();
-
-    //if (Input.GetKeyDown(KeyCode.R))
-    //{
-    //  foreach (MonsterRequest box in requestBoxes)
-    //  {
-    //    Request req = GenerateRandomRequest();
-    //    box.SetRequest(req);
-    //  }
-    //}
-
-    //if (Input.GetKeyDown(KeyCode.S))
-    //{
-    //  PlayEatingSound();
-    //}
-	}
+    // debug testing
+    if (Input.GetKeyDown(KeyCode.T))
+    {
+      debug_data.force_nextMonster = true;
+      debug_data.next_type = MONSTER_TYPE.TIMED;
+      ServeMonsterRequest(null, requestBoxes[0]);
+    }
+    if (Input.GetKeyDown(KeyCode.P))
+    {
+      debug_data.force_nextMonster = true;
+      debug_data.next_type = MONSTER_TYPE.PICKY;
+      ServeMonsterRequest(null, requestBoxes[0]);
+    }
+  }
 
   public void UpdateMonsterRP()
   {
@@ -179,6 +191,9 @@ public class MonsterManager : MonoBehaviour {
         List<INGREDIENT_TYPE> gridIngredients = new List<INGREDIENT_TYPE>(gs.ingredientStack);
         gridIngredients.RemoveAll((INGREDIENT_TYPE type) => { return type == INGREDIENT_TYPE.EATER; });
 
+        // Check specific monster requirements
+        if (!SpecificMonsterCheck(req, gs)) continue;
+
         // Check if grid request is met
         if (req.gridType != gs.gridType) continue;
         
@@ -195,23 +210,45 @@ public class MonsterManager : MonoBehaviour {
         if (!same) continue;
 
         //ServeMonsterRequest(gs, reqBox);
-        gs.SetCanServe(true, reqBox);
+        gs.SetCanServe(true, reqBox, reqBox.chairColor);
       }
     }
   }
 
+  // returns false if check fails
+  bool SpecificMonsterCheck(Request monReq, GridScript gs)
+  {
+    switch (monReq.monsterType)
+    {
+      case MONSTER_TYPE.PICKY:
+        if (monReq.typeParams.specificGrid != gs) return false;
+        break;
+    }
+
+    return true;
+  }
+
   public void ServeMonsterRequest(GridScript gs, MonsterRequest reqBox)
   {
+    // Increase score
+    int scoreAdded = GameManager.Instance.AddScore(10);
+    GameManager.Instance.AddNumServed(1);
+
     // request has been met
-    gs.ClearStack();
-    //AdvanceRequests();
+    if (gs != null)
+    {
+      gs.TriggerServed(reqBox);
+
+      // update score text in grid
+      gs.TriggerScoreText(scoreAdded);
+    }
 
     // feedback for request met
     GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
     PlayEatingSound();
 
     // get the next request
-    UpdateReqeustMet(reqBox);
+    UpdateRequestMet(reqBox);
 
     // Animate monsters in/out
     reqBox.monsterObj.GetComponent<MonsterAnimation>().ForceMoveComplete();
@@ -220,6 +257,7 @@ public class MonsterManager : MonoBehaviour {
     {
       MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
       if (anim.isAnimating()) continue;
+      anim.InitSprite(reqBox.request.monsterType);
       anim.MoveOutFrom(monsPos);
       break;
     }
@@ -234,13 +272,6 @@ public class MonsterManager : MonoBehaviour {
 
     // update combo man with another combo
     GameManager.Instance.comboMan.AddComboCount();
-
-    // Increase score
-    int scoreAdded = GameManager.Instance.AddScore(10);
-    GameManager.Instance.AddNumServed(1);
-
-    // update score text in grid
-    gs.TriggerScoreText(scoreAdded);
   }
 
   public void AddSauceToAllRequests()
@@ -264,25 +295,29 @@ public class MonsterManager : MonoBehaviour {
     GameManager.Instance.SFX().PlaySound(clip);
   }
 
-  void UpdateReqeustMet(MonsterRequest box)
+  void UpdateRequestMet(MonsterRequest box)
   {
     int index = requestBoxes.IndexOf(box);
     requestBoxes[index].request = new Request();
+
+    // update monsters
     requestBoxes[index].SetRequest(GenerateRandomRequest());
+
+    // apply any grid effects
+    GameManager.Instance.gridMan.MonsterAffectGrid(requestBoxes[index].request);
   }
 
   void GenMonsterType(out Request req)
   {
     req = new Request();
 
-    //List<int> allMonsterTypes = new List<int>();
-    // List of contracted monsters
-    //allMonsterTypes.Add(0);
-    //if (rp.timerContractOn) allMonsterTypes.Add((int)MONSTER_TYPE.TIMED);
-
     // Generate monster type
-    //req.monsterType = (MONSTER_TYPE) allMonsterTypes[Random.Range(0, allMonsterTypes.Count)];
     req.monsterType = RollMonsterType();
+
+    if (debug_data.force_nextMonster)
+    {
+      req.monsterType = debug_data.next_type;
+    }
 
     switch (req.monsterType)
     {

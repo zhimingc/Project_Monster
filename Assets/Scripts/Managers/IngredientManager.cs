@@ -139,6 +139,7 @@ public class IngredientManager : MonoBehaviour {
 
   void UpdateQueuePositions()
   {
+    float hardSetSpacing = 0.1f;
     for (int i = ingredientList.Count - 1, c = 0; i >= 0; --i, ++c)
     {
       Vector3 pos = ingredientList[i].transform.position;
@@ -147,12 +148,12 @@ public class IngredientManager : MonoBehaviour {
       if (isSpawnHorizontal)
       {
         pos.x = transform.position.x + 
-          swing * (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.x * idleScaling) / 2.0f);
+          swing * (c * (-maxLayout - hardSetSpacing) * maxLayout * idleScaling - (gridBlockSize.x * idleScaling) / 2.0f);
       }
       else
       {
         pos.y = transform.position.y + 
-          swing * (c * (-maxLayout - spacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
+          swing * (c * (-maxLayout - hardSetSpacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
       }
       ingredientList[i].transform.position = pos;
       ingredientList[i].GetComponent<IngredientBlock>().oldPos = pos;
@@ -182,7 +183,8 @@ public class IngredientManager : MonoBehaviour {
     blockScript.layout = ObjectFactory.blockLayouts[layout];
 
     Vector2 ingredientSize = gridBlockSize;
-    Vector2 newScale = (ingredientSize + new Vector2(spacing, spacing)) * maxLayout; 
+    //Vector2 newScale = (ingredientSize + new Vector2(spacing, spacing)) * maxLayout; 
+    Vector2 newScale = (ingredientSize) * maxLayout;
     parent.transform.localScale = newScale; 
     parent.transform.position = t.position + new Vector3(newScale.x, -newScale.y, 0.0f) / (maxLayout * 2.0f);
 
@@ -209,7 +211,8 @@ public class IngredientManager : MonoBehaviour {
       GameObject newIngredient = Instantiate(center, t.position, Quaternion.identity);
 
       // Initialize new ingredient 
-      Vector3 offset = Vector2.Scale(vec, ingredientSize + new Vector2(spacing, spacing));
+      //Vector3 offset = Vector2.Scale(vec, ingredientSize + new Vector2(spacing, spacing));
+      Vector3 offset = Vector2.Scale(vec, ingredientSize);
       newIngredient.transform.position += offset;
  
       newIngredient.transform.SetParent(ingredientHolder2.transform);

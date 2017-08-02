@@ -17,15 +17,15 @@ public class GridManager : MonoBehaviour {
 
   void Update()
   {
-    //DEBUG
-    if (Input.GetKeyDown(KeyCode.T))
-    {
-      ApplyTurntable(true);
-    }
-    if (Input.GetKeyUp(KeyCode.T))
-    {
-      ApplyTurntable(false);
-    }
+    ////DEBUG
+    //if (Input.GetKeyDown(KeyCode.T))
+    //{
+    //  ApplyTurntable(true);
+    //}
+    //if (Input.GetKeyUp(KeyCode.T))
+    //{
+    //  ApplyTurntable(false);
+    //}
   }
 
   GameObject GetGrid(int x, int y)
@@ -115,12 +115,6 @@ public class GridManager : MonoBehaviour {
 
     return canFit;
   }
-
-  //// for a single block which affects the grid/board
-  //public void AddBlockToGridSingle(GridScript singleGrid, BlockBehaviour block)
-  //{
-  //  singleGrid.AddToStack(0);
-  //}
 
   public void AddBlockToGrid(GridScript singleGrid, BlockBehaviour block)
   {
@@ -238,6 +232,23 @@ public class GridManager : MonoBehaviour {
       GetGrid(0, 1).GetComponent<GridScript>().MoveStackBack();
       GetGrid(1, 1).GetComponent<GridScript>().MoveStackBack();
       GetGrid(1, 0).GetComponent<GridScript>().MoveStackBack();
+    }
+  }
+
+  public void MonsterAffectGrid(Request monReq)
+  {
+    // randomly select a grid to affect
+    int gridIndex = Random.Range(0, 4);
+
+    // call effect on grid
+    if (gridIndex > 1)
+    {
+      gridIndex -= 2;
+      grid[1][gridIndex].GetComponent<GridScript>().MonsterEffect(monReq);
+    }
+    else
+    {
+      grid[0][gridIndex].GetComponent<GridScript>().MonsterEffect(monReq);
     }
   }
 }

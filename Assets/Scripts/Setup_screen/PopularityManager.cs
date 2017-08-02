@@ -42,7 +42,7 @@ public class PopularityManager : MonoBehaviour {
     // debug
     if (Input.GetKeyDown(KeyCode.S))
     {
-      GameManager.Instance.scoreMan.totalScore += 100;
+      GameManager.Instance.scoreMan.totalScore += 1000;
       TriggerPopularityUpdate();
     }
   }
@@ -76,8 +76,10 @@ public class PopularityManager : MonoBehaviour {
     // is the current score exceeds max rank
     if (rankIndex < 0)
     {
+      rankIndex = (int)RANKS.NUM_MILESTONES;
+      progressBar.GetComponentInChildren<Image>().fillAmount = 1.0f;
       popNext.gameObject.SetActive(false);
-      rankIndex = GameProgression.rankReq.Length - 1;
+      return;
     }
 
     barProgress = GameManager.Instance.GetTotalPopularity() / GameProgression.rankReq[rankIndex];
@@ -90,7 +92,8 @@ public class PopularityManager : MonoBehaviour {
     int displayRank = rankIndex;
 
     // check if rank up
-    if (GameProgression.rankReq[rankIndex] <= GameManager.Instance.GetTotalPopularity())
+    if (rankIndex < (int)RANKS.NUM_MILESTONES &&
+      GameProgression.rankReq[rankIndex] <= GameManager.Instance.GetTotalPopularity())
     {
       if (popNext.gameObject.activeSelf) progressBar.GetComponentInChildren<ParticleSystem>().Play();
       if (rankIndex + 1 >= GameProgression.rankReq.Length)
@@ -99,23 +102,27 @@ public class PopularityManager : MonoBehaviour {
         popNext.gameObject.SetActive(false);
       }
 
-      rankIndex = Mathf.Min(rankIndex + 1, GameProgression.rankReq.Length - 1);
-
       // rank up behaviour
-      toolMan.UpdateToolBox((RANKS)rankIndex - 1);
+      toolMan.UpdateToolBox((RANKS)rankIndex);
       CheckMonsterUnlock();
       GameManager.Instance.gameData.pop_rank = rankIndex;
+
+      rankIndex = Mathf.Min(rankIndex + 1, GameProgression.rankReq.Length);
     }
 
     // update display
-    popNext.text = GameProgression.rankReq[rankIndex].ToString();
-    rankText.text = "Rank: " + displayRank.ToString();
+    if (rankIndex < GameProgression.rankReq.Length)
+    {
+      popNext.text = GameProgression.rankReq[rankIndex].ToString();
 
-    float lastRank = 0.0f;
-    if (rankIndex > 0) lastRank = GameProgression.rankReq[rankIndex - 1];
-    barProgress = (float) (GameManager.Instance.GetTotalPopularity() - lastRank) / (GameProgression.rankReq[rankIndex] - lastRank);
-    barProgress = Mathf.Min(1.0f, barProgress);
-    progressBar.GetComponentInChildren<Image>().fillAmount = barProgress;
+      float lastRank = 0.0f;
+      if (rankIndex > 0) lastRank = GameProgression.rankReq[rankIndex - 1];
+      barProgress = (GameManager.Instance.GetTotalPopularity() - lastRank) / (GameProgression.rankReq[rankIndex] - lastRank);
+      barProgress = Mathf.Min(1.0f, barProgress);
+      progressBar.GetComponentInChildren<Image>().fillAmount = barProgress;
+    }
+
+    rankText.text = "Rank: " + displayRank.ToString();
   }
 
   void InitPopMonsters()
@@ -141,9 +148,9 @@ public class PopularityManager : MonoBehaviour {
   void CheckMonsterUnlock()
   {
     float[] pop_monsters = GameManager.Instance.gameData.pop_monsters;
-    int FIRST_TIME_PERCENTAGE = 25;
+    int FIRST_TIME_PERCENTAGE = 24;
 
-    switch((RANKS)rankIndex - 1)
+    switch((RANKS)rankIndex)
     {
       case RANKS.IMPATIENT_MON:
         pop_monsters[0] -= FIRST_TIME_PERCENTAGE;
@@ -152,6 +159,12 @@ public class PopularityManager : MonoBehaviour {
         break;
       case RANKS.PICKY_MON:
         // take the first time percentage out of each active monster
+        for (int i = 0; i < 2; ++i)
+        {
+          pop_monsters[i] -= FIRST_TIME_PERCENTAGE / 2;
+        }
+        pop_monsters[2] = FIRST_TIME_PERCENTAGE;
+        pop_monsters_obj[2].GetComponent<MonsterSetup>().SetMonsterBubble();
         break;
     }
 

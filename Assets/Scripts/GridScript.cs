@@ -11,6 +11,7 @@ public class GridScript : MonoBehaviour {
   public int[] coordinates;
   public GameObject monsterServeObj;  // graphics to show that you can serve
   public GameObject scoreText;
+  public GameObject pickyIndicator;
   public bool canServe;         // flag to indicate if this grid meets any requests
   
   private List<GameObject> stackObjs;
@@ -48,6 +49,7 @@ public class GridScript : MonoBehaviour {
 
     // Init can serve variables
     SetCanServe(false);
+    pickyIndicator.SetActive(false);
 
     // turntable variables
     turnSpeed = 0.25f;
@@ -156,7 +158,7 @@ public class GridScript : MonoBehaviour {
       playerScript.SetMouseUpDel(gameObject, GridMouseUp);
 
       // Update ability to serve
-      GameManager.Instance.monsterMan.CheckRequestMetAll();
+      //GameManager.Instance.monsterMan.CheckRequestMetAll();
     }
   }
 
@@ -177,6 +179,9 @@ public class GridScript : MonoBehaviour {
           ingredientStack.Add(ingredient.type);
           break;
       }
+
+      // Visual feedback for grid
+      UpdateStackDisplay();
     }
 
     if (playerScript.IsTypeOfBlock<ItemScript>())
@@ -196,15 +201,14 @@ public class GridScript : MonoBehaviour {
             tmpHold = ingredientStack[ingredientStack.Count - 1];
             ingredientStack[ingredientStack.Count - 1] = INGREDIENT_TYPE.EATER;
           }
+          // Visual feedback for grid
+          UpdateStackDisplay();
           break;
         case ITEM_TYPE.TURNTABLE:
           gridMan.ApplyTurntable(true);
           break;
       }
     }
-
-    // Visual feedback for grid
-    UpdateStackDisplay();
   }
 
   public void RemoveFromStack(int index)
@@ -223,6 +227,9 @@ public class GridScript : MonoBehaviour {
           ingredientStack.RemoveAt(ingredientStack.Count - 1);
           break;
       }
+
+      // Visual feedback for grid
+      UpdateStackDisplay();
     }
 
     if (playerScript.IsTypeOfBlock<ItemScript>())
@@ -244,15 +251,15 @@ public class GridScript : MonoBehaviour {
           {
             ingredientStack.Remove(INGREDIENT_TYPE.EATER);
           }
+
+          // Visual feedback for grid
+          UpdateStackDisplay();
           break;
         case ITEM_TYPE.TURNTABLE:
           gridMan.ApplyTurntable(false);
           break;
       }
     }
-
-    // Visual feedback for grid
-    UpdateStackDisplay();
   }
 
   public void ToggleGridType(GRID_TYPE type)
@@ -372,10 +379,14 @@ public class GridScript : MonoBehaviour {
     return gridMan.CheckIfLegalMove(this, playerScript.blockBeingDragged);
   }
 
-  public void ClearStack()
+  public void TriggerServed(MonsterRequest req)
   {
     ingredientStack.Clear();
     UpdateStackDisplay();
+    if (req.request.monsterType == MONSTER_TYPE.PICKY)
+    {
+      pickyIndicator.SetActive(false);
+    }
 
     EmitEatenParticles();
   }
@@ -389,13 +400,21 @@ public class GridScript : MonoBehaviour {
     UpdateStackDisplay();
   }
 
-  public void SetCanServe(bool flag, MonsterRequest setReq = null)
+  public void SetCanServe(bool flag, MonsterRequest setReq = null, Color chairColor = new Color())
   {
     canServe = flag;
     monsterServeObj.SetActive(flag);
     if (setReq)
     {
       monsterServeObj.GetComponent<SpriteRenderer>().sprite = setReq.monsterObj.GetComponent<SpriteRenderer>().sprite;
+      Color newCol = setReq.monsterObj.GetComponent<SpriteRenderer>().color;
+      newCol.a = monsterServeObj.GetComponent<SpriteRenderer>().color.a;
+      monsterServeObj.GetComponent<SpriteRenderer>().color = newCol;
+
+      // chair being served
+      newCol = chairColor;
+      newCol.a = monsterServeObj.GetComponentsInChildren<SpriteRenderer>()[1].color.a;
+      monsterServeObj.GetComponentsInChildren<SpriteRenderer>()[1].color = newCol;
     }
     monReq = setReq;
   }
@@ -420,6 +439,7 @@ public class GridScript : MonoBehaviour {
   {
     LeanTween.cancel(gameObject);
 
+    SetCanServe(false);
     GridScript toScript = toObj.GetComponent<GridScript>();
 
     for (int i = 0; i < stackObjs.Count; ++i)
@@ -456,6 +476,18 @@ public class GridScript : MonoBehaviour {
     {
       LeanTween.cancel(stackObjs[i]);
       LeanTween.move(stackObjs[i], rotateFromPos[i], turnSpeed).setEase(LeanTweenType.easeOutQuad);
+    }
+  }
+
+  public void MonsterEffect(Request monReq)
+  {
+    switch (monReq.monsterType)
+    {
+      case MONSTER_TYPE.PICKY:
+        pickyIndicator.SetActive(true);
+        monReq.typeParams.specificGrid = this;
+        pickyIndicator.GetComponent<SpriteRenderer>().color = monReq.chairColor;
+        break;
     }
   }
 }

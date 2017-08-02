@@ -8,6 +8,7 @@ public class MonsterAnimation : MonoBehaviour {
   public float animTime;
   public GameObject requestObj, parent;
   public Vector3 origin;// originScale;
+  public MONSTER_TYPE type;
 
   private float[] boundaries;
   private BackgroundManager backMan;
@@ -24,19 +25,34 @@ public class MonsterAnimation : MonoBehaviour {
     //originScale = transform.localScale;
 
     // sprites
-    monsterStates = new Sprite[2];
-    monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_1");
-    monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_1_angry");
+    monsterStates = new Sprite[(int)MONSTER_TYPE.NUM_TYPES];
+    monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
+    monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
+    monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_basic");
+  }
 
-    // initial state
-    //GetComponent<SpriteRenderer>().sprite = monsterStates[0];
+  void Start()
+  {
+    // init sprite
+    if (requestObj != null)
+    {
+      MonsterRequest req = requestObj.GetComponent<MonsterRequest>();
+      type = req.request.monsterType;
+    }
   }
 
   // init the monster sprite according to monster type
-  public void InitSprite()
+  public void InitSprite(MONSTER_TYPE monType)
   {
-    int spriteIndex = (int)requestObj.GetComponent<MonsterRequest>().request.monsterType;
+    type = monType;
+    int spriteIndex = (int)monType;
     GetComponent<SpriteRenderer>().sprite = monsterStates[spriteIndex];
+    GetComponent<SpriteRenderer>().color = Color.white;
+
+    if (type == MONSTER_TYPE.PICKY)
+    {
+      GetComponent<SpriteRenderer>().color = Color.cyan;
+    }
   }
 
   public void Hide()
@@ -56,7 +72,7 @@ public class MonsterAnimation : MonoBehaviour {
   public void MoveInFrom(Vector3 from)
   {
     // monsters moving out are angry (sprite)
-    InitSprite();
+    //InitSprite();
 
     GetComponent<Animator>().SetBool("isMoving", true);
     parent.transform.position = from;
@@ -80,6 +96,8 @@ public class MonsterAnimation : MonoBehaviour {
 
   public void MoveOutFrom(Vector3 from)
   {
+    //InitSprite();
+
     // monsters moving out are happy (sprite)
     GetComponent<SpriteRenderer>().sprite = monsterStates[0];
 

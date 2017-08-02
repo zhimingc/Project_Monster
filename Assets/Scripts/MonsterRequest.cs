@@ -16,6 +16,9 @@ public struct MonsterTypeParams
 {
   // timed monsters
   public float curTimer, maxTimer;
+
+  // picky monster
+  public GridScript specificGrid;
 }
 
 public class MonsterRequest : MonoBehaviour {
@@ -29,6 +32,8 @@ public class MonsterRequest : MonoBehaviour {
   // monster specific behaviour
   private MonsterTypeParams typeParams;
   public GameObject stopwatch;
+  public GameObject pickyIndicator;
+  public Color chairColor;
 
   // Use this for initialization
   void Start () {
@@ -74,14 +79,19 @@ public class MonsterRequest : MonoBehaviour {
     request.monsterType = req.monsterType;
     typeParams = req.typeParams;
 
+    // reset specific type feedback
+    stopwatch.SetActive(false);
+    pickyIndicator.SetActive(false);
+
     // init depending on monster type
     switch (request.monsterType)
     {
-      case MONSTER_TYPE.NORMAL:
-        stopwatch.SetActive(false);
-        break;
       case MONSTER_TYPE.TIMED:
         stopwatch.SetActive(true);
+        break;
+      case MONSTER_TYPE.PICKY:
+        pickyIndicator.SetActive(true);
+        pickyIndicator.GetComponent<SpriteRenderer>().color = chairColor;
         break;
     }
   }
@@ -103,9 +113,12 @@ public class MonsterRequest : MonoBehaviour {
   {
     request = req;
 
+    // update chair color depending on which lane it is
+    request.chairColor = chairColor;
+
     // Set new monster type
     SetMonsterType(req);
-    monsterObj.GetComponent<MonsterAnimation>().InitSprite();
+    monsterObj.GetComponent<MonsterAnimation>().InitSprite(req.monsterType);
 
     // reset ingredient stack obj
     for (int i = 0; i < ingredientStackObjs.Count; ++i)

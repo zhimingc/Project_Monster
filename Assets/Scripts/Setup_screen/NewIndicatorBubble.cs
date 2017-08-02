@@ -23,7 +23,7 @@ public class NewIndicatorBubble : MonoBehaviour {
     if (InputMan.OnDown())
     {
       if (clickFn != null) clickFn();
-      gameObject.SetActive(false);
+      transform.parent.gameObject.SetActive(false);
     }
   }
 
