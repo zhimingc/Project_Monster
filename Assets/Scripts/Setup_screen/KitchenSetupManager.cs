@@ -10,7 +10,7 @@ public class KitchenSetupManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
     isCounterUp = false;
-    ToggleCounterColliders(isCounterUp);
+    //ToggleCounterColliders(isCounterUp);
 
   }
 	
@@ -31,7 +31,7 @@ public class KitchenSetupManager : MonoBehaviour {
     isCounterUp = flag;
     LeanTween.cancel(counterObj);
 
-    ToggleCounterColliders(isCounterUp);
+    //ToggleCounterColliders(isCounterUp);
 
     if (isCounterUp)
     {
@@ -46,12 +46,12 @@ public class KitchenSetupManager : MonoBehaviour {
   public void RaiseCounter()
   {
     if (isCounterUp == true) return;
-    ToggleCounter(true);
+    //ToggleCounter(true);
   }
 
   public void LowerCounter()
   {
     if (isCounterUp == false) return;
-    ToggleCounter(false);
+    //ToggleCounter(false);
   }
 }

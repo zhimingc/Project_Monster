@@ -230,9 +230,11 @@ public class MonsterManager : MonoBehaviour {
 
   public void ServeMonsterRequest(GridScript gs, MonsterRequest reqBox)
   {
+    // update combo man with another combo
+    GameManager.Instance.comboMan.AddComboCount();
+
     // Increase score
-    int scoreAdded = GameManager.Instance.AddScore(10);
-    GameManager.Instance.AddNumServed(1);
+    int scoreAdded = GameManager.Instance.AddScore();
 
     // request has been met
     if (gs != null)
@@ -243,12 +245,13 @@ public class MonsterManager : MonoBehaviour {
       gs.TriggerScoreText(scoreAdded);
     }
 
+    // add number served and check for shift change
+    GameManager.Instance.AddNumServed(1);
+
+
     // feedback for request met
     GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
     PlayEatingSound();
-
-    // get the next request
-    UpdateRequestMet(reqBox);
 
     // Animate monsters in/out
     reqBox.monsterObj.GetComponent<MonsterAnimation>().ForceMoveComplete();
@@ -267,11 +270,11 @@ public class MonsterManager : MonoBehaviour {
     moveIn.x = -7;
     reqBox.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
 
+    // get the next request
+    UpdateRequestMet(reqBox);
+
     // update serve ability of grids;
     CheckRequestMetAll();
-
-    // update combo man with another combo
-    GameManager.Instance.comboMan.AddComboCount();
   }
 
   public void AddSauceToAllRequests()
@@ -300,11 +303,15 @@ public class MonsterManager : MonoBehaviour {
     int index = requestBoxes.IndexOf(box);
     requestBoxes[index].request = new Request();
 
-    // update monsters
-    requestBoxes[index].SetRequest(GenerateRandomRequest());
+    // generate request
+    Request newReq = GenerateRandomRequest();
 
     // apply any grid effects
-    GameManager.Instance.gridMan.MonsterAffectGrid(requestBoxes[index].request);
+    newReq.chairColor = requestBoxes[index].chairColor;
+    GameManager.Instance.gridMan.MonsterAffectGrid(newReq);
+
+    // update monsters
+    requestBoxes[index].SetRequest(newReq);
   }
 
   void GenMonsterType(out Request req)
@@ -446,5 +453,15 @@ public class MonsterManager : MonoBehaviour {
       maxTimer = Mathf.Max(maxTimer, minTimer);
     }
     currentTimer = maxTimer;
+  }
+
+  // recall set request for any updates to the requests
+  // e.g. picky monster updated by dinner
+  public void UpdateMonsterRequests()
+  {
+    foreach(MonsterRequest req in requestBoxes)
+    {
+      req.UpdateRequest();
+    }
   }
 }

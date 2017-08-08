@@ -41,7 +41,7 @@ public class IngredientManager : MonoBehaviour {
     ingredientFlipflop = 1;
     maxCountdown = 1;
     ingredientCountdown = maxCountdown;
-    //ingredientCountup = 0;
+    numberOfIngredients = GameManager.Instance.gameData.num_ingredients;
     ++numberOfIngredients;  // Because random range excludes max value
     //sauceFlipflop = 1;
 

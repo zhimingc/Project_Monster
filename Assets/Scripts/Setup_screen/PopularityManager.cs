@@ -19,10 +19,17 @@ public class PopularityManager : MonoBehaviour {
 	void Start () {
     //pop_monsters_obj = GameObject.FindGameObjectsWithTag("PopMonster");
     popTotal.text = GameManager.Instance.GetTotalPopularity().ToString();
+    UpdateDayText();
 
-    dayText.GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days).ToString();
     InitRankTracking();
     InitPopMonsters();
+
+    CheckMonsterUnlock();
+  }
+
+  public void UpdateDayText()
+  {
+    dayText.GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days).ToString();
   }
 
   public void TriggerPopularityUpdate()
@@ -92,7 +99,7 @@ public class PopularityManager : MonoBehaviour {
     int displayRank = rankIndex;
 
     // check if rank up
-    if (rankIndex < (int)RANKS.NUM_MILESTONES &&
+    if (rankIndex < (int)RANKS.NUM_MILESTONES - 1 &&
       GameProgression.rankReq[rankIndex] <= GameManager.Instance.GetTotalPopularity())
     {
       if (popNext.gameObject.activeSelf) progressBar.GetComponentInChildren<ParticleSystem>().Play();
@@ -101,13 +108,11 @@ public class PopularityManager : MonoBehaviour {
         displayRank = rankIndex + 1;
         popNext.gameObject.SetActive(false);
       }
+      rankIndex = Mathf.Min(rankIndex + 1, GameProgression.rankReq.Length);
 
       // rank up behaviour
       toolMan.UpdateToolBox((RANKS)rankIndex);
-      CheckMonsterUnlock();
       GameManager.Instance.gameData.pop_rank = rankIndex;
-
-      rankIndex = Mathf.Min(rankIndex + 1, GameProgression.rankReq.Length);
     }
 
     // update display
@@ -125,7 +130,7 @@ public class PopularityManager : MonoBehaviour {
     rankText.text = "Rank: " + displayRank.ToString();
   }
 
-  void InitPopMonsters()
+  public void InitPopMonsters()
   {
     float[] pop_monsters = GameManager.Instance.gameData.pop_monsters;
 
@@ -147,31 +152,11 @@ public class PopularityManager : MonoBehaviour {
 
   void CheckMonsterUnlock()
   {
-    float[] pop_monsters = GameManager.Instance.gameData.pop_monsters;
-    int FIRST_TIME_PERCENTAGE = 24;
-
-    switch((RANKS)rankIndex)
+    int newMonster = GameManager.Instance.gameData.newMonsterIndex;
+    if (newMonster > 0)
     {
-      case RANKS.IMPATIENT_MON:
-        pop_monsters[0] -= FIRST_TIME_PERCENTAGE;
-        pop_monsters[1] = FIRST_TIME_PERCENTAGE;
-        pop_monsters_obj[1].GetComponent<MonsterSetup>().SetMonsterBubble();
-        break;
-      case RANKS.PICKY_MON:
-        // take the first time percentage out of each active monster
-        for (int i = 0; i < 2; ++i)
-        {
-          pop_monsters[i] -= FIRST_TIME_PERCENTAGE / 2;
-        }
-        pop_monsters[2] = FIRST_TIME_PERCENTAGE;
-        pop_monsters_obj[2].GetComponent<MonsterSetup>().SetMonsterBubble();
-        break;
+      pop_monsters_obj[newMonster].GetComponent<MonsterSetup>().SetMonsterBubble();
     }
-
-    // update game data
-    GameManager.Instance.gameData.pop_monsters = pop_monsters;
-    // re init the pop monster objects
-    InitPopMonsters();
   }
 
   void ComputeIncScore()

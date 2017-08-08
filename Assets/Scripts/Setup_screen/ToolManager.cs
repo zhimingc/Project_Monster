@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class ToolManager : MonoBehaviour {
 
+  public bool overwriteLocks;
   public ItemSetup[] toolBox;
   public GameObject newTool_indicator, newTool;
 
 	// Use this for initialization
 	void Start () {
     int rank = GameManager.Instance.gameData.pop_rank;
-    if (rank > (int)RANKS.BIN_TOOL) toolBox[0].SetItemType(ITEM_TYPE.BIN);
-    if (rank > (int)RANKS.EATER_TOOL) toolBox[1].SetItemType(ITEM_TYPE.EATER);
-    if (rank > (int)RANKS.TURNTABLE_TOOL) toolBox[2].SetItemType(ITEM_TYPE.TURNTABLE);
+
+    toolBox[0].SetItemType(ITEM_TYPE.EATER);
+
+    //if (rank >= (int)RANKS.BIN_TOOL) toolBox[0].SetItemType(ITEM_TYPE.BIN);
+    //if (rank >= (int)RANKS.EATER_TOOL) toolBox[1].SetItemType(ITEM_TYPE.EATER);
+    if (rank >= (int)RANKS.TURNTABLE_TOOL || overwriteLocks) toolBox[1].SetItemType(ITEM_TYPE.TURNTABLE);
     //if (rank > (int)RANKS.BIN_TOOL) toolBox[3].SetItemType(ITEM_TYPE.BIN);
 
     //ToggleNewToolIndicator(GameManager.Instance.gameData.indicator_newTool);
@@ -22,17 +26,17 @@ public class ToolManager : MonoBehaviour {
   {
     switch(rankType)
     {
-      case RANKS.BIN_TOOL:
-        toolBox[0].SetItemType(ITEM_TYPE.BIN);
-        SetNewToolIndicator(toolBox[0].gameObject);
-        break;
-      case RANKS.EATER_TOOL:
-        toolBox[1].SetItemType(ITEM_TYPE.EATER);
-        SetNewToolIndicator(toolBox[1].gameObject);
-        break;
+      //case RANKS.BIN_TOOL:
+      //  toolBox[0].SetItemType(ITEM_TYPE.BIN);
+      //  SetNewToolIndicator(toolBox[0].gameObject);
+      //  break;
+      //case RANKS.EATER_TOOL:
+      //  toolBox[1].SetItemType(ITEM_TYPE.EATER);
+      //  SetNewToolIndicator(toolBox[1].gameObject);
+      //  break;
       case RANKS.TURNTABLE_TOOL:
-        toolBox[2].SetItemType(ITEM_TYPE.TURNTABLE);
-        SetNewToolIndicator(toolBox[2].gameObject);
+        toolBox[1].SetItemType(ITEM_TYPE.TURNTABLE);
+        SetNewToolIndicator(toolBox[1].gameObject);
         break;
     }
   }

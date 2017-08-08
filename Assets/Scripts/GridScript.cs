@@ -32,6 +32,9 @@ public class GridScript : MonoBehaviour {
   private List<INGREDIENT_TYPE> tmpIngredientStack;
   private List<GameObject> tmpStackObjs;
 
+  // picky monster 
+  private Request pickedBy;
+
 
   void Awake()
   {
@@ -267,6 +270,12 @@ public class GridScript : MonoBehaviour {
     gridType = type;
     UpdateStackDisplay();
 
+    // update any picky monsters
+    if (pickedBy != null)
+    {
+      pickedBy.gridType = gridType;
+    }
+
     // Update ability to serve
     GameManager.Instance.monsterMan.CheckRequestMetAll();
   }
@@ -363,7 +372,14 @@ public class GridScript : MonoBehaviour {
     {
       if (canServe)
       {
+        if (monReq.request.monsterType == MONSTER_TYPE.PICKY)
+        {
+          pickedBy = null;
+        }
+
         GameManager.Instance.monsterMan.ServeMonsterRequest(this, monReq);
+
+        // reset serve
         SetCanServe(false);
       }
     }
@@ -479,15 +495,22 @@ public class GridScript : MonoBehaviour {
     }
   }
 
-  public void MonsterEffect(Request monReq)
+  // returns true if application of effect was successful
+  public bool MonsterEffect(Request monReq)
   {
     switch (monReq.monsterType)
     {
       case MONSTER_TYPE.PICKY:
+        if (pickedBy != null) return false;
+
+        pickedBy = monReq;
         pickyIndicator.SetActive(true);
         monReq.typeParams.specificGrid = this;
+        monReq.gridType = gridType;
         pickyIndicator.GetComponent<SpriteRenderer>().color = monReq.chairColor;
         break;
     }
+
+    return true;
   }
 }

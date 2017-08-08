@@ -90,7 +90,7 @@ public class ItemSpawn : MonoBehaviour {
     }
   }
 
-  void SpawnItem()
+  public void SpawnItem()
   {
     hasItem = true;
     int layout = 0;

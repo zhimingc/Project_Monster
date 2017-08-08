@@ -38,6 +38,11 @@ public class ComboManager : MonoBehaviour {
     }
   }
 
+  public int GetComboCount()
+  {
+    return comboCount;
+  }
+
   public float GetComboMultiplier()
   {
     if (comboCount <= 1) return 1.0f;

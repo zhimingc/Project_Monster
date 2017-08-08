@@ -23,6 +23,7 @@ public class SauceScript : MonoBehaviour {
     maxCooldown = GetComponentInParent<SauceManager>().maxCooldown;
     isCoolingDown = false;
 
+    cooldownText.enabled = false;
     GenerateSauce();
     UpdateStateFeedback();
   }
@@ -34,17 +35,24 @@ public class SauceScript : MonoBehaviour {
 
   public void SauceMouseUp()
   {
-    if (!isCoolingDown && playerScript.playerState == PLAYER_STATE.DRAGGING)
+    //if (Input.GetMouseButtonUp(0) && playerScript.hoveredGrid != null)
+    if (InputMan.OnUp() && playerScript.hoveredGrid != null)
     {
-      //if (Input.GetMouseButtonUp(0) && playerScript.hoveredGrid != null)
-      if (InputMan.OnUp() && playerScript.hoveredGrid != null)
+      if (GameManager.Instance.dayMan.toggleTimedShiftFeature)
+      {
+        GenerateSauce();
+      }
+      else
       {
         GameManager.Instance.IncrementTurnCounter();
 
+        // turn off cooldown if shifts are timed
         isCoolingDown = true;
+
         // Set sauce cooldown
         curCooldown = GameManager.Instance.turnCounter;
       }
+
     }
   }
 
@@ -56,8 +64,7 @@ public class SauceScript : MonoBehaviour {
   public void OnTouchStay()
   {
     //if (Input.GetMouseButtonDown(0) &&
-    if (InputMan.OnDown() &&
-      !isCoolingDown && playerScript.playerState == PLAYER_STATE.IDLE)
+    if (InputMan.OnDown() && playerScript.playerState == PLAYER_STATE.IDLE)
     {
       sauceObj.GetComponent<IngredientBlock>().StartDrag();
       // Set delegate to determine mouse up behaviour
@@ -65,27 +72,21 @@ public class SauceScript : MonoBehaviour {
     }
   }
 
-  void OnMouseExit()
-  {
-    OnTouchExit();
-  }
-
-  public void OnTouchExit()
-  {
-    if (!isCoolingDown && playerScript.playerState == PLAYER_STATE.IDLE)
-    {
-      playerScript.ResetMouseUpDel(gameObject);
-    }
-  }
-
   void UpdateCooldown()
   {
+    if (GameManager.Instance.dayMan.toggleTimedShiftFeature)
+    {
+      sauceObj.GetComponent<BoxCollider2D>().enabled = false;
+      return;
+    }
+
     // THIS PIECE OF CODE IS DOING THE JOB OF MOUSEUPEVENT
     if (!isCoolingDown && sauceObj == null)
     {
       GameManager.Instance.IncrementTurnCounter();
       isCoolingDown = true;
       curCooldown = GameManager.Instance.turnCounter;
+      cooldownText.enabled = true;
     }
 
     if (isCoolingDown)
@@ -135,8 +136,6 @@ public class SauceScript : MonoBehaviour {
 
     // color grid
     ObjectFactory.InitializeSaucePlate(sauceObj, sauceType);
-
-    sauceObj.GetComponent<BoxCollider2D>().enabled = false;
   }
 
   

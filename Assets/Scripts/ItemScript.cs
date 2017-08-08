@@ -115,23 +115,33 @@ public class ItemScript : BlockBehaviour
       case ITEM_TYPE.BIN:
         if (playerScript.playerState == PLAYER_STATE.DRAGGING)
         {
-          // Set cooldown
-          GetComponentInParent<ItemSpawn>().RemoveItem();
           // Audio feedback
           GameManager.Instance.SFX().PlaySoundWithPitch("trash", 0.75f, 1.0f);
-          // disable use while cooling down
-          ToggleCanUse(false);
+
+          UseUpItem();
         }
         break;
     }
 
     if (playerScript.hoveredGrid != null)
     {
-      // Set cooldown
-      GetComponentInParent<ItemSpawn>().RemoveItem();
-      // disable use while cooling down
-      ToggleCanUse(false);
+      UseUpItem();
     }
+  }
+
+  void UseUpItem()
+  {
+    if (GameManager.Instance.dayMan.toggleTimedShiftFeature)
+    {
+      GetComponentInParent<ItemSpawn>().SpawnItem();
+
+      return;
+    }
+
+    // Set cooldown
+    GetComponentInParent<ItemSpawn>().RemoveItem();
+    // disable use while cooling down
+    ToggleCanUse(false);
   }
 
   new public void StartDrag()

@@ -125,6 +125,7 @@ public class MonsterRequest : MonoBehaviour {
     {
       Sprite sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
       ingredientStackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
+      ingredientStackObjs[i].GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     // Set the display according to ingredient
@@ -163,5 +164,8 @@ public class MonsterRequest : MonoBehaviour {
     }
   }
 
-
+  public void UpdateRequest()
+  {
+    SetRequest(request);
+  }
 }

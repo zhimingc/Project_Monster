@@ -174,6 +174,8 @@ public class GridManager : MonoBehaviour {
     GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
     // play sfx
     GameManager.Instance.SFX().PlaySoundWithPitch("boom1", 0.9f, 1.1f);
+    // Update monster requests
+    GameManager.Instance.monsterMan.UpdateMonsterRequests();
 
     LeanTween.delayedCall(0.5f, () =>
     {
@@ -182,7 +184,11 @@ public class GridManager : MonoBehaviour {
       GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
       // play sfx
       GameManager.Instance.SFX().PlaySoundWithPitch("boom1", 0.9f, 1.1f);
+      // Update monster requests
+      GameManager.Instance.monsterMan.UpdateMonsterRequests();
     });
+
+
   }
 
   void ConstructGrid(int gridX, int gridY)
@@ -237,18 +243,32 @@ public class GridManager : MonoBehaviour {
 
   public void MonsterAffectGrid(Request monReq)
   {
-    // randomly select a grid to affect
-    int gridIndex = Random.Range(0, 4);
+    bool applied = false;
+    while (applied == false)
+    {
+      // randomly select a grid to affect
+      int gridIndex = Random.Range(0, 4);
+      int colIndex = 0;
+      // call effect on grid
+      if (gridIndex > 1)
+      {
+        colIndex = 1;
+        gridIndex -= 2;
+      }
+      applied = grid[colIndex][gridIndex].GetComponent<GridScript>().MonsterEffect(monReq);
+    }
+  }
 
-    // call effect on grid
-    if (gridIndex > 1)
+  public bool AnyGridsServable()
+  {
+    for (int x = 0; x < grid.Count; ++x)
     {
-      gridIndex -= 2;
-      grid[1][gridIndex].GetComponent<GridScript>().MonsterEffect(monReq);
+      for (int y = 0; y < grid[x].Count; ++y)
+      {
+        if (grid[x][y].GetComponent<GridScript>().canServe) return true;
+      }
     }
-    else
-    {
-      grid[0][gridIndex].GetComponent<GridScript>().MonsterEffect(monReq);
-    }
+
+    return false;
   }
 }

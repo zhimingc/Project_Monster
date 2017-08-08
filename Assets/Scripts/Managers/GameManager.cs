@@ -29,18 +29,28 @@ public class GameData
 
     // flags
     flag_firstPlay = true;
+
+    playerName = PlayerPrefs.GetString("name");
+    if (playerName == "") playerName = "Leslie";
   }
 
   public void Reset()
   {
     pop_total = 0;
     pop_rank = 0;
-    count_days = 0;
-    pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
-    pop_monsters[0] = 100.0f;
+    ConsecutiveDayReset();
 
     // flags
     flag_firstPlay = true;
+  }
+
+  // does not clear total popularity
+  public void ConsecutiveDayReset()
+  {
+    count_days = 0;
+    pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+    pop_monsters[0] = 100.0f;
+    num_ingredients = 1;
   }
 
   public int pop_total;
@@ -48,6 +58,12 @@ public class GameData
   public float[] pop_monsters;
   public bool indicator_newTool;
   public bool flag_firstPlay;
+
+  // gameplay stat stuff, put in another class later
+  public int num_ingredients;
+  public int newMonsterIndex;
+  public string playerName;
+  public MONSTER_EVENT eventType;
 }
 
 public class GameManager : Singleton<GameManager>
@@ -69,12 +85,15 @@ public class GameManager : Singleton<GameManager>
   public GridManager gridMan;
   public ComboManager comboMan;
   public KitchenSetupManager setupMan;  // only in setup screen
+  public IngredientManager ingredientMan;
 
   private LoadManager loadMan;
   private MusicManager musicMan;
   private UIManager uiMan;
   private BackgroundManager backMan;
   private Cursor cursorScript;
+  private ConsecutiveManager consecMan;
+
   private bool isPaused;
 
   public bool startWithHelp, helpToggler;
@@ -94,9 +113,11 @@ public class GameManager : Singleton<GameManager>
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
     cursorScript = gameObject.AddComponent<Cursor>();
-    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
+    consecMan = gameObject.AddComponent<ConsecutiveManager>();
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
     gameData = new GameData();
+
+    GameManagerReset();
 
     // DEBUG HACK TO ADD CONTRACTS
     //contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
@@ -146,6 +167,9 @@ public class GameManager : Singleton<GameManager>
 
   void InitializeManagers()
   {
+    // Apply consecutive changes from the day
+    consecMan.ApplyNewDayChanges(gameData.count_days);
+
     turnCounter = 0;
     currentLevel = 0;
     helpToggler = true;
@@ -159,6 +183,7 @@ public class GameManager : Singleton<GameManager>
       monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
       backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
       comboMan = GameObject.Find("combo_man").GetComponent<ComboManager>();
+      ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
 
       // contract icon display
       InitContractIcons();
@@ -170,6 +195,11 @@ public class GameManager : Singleton<GameManager>
     if (SceneManager.GetActiveScene().name.Contains("screen-setup"))
     {
       setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
+    }
+
+    if (SceneManager.GetActiveScene().name.Contains("leaderboard"))
+    {
+      scoreMan.TriggerUpdateLeaderboard();
     }
   }
 
@@ -265,8 +295,11 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
       }
 
-      // Update to display score
-      //scoreMan.DisplayScore();
+      if (Input.GetKeyDown(KeyCode.W))
+      {
+        dayMan.dayState = DAY_STATE.WIN;
+        dayMan.TriggerShiftChange();
+      }
     }
 
     if (Input.GetKeyDown(KeyCode.Escape))
@@ -338,9 +371,9 @@ public class GameManager : Singleton<GameManager>
     comboMan.ResetComboCount();
   }
 
-  public int AddScore(int amt)
+  public int AddScore()
   {
-    return scoreMan.AddScore(amt);
+    return scoreMan.AddScore();
   }
 
   public void AddNumServed(int amt)
@@ -348,7 +381,7 @@ public class GameManager : Singleton<GameManager>
     scoreMan.AddNumberServed(amt);
 
     // Check for day change
-    dayMan.UpdateProgressBar();
+    //dayMan.UpdateProgressBar();
     dayMan.CheckForShiftChange();
   }
 
@@ -528,7 +561,7 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.SETUP_TOGGLE:
         bool flipped = setupMan.isCounterUp;
         btn.GetComponentsInChildren<SpriteRenderer>()[1].flipX = !flipped;
-        setupMan.ToggleCounter(!flipped);
+        //setupMan.ToggleCounter(!flipped);
         break;
       case BUTTON_TYPE.TO_FIRSTTIME:
         if (gameData.flag_firstPlay)
@@ -544,10 +577,34 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.RESET_DATA:
         gameData.Reset();
         scoreMan.Reset();
-        itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EMPTY), new ItemInfo(ITEM_TYPE.EMPTY) };
+        GameManagerReset();
         break;
       case BUTTON_TYPE.TO_GAME:
         Button_ToGame();
+        break;
+      case BUTTON_TYPE.DEBUG_LEVELSKIP:
+        ++gameData.count_days;
+        consecMan.ApplyNewDayChanges(gameData.count_days);
+        GameObject.Find("store_stats").GetComponent<PopularityManager>().UpdateDayText();
+        GameObject.Find("store_stats").GetComponent<PopularityManager>().InitPopMonsters();
+        break;
+      case BUTTON_TYPE.DEBUG_GETPOP:
+        scoreMan.totalScore += 1000;
+        GameObject.Find("store_stats").GetComponent<PopularityManager>().TriggerPopularityUpdate();
+        break;
+      case BUTTON_TYPE.GAME_CHANGENAME:
+        gameData.playerName = "";
+        GameObject.Find("main_menu").GetComponent<MainMenuManager>().ActivateNameChange();
+        break;
+      case BUTTON_TYPE.GAME_EVENTFORWARD:
+        GameObject.Find("event_parent").GetComponent<MonsterEventManager>().ScrollEventForward();
+        break;
+      case BUTTON_TYPE.GAME_EVENTBACK:
+        GameObject.Find("event_parent").GetComponent<MonsterEventManager>().ScrollEventBack();
+        break;
+      case BUTTON_TYPE.GAME_LEADERBOARD:
+        LoadSceneWithTransition("screen-leaderboard");
+        //scoreMan.TriggerUpdateLeaderboard();
         break;
     }
   }
@@ -582,10 +639,10 @@ public class GameManager : Singleton<GameManager>
   // to check for days ending early for day 1/2
   public bool CheckIfDayEnds(DAY_STATE state)
   {
-    if ((DAYS)gameData.count_days == DAYS.BREAKFAST 
-      && state == DAY_STATE.LUNCH) return true;
-    if ((DAYS)gameData.count_days == DAYS.LUNCH
-      && state == DAY_STATE.DINNER) return true;
+    //if ((DAYS)gameData.count_days == DAYS.BREAKFAST 
+    //  && state == DAY_STATE.LUNCH) return true;
+    //if ((DAYS)gameData.count_days == DAYS.LUNCH
+    //  && state == DAY_STATE.DINNER) return true;
 
     return false;
   }
@@ -593,6 +650,29 @@ public class GameManager : Singleton<GameManager>
   public void AddToDayCount(int amt)
   {
     gameData.count_days += amt;
+  }
+
+  void GameManagerReset()
+  {
+    itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EATER), new ItemInfo(ITEM_TYPE.EATER) };
+
+  }
+
+  public void EndOfDayTrigger()
+  {
+    if (!dayMan.toggleTimedShiftFeature)
+    {
+      AddToDayCount(1);
+    }
+
+    switch (gameData.eventType)
+    {
+      case MONSTER_EVENT.FIRST_DAY:
+        break;
+      case MONSTER_EVENT.MAIN_EVENT:
+        scoreMan.UpdateLeaderboard();
+        break;
+    }
   }
 }
 

@@ -6,6 +6,22 @@ static public class InputMan {
 
   static public RuntimePlatform platform;
 
+  static public bool UsingPC()
+  {
+    bool res = false;
+    switch (platform)
+    {
+      case RuntimePlatform.Android:
+      case RuntimePlatform.IPhonePlayer:
+        res = false;
+        break;
+      default:
+        res = true;
+        break;
+    }
+    return res;
+  }
+
 	static public bool OnDown()
   {
     bool res = false;

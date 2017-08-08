@@ -7,7 +7,7 @@ public class MonsterAnimation : MonoBehaviour {
   // Animation properties
   public float animTime;
   public GameObject requestObj, parent;
-  public Vector3 origin;// originScale;
+  public Vector3 origin, landingPos;// originScale;
   public MONSTER_TYPE type;
 
   private float[] boundaries;
@@ -28,7 +28,7 @@ public class MonsterAnimation : MonoBehaviour {
     monsterStates = new Sprite[(int)MONSTER_TYPE.NUM_TYPES];
     monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
     monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
-    monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_basic");
+    monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_picky");
   }
 
   void Start()
@@ -49,10 +49,10 @@ public class MonsterAnimation : MonoBehaviour {
     GetComponent<SpriteRenderer>().sprite = monsterStates[spriteIndex];
     GetComponent<SpriteRenderer>().color = Color.white;
 
-    if (type == MONSTER_TYPE.PICKY)
-    {
-      GetComponent<SpriteRenderer>().color = Color.cyan;
-    }
+    //if (type == MONSTER_TYPE.PICKY)
+    //{
+    //  GetComponent<SpriteRenderer>().color = Color.cyan;
+    //}
   }
 
   public void Hide()
@@ -71,16 +71,9 @@ public class MonsterAnimation : MonoBehaviour {
 
   public void MoveInFrom(Vector3 from)
   {
-    // monsters moving out are angry (sprite)
-    //InitSprite();
-
     GetComponent<Animator>().SetBool("isMoving", true);
     parent.transform.position = from;
 
-    //float offset = origin.x - boundaries[0];
-    //transform.localScale += new Vector3(offset / 2.75f, 0, 0);
-
-    //LeanTween.scale(gameObject, originScale, animTime);
     LeanTween.move(parent, origin, animTime).setEase(LeanTweenType.easeInOutQuad);
     LeanTween.delayedCall(gameObject, animTime, () =>
     {
@@ -96,11 +89,6 @@ public class MonsterAnimation : MonoBehaviour {
 
   public void MoveOutFrom(Vector3 from)
   {
-    //InitSprite();
-
-    // monsters moving out are happy (sprite)
-    GetComponent<SpriteRenderer>().sprite = monsterStates[0];
-
     GetComponent<Animator>().SetBool("isMoving", true);
     LeanTween.delayedCall(animTime, () =>
     {

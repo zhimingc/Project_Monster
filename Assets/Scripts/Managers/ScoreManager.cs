@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum LEADERBOARD
+{
+  FIRST, SECOND, THIRD, FOURTH, FIFTH, SIXTH, SEVENTH, EIGHTH, NINTH, TENTH
+};
+
 [System.Serializable]
 public class ScoreManager : MonoBehaviour {
 
@@ -14,6 +19,38 @@ public class ScoreManager : MonoBehaviour {
   public int totalScore, incScore;
   public int curScore, curInstantScore;
   private Vector3 scoreOriginalScale;
+  private int[] shiftScoreAmt;
+
+  // to track score breakdown
+  private int[][] scoreBreakdown;
+
+  public bool toUpdateLeaderboard = false;
+
+  // to track leaderboard
+  private List<Pair<string, int>> leaderboard;
+
+  void Start()
+  {
+    shiftScoreAmt = new int[3]
+    {
+      10, 20, 30
+    };
+
+    // init leaderboard from player pref
+    leaderboard = new List<Pair<string, int>>();
+    for (int i = 0; i < 10; ++i)
+    {
+      leaderboard.Add(new Pair<string, int>("human " + i, 0));
+    }
+    LoadLeaderboard();
+
+    Reset();
+  }
+
+  public void TriggerUpdateLeaderboard()
+  {
+    toUpdateLeaderboard = true;
+  }
 
   public void Reset()
   {
@@ -22,10 +59,20 @@ public class ScoreManager : MonoBehaviour {
     curScore = 0;
     curInstantScore = 0;
     totalScore = 0;
+
+    scoreBreakdown = new int[3][];
+    for (int i = 0; i < scoreBreakdown.Length; ++i)
+    {
+      scoreBreakdown[i] = new int[4] { 0, 0, 0, 0 };
+    }
   }
 
-  public int AddScore(int amt)
+  public int AddScore()
   {
+    int dayNum = (int)GameManager.Instance.dayMan.dayState;
+    int comboNum = GameManager.Instance.comboMan.GetComboCount();
+
+    int amt = shiftScoreAmt[(int)GameManager.Instance.dayMan.dayState];
     amt = (int) (amt * GameManager.Instance.comboMan.GetComboMultiplier());
     totalScore += amt;
     curInstantScore += amt;
@@ -33,6 +80,9 @@ public class ScoreManager : MonoBehaviour {
     // compute the amount of be added every frame
     ComputeIncScore();
     AnimateAdding();
+
+    // update score breakdown
+    ++scoreBreakdown[dayNum][comboNum - 1];
 
     return amt;
   }
@@ -67,6 +117,12 @@ public class ScoreManager : MonoBehaviour {
 
   void Update()
   {
+    if (toUpdateLeaderboard)
+    {
+      toUpdateLeaderboard = false;
+      UpdateLeaderboard();
+    }
+
     if (curScore != curInstantScore)
     {
       curScore += incScore;
@@ -98,6 +154,65 @@ public class ScoreManager : MonoBehaviour {
   {
     if (scoreObj)
       scoreObj.GetComponent<TextMesh>().text = curScore.ToString();
+  }
+
+  public void UpdateLeaderboard()
+  {
+    string name = GameManager.Instance.gameData.playerName;
+    string tmpName = "";
+    int tmpScore = 0;
+    bool replaced = false;
+
+    for (int i = 0; i < leaderboard.Count; ++i)
+    {
+      if (replaced)
+      {
+        Utility.Swap(ref leaderboard[i].first, ref tmpName);
+        Utility.Swap(ref leaderboard[i].second, ref tmpScore);
+      }
+      else if (curInstantScore > leaderboard[i].second)
+      {
+        replaced = true;
+        tmpName = leaderboard[i].first;
+        tmpScore = leaderboard[i].second;
+        leaderboard[i].first = name;
+        leaderboard[i].second = curInstantScore;
+      }
+    }
+
+    // update leaderboard text
+    Text leaderNames = GameObject.Find("leader_names").GetComponent<Text>();
+    Text leaderNumbers = GameObject.Find("leader_numbers").GetComponent<Text>();
+    string leaderNameText = "", leaderNumText = "";
+    for (int i = 0; i < leaderboard.Count; ++i)
+    {
+      leaderNameText += (i + 1) + ". " + leaderboard[i].first + ":\n";
+      leaderNumText += leaderboard[i].second.ToString() + "\n";
+    }
+    leaderNames.text = leaderNameText;
+    leaderNumbers.text = leaderNumText;
+
+    // update player prefs
+    for (int i = 0; i < leaderboard.Count; ++i)
+    {
+      PlayerPrefs.SetInt(leaderboard[i].first, leaderboard[i].second);
+
+      // to find the leaders on load
+      PlayerPrefs.SetString(((LEADERBOARD)i).ToString(), leaderboard[i].first);
+    }
+  }
+
+  public void LoadLeaderboard()
+  {
+    // update player prefs
+    for (int i = 0; i < leaderboard.Count; ++i)
+    {
+      string name = PlayerPrefs.GetString(((LEADERBOARD)i).ToString());
+      // skip if entry could not be found
+      if (name == "") continue;
+
+      leaderboard[i].first = name;
+      leaderboard[i].second = PlayerPrefs.GetInt(name); }
   }
 
 }

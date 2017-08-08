@@ -113,7 +113,7 @@ public class IngredientBlock : BlockBehaviour
       GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
       foreach (GameObject obj in childrenObjs)
       {
-        obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        obj.GetComponent<SpriteRenderer>().color += new Color(0.0f, 0.0f, 0.0f, 0.5f);
         obj.GetComponent<Animator>().SetBool("idle_anim", true);
       }
 
@@ -125,7 +125,7 @@ public class IngredientBlock : BlockBehaviour
       GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
       foreach (GameObject obj in childrenObjs)
       {
-        obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+        obj.GetComponent<SpriteRenderer>().color -= new Color(0.0f, 0.0f, 0.0f, 0.5f);
         obj.GetComponent<Animator>().SetBool("idle_anim", false);
       }
 

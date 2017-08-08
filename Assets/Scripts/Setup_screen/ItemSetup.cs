@@ -51,8 +51,6 @@ public class ItemSetup : BlockBehaviour {
     // Original scale when dragging
     ToggleScale();
 
-    oldPos = transform.position;
-
     // update tool box manager if this is a new tool
     GetComponentInParent<ToolManager>().OffNewToolIndicator(gameObject);
   }

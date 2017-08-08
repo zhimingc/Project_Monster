@@ -26,3 +26,20 @@ static public class Utility {
     rhs = temp;
   }
 }
+
+[System.Serializable]
+public class Pair<T, U>
+{
+  public Pair()
+  {
+  }
+
+  public Pair(T initFirst, U initSecond)
+  {
+    first = initFirst;
+    second = initSecond;
+  }
+
+  public T first;
+  public U second;
+}

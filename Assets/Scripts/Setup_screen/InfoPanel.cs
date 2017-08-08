@@ -59,7 +59,7 @@ public class InfoPanel : MonoBehaviour {
           break;
         case ITEM_TYPE.TURNTABLE:
           info_text.text = "Turn the table and rotate the ingredients on the table.";
-          detail_pos.text = "Rotates ingredient stacks clockwise\nUse: Drag turn table onto any plate";
+          detail_pos.text = "Rotates ingredient stacks clockwise\nUse: Drag onto any plate";
           break;
       }
 
@@ -85,14 +85,19 @@ public class InfoPanel : MonoBehaviour {
       switch(monster.type)
       {
         case MONSTER_TYPE.NORMAL:
-          info_text.text = "Average dune monster just looking for a quick bite of some human food.";
+          detail_pos.text = "Average dune monster just looking for a quick bite of some human food.";
           detail_neg.text = "";
-          detail_pos.text = "Popularity+";
+          //detail_pos.text = "Popularity+";
           break;
         case MONSTER_TYPE.TIMED:
-          info_text.text = "The Lizmen are always in a hurry. They must have their order quick!";
+          detail_pos.text = "Where are these lizards always hurrying off to?";
           detail_neg.text = "Chance for timed requests\n30 seconds to serve request";
-          detail_pos.text = "Popularity++";
+          //detail_pos.text = "Popularity++";
+          break;
+        case MONSTER_TYPE.PICKY:
+          detail_pos.text = "Some say they're still looking for the crabby patty recipe.";
+          detail_neg.text = "Will only eat from the plate of its choice";
+          //detail_pos.text = "Popularity++";
           break;
       }
     }
