@@ -670,6 +670,7 @@ public class GameManager : Singleton<GameManager>
       case MONSTER_EVENT.FIRST_DAY:
         break;
       case MONSTER_EVENT.MAIN_EVENT:
+      case MONSTER_EVENT.FRENZY_EVENT:
         scoreMan.UpdateLeaderboard();
         break;
     }

@@ -78,7 +78,14 @@ public class BackgroundManager : MonoBehaviour {
 	
   void SpawnStartClouds()
   {
-    while (--numStartClouds >= 0)
+    foreach (GameObject obj in clouds)
+    {
+      obj.GetComponent<CloudScript>().DestroyAll();
+    }
+    clouds.Clear();
+
+    int tmpNum = numStartClouds;
+    while (--tmpNum >= 0)
     {
       float xPos = Random.Range(cloudPosLimits[0], cloudPosLimits[1] - 2.0f);
       SpawnCloud(xPos);
@@ -91,6 +98,11 @@ public class BackgroundManager : MonoBehaviour {
   //  {
   //    SpawnCloud();
   //  }
+
+    if (Input.GetKeyDown(KeyCode.C))
+    {
+      SpawnStartClouds();
+    }
 
     UpdateCloudSpawner();
   }

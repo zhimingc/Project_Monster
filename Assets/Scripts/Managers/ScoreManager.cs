@@ -24,13 +24,15 @@ public class ScoreManager : MonoBehaviour {
   // to track score breakdown
   private int[][] scoreBreakdown;
 
-  public bool toUpdateLeaderboard = false;
+  public bool toUpdateLeaderboard = false, newScoreToAdd;
 
   // to track leaderboard
   private List<Pair<string, int>> leaderboard;
 
   void Start()
   {
+    newScoreToAdd = false;
+
     shiftScoreAmt = new int[3]
     {
       10, 20, 30
@@ -104,6 +106,8 @@ public class ScoreManager : MonoBehaviour {
       scoreOriginalScale = scoreObj.transform.localScale;
     }
 
+    newScoreToAdd = true;
+
     // for kitchen setup scene
     numServed = 0;
     incScore = 0;
@@ -120,7 +124,7 @@ public class ScoreManager : MonoBehaviour {
     if (toUpdateLeaderboard)
     {
       toUpdateLeaderboard = false;
-      UpdateLeaderboard();
+      DisplayLeaderboard();
     }
 
     if (curScore != curInstantScore)
@@ -180,6 +184,11 @@ public class ScoreManager : MonoBehaviour {
       }
     }
 
+    DisplayLeaderboard();
+  }
+
+  public void DisplayLeaderboard()
+  {
     // update leaderboard text
     Text leaderNames = GameObject.Find("leader_names").GetComponent<Text>();
     Text leaderNumbers = GameObject.Find("leader_numbers").GetComponent<Text>();

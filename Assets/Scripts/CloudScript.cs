@@ -73,4 +73,10 @@ public class CloudScript : MonoBehaviour {
     cloudShadow.transform.position = new Vector3(transform.position.x, offsetFrom + totalOffset, 0);
     cloudShadow.transform.localScale = transform.localScale;
   }
+
+  public void DestroyAll()
+  {
+    Destroy(cloudShadow);
+    Destroy(gameObject);
+  }
 }

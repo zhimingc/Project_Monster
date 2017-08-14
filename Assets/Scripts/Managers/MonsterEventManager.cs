@@ -5,8 +5,10 @@ using UnityEngine;
 public enum MONSTER_EVENT
 {
   FIRST_DAY,
+  ZEN_EVENT,
   MAIN_EVENT,
-  NUM_EVENTS
+  FRENZY_EVENT,
+  NUM_EVENTS,
 };
 
 public class MonsterEventManager : MonoBehaviour {
@@ -93,6 +95,13 @@ public class MonsterEventManager : MonoBehaviour {
         GameManager.Instance.gameData.pop_monsters[0] = 100.0f;
         break;
       case MONSTER_EVENT.MAIN_EVENT:
+      case MONSTER_EVENT.FRENZY_EVENT:
+        GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+        GameManager.Instance.gameData.pop_monsters[0] = 34.0f;
+        GameManager.Instance.gameData.pop_monsters[1] = 33.0f;
+        GameManager.Instance.gameData.pop_monsters[2] = 33.0f;
+        break;
+      case MONSTER_EVENT.ZEN_EVENT:
         GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
         GameManager.Instance.gameData.pop_monsters[0] = 34.0f;
         GameManager.Instance.gameData.pop_monsters[1] = 33.0f;

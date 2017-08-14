@@ -56,6 +56,8 @@ public static class GameProgression {
   public static string[] eventFlavText = new string[(int)MONSTER_EVENT.NUM_EVENTS]
 {
     "First day on the job",
+    "feed 30 monsters!",
     "Main event",
+    "feed monsters to add time",
 };
 }

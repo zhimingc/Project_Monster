@@ -15,6 +15,9 @@ public enum DAY_STATE
 public class DayManager : MonoBehaviour {
 
   public bool toggleTimedShiftFeature;
+  public bool toggleAddedTime;
+  public bool toggleFixedShiftAmts;
+
   public DAY_STATE dayState;
   public GameObject dayFeedback, progressBar, sauces;
   public int[] shiftIntervals;
@@ -34,6 +37,11 @@ public class DayManager : MonoBehaviour {
   public float maxShiftTime;
   public GameObject shiftTimerCanvas;
   public GameObject shiftTimerBar, shiftTimerText;
+
+  public GameObject[] timerAddedText;
+  private int curTimeAddedIndex;
+
+  public float timeAddedOnServe;
   private float shiftTimer;
   private bool timerPause;
 
@@ -59,6 +67,10 @@ public class DayManager : MonoBehaviour {
 
     // timed shifts feature
     shiftTimer = maxShiftTime;
+    toggleAddedTime = false;
+    toggleFixedShiftAmts = false;
+    ToggleTimer(true);
+    UpdateTimerText();
 
     switch (GameManager.Instance.gameData.eventType)
     {
@@ -68,6 +80,15 @@ public class DayManager : MonoBehaviour {
         break;
       case MONSTER_EVENT.MAIN_EVENT:
         toggleTimedShiftFeature = true;
+        break;
+      case MONSTER_EVENT.ZEN_EVENT:
+        toggleTimedShiftFeature = false;
+        shiftTimerCanvas.SetActive(false);
+        break;
+      case MONSTER_EVENT.FRENZY_EVENT:
+        toggleTimedShiftFeature = true;
+        toggleAddedTime = true;
+        toggleFixedShiftAmts = true;
         break;
     }
   }
@@ -102,16 +123,28 @@ public class DayManager : MonoBehaviour {
     shiftTimer -= Time.deltaTime;
     if (shiftTimer <= 0.0f)
     {
-      shiftTimer = maxShiftTime;
-      ++dayState;
-      if (dayState == DAY_STATE.WIN)
+      switch (GameManager.Instance.gameData.eventType)
       {
-        shiftTimer = 0.0f;
+        case MONSTER_EVENT.MAIN_EVENT:
+          ++dayState;
+          if (dayState == DAY_STATE.WIN)
+          {
+            shiftTimer = 0.0f;
+          }
+
+          TriggerShiftChange();
+          break;
+        case MONSTER_EVENT.FRENZY_EVENT:
+          dayState = DAY_STATE.WIN;
+          TriggerShiftChange();
+          break;
       }
-
-      TriggerShiftChange();
     }
+    UpdateTimerText();
+  }
 
+  void UpdateTimerText()
+  {
     shiftTimerBar.GetComponent<Image>().fillAmount = shiftTimer / maxShiftTime;
     shiftTimerText.GetComponent<Text>().text = shiftTimer.ToString("0.0");
   }
@@ -119,10 +152,43 @@ public class DayManager : MonoBehaviour {
   void ToggleTimer(bool flag)
   {
     timerPause = flag;
-    if (flag)
+  }
+
+  void ChangeShiftBehaviour()
+  {
+    switch (GameManager.Instance.gameData.eventType)
     {
-      shiftTimer = maxShiftTime;
+      case MONSTER_EVENT.MAIN_EVENT:
+        shiftTimer = maxShiftTime;
+        break;
+      case MONSTER_EVENT.FRENZY_EVENT:
+        AddToTimer(5.0f);
+        break;
     }
+  }
+
+  void AddToTimer(float amt)
+  {
+    float newTimeAmt = shiftTimer + amt;
+
+    if (newTimeAmt > maxShiftTime)
+    {
+      newTimeAmt = maxShiftTime;
+    }
+    shiftTimer = newTimeAmt;
+
+    // animate added time text
+    GameObject addedText = timerAddedText[curTimeAddedIndex];
+    curTimeAddedIndex = (curTimeAddedIndex + 1) % timerAddedText.Length;
+    addedText.transform.position = shiftTimerText.transform.position;
+    addedText.GetComponent<Text>().text = "+" + amt.ToString("0.0");
+    addedText.GetComponent<Text>().enabled = true;
+    LeanTween.moveLocalY(addedText, 0.3f, 1.0f);
+    LeanTween.delayedCall(1.0f, () =>
+    {
+      addedText.GetComponent<Text>().enabled = false;
+    });
+
   }
 
   public void PlayShiftSign(DAY_STATE color)
@@ -150,14 +216,9 @@ public class DayManager : MonoBehaviour {
         //startDaySign.GetComponentsInChildren<Text>()[1].text = "Goal: " + toServe.ToString();
 
         string flavText = "No more new content";
-        if (toggleTimedShiftFeature)
-        {
-          flavText = "Get ready!";
-        }
-        else
-        {
-          if (dayNum < GameProgression.dayFlavText.Length) flavText = GameProgression.dayFlavText[dayNum];
-        }
+        //if (dayNum < GameProgression.dayFlavText.Length) flavText = GameProgression.dayFlavText[dayNum];
+        flavText = GameProgression.eventFlavText[(int)GameManager.Instance.gameData.eventType];
+
         startDaySign.GetComponentsInChildren<Text>()[1].text = flavText;
 
         startDaySign.GetComponent<Animator>().SetTrigger("isEnter");
@@ -188,7 +249,11 @@ public class DayManager : MonoBehaviour {
 
           LeanTween.delayedCall(timerDelay, () =>
           {
-            if (toggleTimedShiftFeature) ToggleTimer(false);
+            if (toggleTimedShiftFeature)
+            {
+              ToggleTimer(false);
+              ChangeShiftBehaviour();
+            }
           });
 
         });
@@ -209,7 +274,11 @@ public class DayManager : MonoBehaviour {
 
           LeanTween.delayedCall(timerDelay, () =>
           {
-            if (toggleTimedShiftFeature) ToggleTimer(false);
+            if (toggleTimedShiftFeature)
+            {
+              ToggleTimer(false);
+              ChangeShiftBehaviour();
+            }
           });
 
         });
@@ -218,10 +287,13 @@ public class DayManager : MonoBehaviour {
         switch (GameManager.Instance.gameData.eventType)
         {
           case MONSTER_EVENT.FIRST_DAY:
+          case MONSTER_EVENT.ZEN_EVENT:
+          case MONSTER_EVENT.MAIN_EVENT:
             backMan.ChangeSignColors(endOfDaySign, color);
             endOfDaySign.GetComponent<Animator>().SetTrigger("isEnter");
             break;
-          case MONSTER_EVENT.MAIN_EVENT:
+          //case MONSTER_EVENT.MAIN_EVENT:
+          case MONSTER_EVENT.FRENZY_EVENT:
             backMan.ChangeSignColors(leaderboardSign, color);
             leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
             break;
@@ -256,7 +328,13 @@ public class DayManager : MonoBehaviour {
   public void CheckForShiftChange()
   {
     // feature toggle
-    if (toggleTimedShiftFeature) return;
+    if (!toggleFixedShiftAmts && toggleTimedShiftFeature) return;
+
+    // don't end day under time is up for frenzy event
+    if (GameManager.Instance.gameData.eventType == MONSTER_EVENT.FRENZY_EVENT)
+    {
+      if (dayState == DAY_STATE.DINNER) return;
+    }
 
     // don't change shift or end the day if there are still serves
     if (gridMan.AnyGridsServable()) return;
@@ -309,5 +387,14 @@ public class DayManager : MonoBehaviour {
     if (shift <= 0) return true;
     int shiftNum = shiftIntervals[(int)shift - 1];
     return GameManager.Instance.scoreMan.numServed + 3 >= shiftNum;
+  }
+
+  // effects of serving on the shift timer
+  public void OnServeTimeEffect()
+  {
+    if (toggleAddedTime)
+    {
+      AddToTimer(timeAddedOnServe);
+    }
   }
 }

@@ -230,6 +230,9 @@ public class MonsterManager : MonoBehaviour {
 
   public void ServeMonsterRequest(GridScript gs, MonsterRequest reqBox)
   {
+    // apply any effects onto timer
+    GameManager.Instance.dayMan.OnServeTimeEffect();
+
     // update combo man with another combo
     GameManager.Instance.comboMan.AddComboCount();
 
