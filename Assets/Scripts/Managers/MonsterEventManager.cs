@@ -95,6 +95,11 @@ public class MonsterEventManager : MonoBehaviour {
         GameManager.Instance.gameData.pop_monsters[0] = 100.0f;
         break;
       case MONSTER_EVENT.MAIN_EVENT:
+        GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+        GameManager.Instance.gameData.pop_monsters[0] = 34.0f;
+        GameManager.Instance.gameData.pop_monsters[1] = 33.0f;
+        GameManager.Instance.gameData.pop_monsters[2] = 33.0f;
+        break;
       case MONSTER_EVENT.FRENZY_EVENT:
         GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
         GameManager.Instance.gameData.pop_monsters[0] = 34.0f;

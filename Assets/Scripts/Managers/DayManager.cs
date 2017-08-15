@@ -54,9 +54,6 @@ public class DayManager : MonoBehaviour {
     sauceMan = GameObject.Find("sauce_man").GetComponent<SauceManager>();
     gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
 
-    // init vars
-    nextShiftNum = shiftIntervals[0];
-
     initialProgressSize = progressBar.transform.localScale.x;
     //UpdateProgressBar();
     CheckForShiftChange();
@@ -66,7 +63,7 @@ public class DayManager : MonoBehaviour {
     GameObject.Find("dayCount_text").GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
 
     // timed shifts feature
-    shiftTimer = maxShiftTime;
+    shiftTimer = maxShiftTime * (2.0f / 3.0f); // start with only 2/3 timer
     toggleAddedTime = false;
     toggleFixedShiftAmts = false;
     ToggleTimer(true);
@@ -89,8 +86,16 @@ public class DayManager : MonoBehaviour {
         toggleTimedShiftFeature = true;
         toggleAddedTime = true;
         toggleFixedShiftAmts = true;
+
+        shiftIntervals[0] = 10;
+        shiftIntervals[1] = 20;
+        shiftIntervals[2] = 30;
         break;
     }
+
+
+    // init vars
+    nextShiftNum = shiftIntervals[0];
   }
 
   void ShiftTrigger(DAY_STATE shift)
@@ -169,6 +174,9 @@ public class DayManager : MonoBehaviour {
 
   void AddToTimer(float amt)
   {
+    // scale amt by combo count
+    amt = amt * GameManager.Instance.comboMan.GetComboMultiplier();
+
     float newTimeAmt = shiftTimer + amt;
 
     if (newTimeAmt > maxShiftTime)
