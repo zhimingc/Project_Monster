@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public enum COMBO_TYPE
 {
+  SINGLE,
   DOUBLE,
   TRIPLE,
   QUAD
@@ -52,15 +53,43 @@ public class ComboManager : MonoBehaviour {
   public void AddComboCount()
   {
     ++comboCount;
-    if (comboCount > 1)
-    {
-      TriggerCombo((COMBO_TYPE)comboCount - 2);
-    }
+    //if (comboCount > 1)
+    //{
+    //  TriggerCombo((COMBO_TYPE)comboCount - 2);
+    //}
   }
 
   public void ResetComboCount()
   {
     comboCount = 0;
+  }
+
+  public void SetComboText(COMBO_TYPE type, GameObject obj, int score)
+  {
+    TextMesh[] texts = obj.GetComponentsInChildren<TextMesh>();
+
+    switch (type)
+    {
+      case COMBO_TYPE.SINGLE:
+        texts[0].text = "";
+        texts[1].text = "";
+        break;
+      case COMBO_TYPE.DOUBLE:
+        texts[0].text = "double!";
+        texts[1].text = "double!";
+        break;
+      case COMBO_TYPE.TRIPLE:
+        texts[0].text = "triple!";
+        texts[1].text = "triple!";
+        break;
+      case COMBO_TYPE.QUAD:
+        texts[0].text = "quad!";
+        texts[1].text = "quad!";
+        break;
+    }
+
+    texts[2].text = score.ToString("0");
+    texts[3].text = score.ToString("0");
   }
 
   void TriggerCombo(COMBO_TYPE type)

@@ -8,6 +8,7 @@ public enum MONSTER_EVENT
   ZEN_EVENT,
   MAIN_EVENT,
   FRENZY_EVENT,
+  FRENZY_PROGRESS,
   NUM_EVENTS,
 };
 
@@ -50,6 +51,11 @@ public class MonsterEventManager : MonoBehaviour {
     curPos.x = 2.0f;
     allEventObjs[nextIndex].transform.localPosition = curPos;
     LeanTween.moveLocalX(allEventObjs[nextIndex], 0.0f, scrollSpeed);
+    allEventObjs[nextIndex].GetComponent<BoxCollider2D>().enabled = false;
+    LeanTween.delayedCall(scrollSpeed, () =>
+    {
+      allEventObjs[nextIndex].GetComponent<BoxCollider2D>().enabled = true;
+    });
 
     curEvent = (MONSTER_EVENT) nextIndex;
     GameManager.Instance.gameData.eventType = curEvent;
@@ -75,6 +81,12 @@ public class MonsterEventManager : MonoBehaviour {
     curPos.x = -2.0f;
     allEventObjs[nextIndex].transform.localPosition = curPos;
     LeanTween.moveLocalX(allEventObjs[nextIndex], 0.0f, scrollSpeed);
+    allEventObjs[nextIndex].GetComponent<BoxCollider2D>().enabled = false;
+    LeanTween.delayedCall(scrollSpeed, () =>
+    {
+      allEventObjs[nextIndex].GetComponent<BoxCollider2D>().enabled = true;
+    });
+
 
     curEvent = (MONSTER_EVENT)nextIndex;
     GameManager.Instance.gameData.eventType = curEvent;
@@ -88,26 +100,27 @@ public class MonsterEventManager : MonoBehaviour {
 
   void UpdateEventData()
   {
-    switch(curEvent)
+    GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+
+    switch (curEvent)
     {
       case MONSTER_EVENT.FIRST_DAY:
-        GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
         GameManager.Instance.gameData.pop_monsters[0] = 100.0f;
         break;
       case MONSTER_EVENT.MAIN_EVENT:
-        GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
         GameManager.Instance.gameData.pop_monsters[0] = 34.0f;
         GameManager.Instance.gameData.pop_monsters[1] = 33.0f;
         GameManager.Instance.gameData.pop_monsters[2] = 33.0f;
         break;
       case MONSTER_EVENT.FRENZY_EVENT:
-        GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
         GameManager.Instance.gameData.pop_monsters[0] = 34.0f;
         GameManager.Instance.gameData.pop_monsters[1] = 33.0f;
         GameManager.Instance.gameData.pop_monsters[2] = 33.0f;
         break;
+      case MONSTER_EVENT.FRENZY_PROGRESS:
+        GameManager.Instance.gameData.pop_monsters[0] = 100.0f;
+        break;
       case MONSTER_EVENT.ZEN_EVENT:
-        GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
         GameManager.Instance.gameData.pop_monsters[0] = 34.0f;
         GameManager.Instance.gameData.pop_monsters[1] = 33.0f;
         GameManager.Instance.gameData.pop_monsters[2] = 33.0f;

@@ -194,7 +194,7 @@ public class IngredientManager : MonoBehaviour {
     ingredientHolder.transform.localScale = ingredientSize;
     ingredientHolder.transform.SetParent(parent.transform);
 
-    GameObject ingredientObj = Instantiate(center, t.position, Quaternion.identity);
+    GameObject ingredientObj = Instantiate(center, t.position - new Vector3(0, 0, 1.5f), Quaternion.identity);
     ingredientObj.transform.SetParent(ingredientHolder.transform);
     ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, new Vector2(1.0f, 1.0f));
     blockScript.AddIngredient(ingredientObj); 
@@ -208,7 +208,7 @@ public class IngredientManager : MonoBehaviour {
       ingredientHolder2.transform.SetParent(parent.transform);
 
       // Create ingredients within connection 
-      GameObject newIngredient = Instantiate(center, t.position, Quaternion.identity);
+      GameObject newIngredient = Instantiate(center, t.position - new Vector3(0, 0, 1.5f), Quaternion.identity);
 
       // Initialize new ingredient 
       //Vector3 offset = Vector2.Scale(vec, ingredientSize + new Vector2(spacing, spacing));

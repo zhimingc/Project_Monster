@@ -31,9 +31,11 @@ public class InfoPanel : MonoBehaviour {
   {
     info_text.text =
       "Tap icons to see more info.\n\nDrag from toolbox into tools to use tool.";
+    detail_pos.text =
+      "Drag from toolbox.";
+
     detail_neg.text = "";
-    detail_pos.text = "";
-    name_text.text = "";
+    name_text.text = "Tap icons for info";
     info_icon.GetComponent<SpriteRenderer>().enabled = false;
   }
 

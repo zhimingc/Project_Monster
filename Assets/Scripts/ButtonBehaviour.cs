@@ -26,7 +26,8 @@ public enum BUTTON_TYPE
   GAME_CHANGENAME,
   GAME_EVENTFORWARD,
   GAME_EVENTBACK,
-  GAME_LEADERBOARD
+  GAME_LEADERBOARD,
+  GAME_EVENTSELECT
 }
 
 public class ButtonBehaviour : MonoBehaviour {

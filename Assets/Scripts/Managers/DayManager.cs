@@ -17,6 +17,7 @@ public class DayManager : MonoBehaviour {
   public bool toggleTimedShiftFeature;
   public bool toggleAddedTime;
   public bool toggleFixedShiftAmts;
+  public bool toggleShifts;
 
   public DAY_STATE dayState;
   public GameObject dayFeedback, progressBar, sauces;
@@ -91,6 +92,12 @@ public class DayManager : MonoBehaviour {
         shiftIntervals[1] = 20;
         shiftIntervals[2] = 30;
         break;
+      case MONSTER_EVENT.FRENZY_PROGRESS:
+        toggleTimedShiftFeature = true;
+        toggleAddedTime = true;
+        toggleFixedShiftAmts = true;
+        toggleShifts = false;
+        break;
     }
 
 
@@ -140,6 +147,7 @@ public class DayManager : MonoBehaviour {
           TriggerShiftChange();
           break;
         case MONSTER_EVENT.FRENZY_EVENT:
+        case MONSTER_EVENT.FRENZY_PROGRESS:
           dayState = DAY_STATE.WIN;
           TriggerShiftChange();
           break;
@@ -167,6 +175,7 @@ public class DayManager : MonoBehaviour {
         shiftTimer = maxShiftTime;
         break;
       case MONSTER_EVENT.FRENZY_EVENT:
+      case MONSTER_EVENT.FRENZY_PROGRESS:
         AddToTimer(5.0f);
         break;
     }
@@ -302,6 +311,7 @@ public class DayManager : MonoBehaviour {
             break;
           //case MONSTER_EVENT.MAIN_EVENT:
           case MONSTER_EVENT.FRENZY_EVENT:
+          case MONSTER_EVENT.FRENZY_PROGRESS:
             backMan.ChangeSignColors(leaderboardSign, color);
             leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
             break;
@@ -337,6 +347,7 @@ public class DayManager : MonoBehaviour {
   {
     // feature toggle
     if (!toggleFixedShiftAmts && toggleTimedShiftFeature) return;
+    if (!toggleShifts) return;
 
     // don't end day under time is up for frenzy event
     if (GameManager.Instance.gameData.eventType == MONSTER_EVENT.FRENZY_EVENT)

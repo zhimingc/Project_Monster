@@ -194,7 +194,7 @@ public class GameManager : Singleton<GameManager>
     // Manager in Setup screen
     if (SceneManager.GetActiveScene().name.Contains("screen-setup"))
     {
-      setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
+      //setupMan = GameObject.Find("setup_man").GetComponent<KitchenSetupManager>();
     }
 
     if (SceneManager.GetActiveScene().name.Contains("leaderboard"))
@@ -415,6 +415,7 @@ public class GameManager : Singleton<GameManager>
     }
 
     backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
+    gridMan.ToggleGrid(false);
 
     // Turn on lose text
     uiMan.ToggleLoseText(true);
@@ -606,6 +607,18 @@ public class GameManager : Singleton<GameManager>
         LoadSceneWithTransition("screen-leaderboard");
         //scoreMan.TriggerUpdateLeaderboard();
         break;
+      case BUTTON_TYPE.GAME_EVENTSELECT:
+        MonsterEventManager eventMan = GameObject.Find("event_parent").GetComponent<MonsterEventManager>();
+        if (eventMan.curEvent == MONSTER_EVENT.FIRST_DAY)
+        {
+          LoadSceneWithTransition("screen-first-timer");
+        }
+        else
+        {
+          LoadSceneWithTransition("screen-setup-tools");
+        }
+        //scoreMan.TriggerUpdateLeaderboard();
+        break;
     }
   }
 
@@ -617,7 +630,7 @@ public class GameManager : Singleton<GameManager>
   
   void Button_ToSetup()
   {
-    LoadSceneWithTransition("screen-setup");
+    LoadSceneWithTransition("screen-setup-event");
     musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
   }
 
@@ -671,6 +684,7 @@ public class GameManager : Singleton<GameManager>
         break;
       case MONSTER_EVENT.MAIN_EVENT:
       case MONSTER_EVENT.FRENZY_EVENT:
+      case MONSTER_EVENT.FRENZY_PROGRESS:
         scoreMan.UpdateLeaderboard();
         break;
     }

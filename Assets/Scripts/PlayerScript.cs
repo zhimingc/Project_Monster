@@ -120,24 +120,27 @@ public class PlayerScript : MonoBehaviour {
   void UpdateIngredientBlock()
   {
     // When an ingredient block is being dragged
-    if (InputMan.OnUp() && playerState == PLAYER_STATE.DRAGGING &&
-      blockBeingDragged != null)
+    if (InputMan.OnUp() && playerState == PLAYER_STATE.DRAGGING)
     {
-      if (blockBeingDragged.GetComponent<IngredientBlock>() != null)
+      if (blockBeingDragged != null)
       {
-        IngredientBlock blockScript = blockBeingDragged.GetComponent<IngredientBlock>();
-        blockScript.StopDrag(deleteIngredientFlag);
+        if (blockBeingDragged.GetComponent<IngredientBlock>() != null)
+        {
+          IngredientBlock blockScript = blockBeingDragged.GetComponent<IngredientBlock>();
+          blockScript.StopDrag(deleteIngredientFlag);
+        }
+        if (blockBeingDragged.GetComponent<ItemScript>() != null)
+        {
+          ItemScript blockScript = blockBeingDragged.GetComponent<ItemScript>();
+          blockScript.StopDrag(deleteIngredientFlag);
+        }
+        else
+        {
+          BlockBehaviour blockScript = blockBeingDragged.GetComponent<BlockBehaviour>();
+          blockScript.StopDrag(deleteIngredientFlag);
+        }
       }
-      if (blockBeingDragged.GetComponent<ItemScript>() != null)
-      {
-        ItemScript blockScript = blockBeingDragged.GetComponent<ItemScript>();
-        blockScript.StopDrag(deleteIngredientFlag);
-      }
-      else
-      {
-        BlockBehaviour blockScript = blockBeingDragged.GetComponent<BlockBehaviour>();
-        blockScript.StopDrag(deleteIngredientFlag);
-      }
+
 
       foreach (var del in mouseUpDelegates)
       {

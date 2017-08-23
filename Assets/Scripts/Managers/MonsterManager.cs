@@ -16,7 +16,8 @@ public class RequestParameters
   public int topBreadProbability;
 
   // Weighted distributions (out of a 100)
-  public int[] sauceDist = new int[] { 33, 33, 34 };
+  //public int[] sauceDist = new int[] { 33, 33, 34 };
+  public int[] sauceDist = new int[] { 50, 50 };
   public int[] waresDist = new int[] { 50, 50 };
   public int[] ingredientDist = new int[] { 50, 50 };
   //public int[] ingredientDist = new int[] { 33, 33, 33 };
@@ -181,6 +182,7 @@ public class MonsterManager : MonoBehaviour {
   public void CheckRequestMet(List<List<GameObject>> grid, MonsterRequest reqBox)
   {
     Request req = reqBox.request;
+    reqBox.monsterObj.GetComponent<MonsterBody>().ToggleFeedSign(false);
     //lhs.ingredients.Remove(INGREDIENT_TYPE.EATER);
 
     for (int x = 0; x < grid.Count; ++x)
@@ -210,6 +212,7 @@ public class MonsterManager : MonoBehaviour {
         if (!same) continue;
 
         //ServeMonsterRequest(gs, reqBox);
+        reqBox.monsterObj.GetComponent<MonsterBody>().ToggleFeedSign(true);
         gs.SetCanServe(true, reqBox, reqBox.chairColor);
       }
     }
@@ -239,7 +242,7 @@ public class MonsterManager : MonoBehaviour {
     // Increase score
     int scoreAdded = GameManager.Instance.AddScore();
 
-    // request has been met
+    // // request has been met
     if (gs != null)
     {
       gs.TriggerServed(reqBox);
@@ -285,7 +288,9 @@ public class MonsterManager : MonoBehaviour {
     for (int i = 0; i < requestBoxes.Count; ++i)
     {
       Request req = requestBoxes[i].request;
-      req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+      req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
+      SwingWeights((int)req.sauce, rp.sauceDist);
+
       requestBoxes[i].SetRequest(req);
     }
 
@@ -402,15 +407,15 @@ public class MonsterManager : MonoBehaviour {
     }
 
     // Reroll if the request is the same as any existing request
-    foreach (MonsterRequest existing in requestBoxes)
-    {
-      //if (existing.request.IsSameAs(req))
-      if (req.IsSameAs(existing.request))
-      {
-        req = GenerateRandomRequest();
-        break;
-      }
-    }
+    //foreach (MonsterRequest existing in requestBoxes)
+    //{
+    //  //if (existing.request.IsSameAs(req))
+    //  if (req.IsSameAs(existing.request))
+    //  {
+    //    req = GenerateRandomRequest();
+    //    break;
+    //  }
+    //}
 
     return req;
   }
