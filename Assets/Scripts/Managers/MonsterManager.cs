@@ -73,8 +73,9 @@ public class MonsterManager : MonoBehaviour {
   public float maxTimer, minTimer;
   public int speedUpInterval;
 
-  // Hack
-  //public int score = 0;
+  // controlled monster spawning
+  public int garbageMonsterSpawnRate;
+  public int monsterSpawnCounter;
 
   private float currentTimer;
   //private Vector3 timerPos, timerScale;
@@ -83,6 +84,7 @@ public class MonsterManager : MonoBehaviour {
 
   // for debugging
   private Debug_MonsterManager debug_data;
+  private int breaker = 0;
 
   void Awake()
   {
@@ -118,6 +120,8 @@ public class MonsterManager : MonoBehaviour {
       // apply any grid effects
       GameManager.Instance.gridMan.MonsterAffectGrid(box.request);
     }
+
+    monsterSpawnCounter = 0;
   }
 	
 	// Update is called once per frame
@@ -312,6 +316,7 @@ public class MonsterManager : MonoBehaviour {
     requestBoxes[index].request = new Request();
 
     // generate request
+    ++monsterSpawnCounter;
     Request newReq = GenerateRandomRequest();
 
     // apply any grid effects
@@ -349,10 +354,17 @@ public class MonsterManager : MonoBehaviour {
     MONSTER_TYPE ret = MONSTER_TYPE.NORMAL;
     float odds = 0;
 
+    // hard spawn garbage monster
+    if (monsterSpawnCounter > 0 &&
+      monsterSpawnCounter % garbageMonsterSpawnRate == 0)
+    {
+      return MONSTER_TYPE.GARBAGE;
+    }
+
     for (int i = 0; i < (int)MONSTER_TYPE.NUM_TYPES; ++i)
     {
       odds += GameManager.Instance.gameData.pop_monsters[i];
-      if (roll < odds)
+      if (roll <= odds)
       {
         ret = (MONSTER_TYPE)i;
         break;
@@ -369,6 +381,11 @@ public class MonsterManager : MonoBehaviour {
 
     // Determine monster type
     GenMonsterType(out req);
+
+    if (req.monsterType == MONSTER_TYPE.GARBAGE)
+    {
+      return req;
+    }
 
     // Add bot bread
     req.ingredients.Add(INGREDIENT_TYPE.BREAD);
@@ -407,16 +424,19 @@ public class MonsterManager : MonoBehaviour {
     }
 
     // Reroll if the request is the same as any existing request
-    //foreach (MonsterRequest existing in requestBoxes)
-    //{
-    //  //if (existing.request.IsSameAs(req))
-    //  if (req.IsSameAs(existing.request))
-    //  {
-    //    req = GenerateRandomRequest();
-    //    break;
-    //  }
-    //}
+    foreach (MonsterRequest existing in requestBoxes)
+    {
+      if (++breaker > 100) break;
+      
+      //if (existing.request.IsSameAs(req))
+      if (req.IsSameAs(existing.request))
+      {
+        req = GenerateRandomRequest();
+        break;
+      }
+    }
 
+    breaker = 0;
     return req;
   }
 

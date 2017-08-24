@@ -32,8 +32,12 @@ public class MonsterBody : MonoBehaviour
 
     GridScript gs = playerScript.hoveredGrid.GetComponent<GridScript>();
 
+    if (gs.monReq == null && 
+      monReq.request.monsterType != MONSTER_TYPE.GARBAGE) return;
+
     // make sure the plate being dragged is the plate to be served
-    if (gs.monReq.request.IsSameAs(monReq.request))
+    if (monReq.request.monsterType == MONSTER_TYPE.GARBAGE ||
+      gs.monReq.request.IsSameAs(monReq.request))
     {
       if (InputMan.OnUp())
       {        

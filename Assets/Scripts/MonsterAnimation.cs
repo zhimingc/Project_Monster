@@ -29,6 +29,9 @@ public class MonsterAnimation : MonoBehaviour {
     monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
     monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
     monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_picky2");
+    monsterStates[3] = Resources.Load<Sprite>("Sprites/monster_picky2");
+    monsterStates[4] = Resources.Load<Sprite>("Sprites/monster_picky2");
+    monsterStates[5] = Resources.Load<Sprite>("Sprites/monster_1"); // garbage
   }
 
   void Start()

@@ -9,6 +9,7 @@ public enum MONSTER_TYPE
   PICKY,
   RUDE,
   GREEDY,
+  GARBAGE,
   NUM_TYPES
 };
 
@@ -24,6 +25,7 @@ public struct MonsterTypeParams
 public class MonsterRequest : MonoBehaviour {
 
   public GameObject ingredientObj, speechBubble, monsterObj;
+  public GameObject requestText; // i.e. garbage monster text
   public Request request;
 
   private List<GameObject> ingredientStackObjs;
@@ -126,6 +128,7 @@ public class MonsterRequest : MonoBehaviour {
       Sprite sprite = Resources.Load<Sprite>("Sprites/ingredient_side");
       ingredientStackObjs[i].GetComponent<SpriteRenderer>().sprite = sprite;
       ingredientStackObjs[i].GetComponent<SpriteRenderer>().color = Color.white;
+      ingredientStackObjs[i].GetComponent<SpriteRenderer>().enabled = true;
     }
 
     // Set the display according to ingredient
@@ -145,6 +148,22 @@ public class MonsterRequest : MonoBehaviour {
 
     // Set display according to grid type
     ObjectFactory.InitializeGrid(gameObject, req.gridType);
+
+    // Specific monster behaviour
+    switch (req.monsterType)
+    {
+      case MONSTER_TYPE.GARBAGE:
+        // reset ingredient stack obj
+        for (int i = 0; i < ingredientStackObjs.Count; ++i)
+        {
+          ingredientStackObjs[i].GetComponent<SpriteRenderer>().enabled = false;
+        }
+        requestText.SetActive(true);
+        break;
+      default:
+        requestText.SetActive(false);
+        break;
+    }
   }
 
   public void InitStack()

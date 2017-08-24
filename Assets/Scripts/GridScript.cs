@@ -404,7 +404,7 @@ public class GridScript : MonoBehaviour {
     // Serve request if able to
     if (InputMan.OnDown())
     {
-      if (canServe)
+      //if (canServe)
       {
         playerScript.SetPlayerState(PLAYER_STATE.DRAGGING);
         playerScript.SetMouseUpDel(gameObject, PlateDragMouseUp);
@@ -476,6 +476,10 @@ public class GridScript : MonoBehaviour {
   public void SetCanServe(bool flag, MonsterRequest setReq = null, Color chairColor = new Color())
   {
     canServe = flag;
+
+    if (setReq != null &&
+      setReq.request.monsterType == MONSTER_TYPE.GARBAGE) return;
+
     monsterServeObj.SetActive(flag);
     if (setReq)
     {
