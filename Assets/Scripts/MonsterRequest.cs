@@ -26,7 +26,9 @@ public class MonsterRequest : MonoBehaviour {
 
   public GameObject ingredientObj, speechBubble, monsterObj;
   public GameObject requestText; // i.e. garbage monster text
+  public GameObject chairObj;
   public Request request;
+  public MonsterFeedback monsterFbScript;
 
   private List<GameObject> ingredientStackObjs;
   private Vector3 originScale;
@@ -35,7 +37,6 @@ public class MonsterRequest : MonoBehaviour {
   private MonsterTypeParams typeParams;
   public GameObject stopwatch;
   public GameObject pickyIndicator;
-  public Color chairColor;
 
   // Use this for initialization
   void Start () {
@@ -45,7 +46,6 @@ public class MonsterRequest : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
     MonsterUpdate();
-
   }
 
   void MonsterUpdate()
@@ -93,7 +93,7 @@ public class MonsterRequest : MonoBehaviour {
         break;
       case MONSTER_TYPE.PICKY:
         pickyIndicator.SetActive(true);
-        pickyIndicator.GetComponent<SpriteRenderer>().color = chairColor;
+        pickyIndicator.GetComponent<SpriteRenderer>().color = chairObj.GetComponent<SpriteRenderer>().color;
         break;
     }
   }
@@ -116,7 +116,7 @@ public class MonsterRequest : MonoBehaviour {
     request = req;
 
     // update chair color depending on which lane it is
-    request.chairColor = chairColor;
+    request.chairColor = chairObj.GetComponent<SpriteRenderer>().color;
 
     // Set new monster type
     SetMonsterType(req);
@@ -187,4 +187,5 @@ public class MonsterRequest : MonoBehaviour {
   {
     SetRequest(request);
   }
+
 }

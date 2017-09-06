@@ -84,7 +84,7 @@ public class ScoreManager : MonoBehaviour {
     AnimateAdding();
 
     // update score breakdown
-    ++scoreBreakdown[dayNum][comboNum - 1];
+    //++scoreBreakdown[dayNum][comboNum - 1];
 
     return amt;
   }
@@ -157,7 +157,7 @@ public class ScoreManager : MonoBehaviour {
   public void DisplayScore()
   {
     if (scoreObj)
-      scoreObj.GetComponent<TextMesh>().text = curScore.ToString();
+      scoreObj.GetComponent<TextMesh>().text = "$" + curScore.ToString();
   }
 
   public void UpdateLeaderboard()

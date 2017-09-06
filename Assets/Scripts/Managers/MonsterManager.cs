@@ -217,7 +217,7 @@ public class MonsterManager : MonoBehaviour {
 
         //ServeMonsterRequest(gs, reqBox);
         reqBox.monsterObj.GetComponent<MonsterBody>().ToggleFeedSign(true);
-        gs.SetCanServe(true, reqBox, reqBox.chairColor);
+        gs.SetCanServe(true, reqBox, reqBox.request.chairColor);
       }
     }
   }
@@ -241,10 +241,17 @@ public class MonsterManager : MonoBehaviour {
     GameManager.Instance.comboMan.AddComboCount();
 
     // apply any effects onto timer
-    GameManager.Instance.dayMan.OnServeTimeEffect();
+    float timeAdded = 0.0f;
+    GameManager.Instance.dayMan.OnServeTimeEffect(ref timeAdded);
 
     // Increase score
     int scoreAdded = GameManager.Instance.AddScore();
+
+    // add number served and check for shift change
+    GameManager.Instance.AddNumServed(1);
+
+    // update popularity of monsters
+    GameManager.Instance.UpdateMonsterPopularity();
 
     // // request has been met
     if (gs != null)
@@ -255,11 +262,8 @@ public class MonsterManager : MonoBehaviour {
       gs.TriggerScoreText(scoreAdded);
     }
 
-    // add number served and check for shift change
-    GameManager.Instance.AddNumServed(1);
-
-
     // feedback for request met
+    reqBox.monsterFbScript.PlayServedFeedback(scoreAdded, timeAdded);
     GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
     PlayEatingSound();
 
@@ -319,12 +323,12 @@ public class MonsterManager : MonoBehaviour {
     ++monsterSpawnCounter;
     Request newReq = GenerateRandomRequest();
 
-    // apply any grid effects
-    newReq.chairColor = requestBoxes[index].chairColor;
-    GameManager.Instance.gridMan.MonsterAffectGrid(newReq);
-
     // update monsters
     requestBoxes[index].SetRequest(newReq);
+
+    // apply any grid effects
+    newReq.chairColor = requestBoxes[index].request.chairColor;
+    GameManager.Instance.gridMan.MonsterAffectGrid(newReq);
   }
 
   void GenMonsterType(out Request req)
@@ -426,8 +430,8 @@ public class MonsterManager : MonoBehaviour {
     // Reroll if the request is the same as any existing request
     foreach (MonsterRequest existing in requestBoxes)
     {
-      if (++breaker > 100) break;
-      
+      if (++breaker > 100) return req;
+
       //if (existing.request.IsSameAs(req))
       if (req.IsSameAs(existing.request))
       {
@@ -436,7 +440,7 @@ public class MonsterManager : MonoBehaviour {
       }
     }
 
-    breaker = 0;
+    //breaker = 0;
     return req;
   }
 

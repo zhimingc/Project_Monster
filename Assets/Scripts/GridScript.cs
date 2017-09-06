@@ -36,7 +36,7 @@ public class GridScript : MonoBehaviour {
   private List<GameObject> tmpStackObjs;
 
   // picky monster 
-  private Request pickedBy;
+  public Request pickedBy;
 
   // follow player
   private List<Vector3> ingredientSidePos;
@@ -67,6 +67,8 @@ public class GridScript : MonoBehaviour {
 
     isPickedUp = false;
     origin = transform.position;
+
+    pickedBy = null;
   }
 
 	// Use this for initialization
@@ -411,11 +413,6 @@ public class GridScript : MonoBehaviour {
         playerScript.SetHoveredGrid(this);
         TogglePickUp(true);
 
-        //if (monReq.request.monsterType == MONSTER_TYPE.PICKY)
-        //{
-        //  pickedBy = null;
-        //}
-
         //GameManager.Instance.monsterMan.ServeMonsterRequest(this, monReq);
 
         //// reset serve
@@ -434,11 +431,9 @@ public class GridScript : MonoBehaviour {
   {
     TogglePickUp(false);
 
-    for (int i = 0; i < stackObjs.Count; ++i)
-    {
-      //LeanTween.move(stackObjs[i], origin + ingredientSidePos[i], 0.25f);
-    }
 
+
+    // moving back to origin
     LeanTween.move(gameObject, origin, 0.25f);
   }
 
@@ -459,9 +454,10 @@ public class GridScript : MonoBehaviour {
     if (req.request.monsterType == MONSTER_TYPE.PICKY)
     {
       pickyIndicator.SetActive(false);
+      pickedBy = null;
     }
 
-    EmitEatenParticles();
+    //EmitEatenParticles();
   }
 
   // Reset any grid data if player mouse up

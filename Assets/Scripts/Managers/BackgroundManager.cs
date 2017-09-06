@@ -73,7 +73,7 @@ public class BackgroundManager : MonoBehaviour {
     sunPositions[2] = new Vector3(4, 7, 0);
 
     ChangeTimeState((int)overrideTime);
-    SpawnStartClouds();
+    //SpawnStartClouds();
   }
 	
   void SpawnStartClouds()
@@ -104,7 +104,7 @@ public class BackgroundManager : MonoBehaviour {
       SpawnStartClouds();
     }
 
-    UpdateCloudSpawner();
+    //UpdateCloudSpawner();
   }
 
   public void ChangeTimeState(int newState)

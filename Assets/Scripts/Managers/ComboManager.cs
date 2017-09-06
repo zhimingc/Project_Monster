@@ -46,6 +46,8 @@ public class ComboManager : MonoBehaviour {
 
   public float GetComboMultiplier()
   {
+    if (comboCount - 2 >= comboMultiplier.Length) return 1.0f;
+
     if (comboCount <= 1) return 1.0f;
     return comboMultiplier[comboCount - 2];
   }

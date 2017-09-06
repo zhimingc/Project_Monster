@@ -58,13 +58,13 @@ public class DayManager : MonoBehaviour {
     initialProgressSize = progressBar.transform.localScale.x;
     //UpdateProgressBar();
     CheckForShiftChange();
-    backMan.ChangeSignColors(shiftChangeObj, DAY_STATE.BREAKFAST);
+    //backMan.ChangeSignColors(shiftChangeObj, DAY_STATE.BREAKFAST);
 
     // update day counter
     GameObject.Find("dayCount_text").GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
 
     // timed shifts feature
-    shiftTimer = maxShiftTime * (2.0f / 3.0f); // start with only 2/3 timer
+    shiftTimer = maxShiftTime;// * (2.0f / 3.0f); // start with only 2/3 timer
     toggleAddedTime = false;
     toggleFixedShiftAmts = false;
     ToggleTimer(true);
@@ -93,6 +93,7 @@ public class DayManager : MonoBehaviour {
         shiftIntervals[2] = 30;
         break;
       case MONSTER_EVENT.FRENZY_PROGRESS:
+      //default:
         toggleTimedShiftFeature = true;
         toggleAddedTime = true;
         toggleFixedShiftAmts = true;
@@ -181,7 +182,7 @@ public class DayManager : MonoBehaviour {
     }
   }
 
-  void AddToTimer(float amt)
+  float AddToTimer(float amt)
   {
     // scale amt by combo count
     amt = amt * GameManager.Instance.comboMan.GetComboMultiplier();
@@ -206,6 +207,7 @@ public class DayManager : MonoBehaviour {
       addedText.GetComponent<Text>().enabled = false;
     });
 
+    return amt;
   }
 
   public void PlayShiftSign(DAY_STATE color)
@@ -227,7 +229,7 @@ public class DayManager : MonoBehaviour {
     switch (dayState)
     {
       case DAY_STATE.BREAKFAST:
-        backMan.ChangeSignColors(startDaySign, color);
+        //backMan.ChangeSignColors(startDaySign, color);
         
         startDaySign.GetComponentsInChildren<Text>()[0].text = "Day " + (dayNum + 1).ToString() + ":";
         //startDaySign.GetComponentsInChildren<Text>()[1].text = "Goal: " + toServe.ToString();
@@ -253,7 +255,7 @@ public class DayManager : MonoBehaviour {
         });
         break;
       case DAY_STATE.LUNCH:
-        backMan.ChangeSignColors(shiftChangeObj, color);
+        //backMan.ChangeSignColors(shiftChangeObj, color);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
         shiftChangeObj.GetComponentInChildren<Text>().text = "LUNCH!";
         LeanTween.delayedCall(1.5f, () =>
@@ -277,7 +279,7 @@ public class DayManager : MonoBehaviour {
 
         break;
       case DAY_STATE.DINNER:
-        backMan.ChangeSignColors(shiftChangeObj, color);
+        //backMan.ChangeSignColors(shiftChangeObj, color);
         shiftChangeObj.GetComponent<Animator>().SetTrigger("isEnter");
         shiftChangeObj.GetComponentInChildren<Text>().text = "DINNER!";
         LeanTween.delayedCall(1.5f, () =>
@@ -306,13 +308,13 @@ public class DayManager : MonoBehaviour {
           case MONSTER_EVENT.FIRST_DAY:
           case MONSTER_EVENT.ZEN_EVENT:
           case MONSTER_EVENT.MAIN_EVENT:
-            backMan.ChangeSignColors(endOfDaySign, color);
+            //backMan.ChangeSignColors(endOfDaySign, color);
             endOfDaySign.GetComponent<Animator>().SetTrigger("isEnter");
             break;
           //case MONSTER_EVENT.MAIN_EVENT:
           case MONSTER_EVENT.FRENZY_EVENT:
           case MONSTER_EVENT.FRENZY_PROGRESS:
-            backMan.ChangeSignColors(leaderboardSign, color);
+            //backMan.ChangeSignColors(leaderboardSign, color);
             leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
             break;
         }
@@ -409,11 +411,17 @@ public class DayManager : MonoBehaviour {
   }
 
   // effects of serving on the shift timer
-  public void OnServeTimeEffect()
+  public void OnServeTimeEffect(ref float timeAdded)
   {
+    int numServed = GameManager.Instance.scoreMan.numServed;
+    if (numServed > 15) timeAddedOnServe = 1.0f;
+    else if (numServed > 10) timeAddedOnServe = 2.5f;
+    else if (numServed > 5) timeAddedOnServe = 5.0f;
+    else timeAddedOnServe = 10.0f;
+
     if (toggleAddedTime)
     {
-      AddToTimer(timeAddedOnServe);
+      timeAdded = AddToTimer(timeAddedOnServe);
     }
   }
 }

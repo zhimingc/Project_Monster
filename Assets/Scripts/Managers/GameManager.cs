@@ -32,6 +32,8 @@ public class GameData
 
     playerName = PlayerPrefs.GetString("name");
     if (playerName == "") playerName = "Leslie";
+
+    eventType = MONSTER_EVENT.FRENZY_PROGRESS;
   }
 
   public void Reset()
@@ -414,11 +416,13 @@ public class GameManager : Singleton<GameManager>
         break;
     }
 
-    backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
+    //backMan.ChangeSignColors(uiMan.loseSign, dayMan.dayState);
     gridMan.ToggleGrid(false);
 
     // Turn on lose text
-    uiMan.ToggleLoseText(true);
+    //uiMan.ToggleLoseText(true);
+    dayMan.leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
+    
     // Turn off monster request boxes
     monsterMan.ToggleMonsterRequests(false);
 
@@ -687,6 +691,30 @@ public class GameManager : Singleton<GameManager>
       case MONSTER_EVENT.FRENZY_PROGRESS:
         scoreMan.UpdateLeaderboard();
         break;
+    }
+  }
+
+  public void UpdateMonsterPopularity()
+  {
+    float swingSpeed = 5.0f;
+
+    int numServed = scoreMan.numServed;
+    if (numServed < 10) return;
+    if (numServed > 10)
+    {
+      if (gameData.pop_monsters[1] < 35.0f)
+      {
+        gameData.pop_monsters[0] -= swingSpeed;
+        gameData.pop_monsters[1] += swingSpeed;
+      }
+    }
+    if (numServed > 15)
+    {
+      if (gameData.pop_monsters[2] < 35.0f)
+      {
+        gameData.pop_monsters[0] -= swingSpeed;
+        gameData.pop_monsters[2] += swingSpeed;
+      }
     }
   }
 }
