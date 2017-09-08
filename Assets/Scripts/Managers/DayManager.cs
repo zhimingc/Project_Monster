@@ -414,10 +414,10 @@ public class DayManager : MonoBehaviour {
   public void OnServeTimeEffect(ref float timeAdded)
   {
     int numServed = GameManager.Instance.scoreMan.numServed;
-    if (numServed > 15) timeAddedOnServe = 1.0f;
+    if (numServed > 15) timeAddedOnServe = 1.5f;
     else if (numServed > 10) timeAddedOnServe = 2.5f;
     else if (numServed > 5) timeAddedOnServe = 5.0f;
-    else timeAddedOnServe = 10.0f;
+    else timeAddedOnServe = 7.5f;
 
     if (toggleAddedTime)
     {

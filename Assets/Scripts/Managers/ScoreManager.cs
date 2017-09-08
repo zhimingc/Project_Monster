@@ -74,7 +74,9 @@ public class ScoreManager : MonoBehaviour {
     int dayNum = (int)GameManager.Instance.dayMan.dayState;
     int comboNum = GameManager.Instance.comboMan.GetComboCount();
 
-    int amt = shiftScoreAmt[(int)GameManager.Instance.dayMan.dayState];
+    //int amt = shiftScoreAmt[(int)GameManager.Instance.dayMan.dayState];
+    int amt = 10 + (numServed / 5) * 5;
+
     amt = (int) (amt * GameManager.Instance.comboMan.GetComboMultiplier());
     totalScore += amt;
     curInstantScore += amt;
@@ -195,7 +197,7 @@ public class ScoreManager : MonoBehaviour {
     string leaderNameText = "", leaderNumText = "";
     for (int i = 0; i < leaderboard.Count; ++i)
     {
-      leaderNameText += (i + 1) + ". " + leaderboard[i].first + ":\n";
+      leaderNameText += (i + 1) + ". " + leaderboard[i].first + "\n";
       leaderNumText += leaderboard[i].second.ToString() + "\n";
     }
     leaderNames.text = leaderNameText;

@@ -175,6 +175,27 @@ public class IngredientManager : MonoBehaviour {
     return layout;
   }
 
+  void PositionIngredientToCenter(GameObject obj, int layout)
+  {
+    Vector3 objPos = obj.transform.localPosition;
+
+    switch (layout)
+    {
+      case 0: // single
+        obj.transform.localPosition = new Vector3(0, 0, 0);
+        obj.transform.localScale = new Vector3(0.75f, 0.75f, 1.0f);
+        break;
+      case 1: // horizontal
+        objPos.y = 0.0f;
+        obj.transform.localPosition = objPos;
+        break;
+      case 2: // vertical
+        objPos.x = 0.0f;
+        obj.transform.localPosition = objPos;
+        break;
+    }
+  }
+
   public GameObject GenerateIngredient(INGREDIENT_TYPE type, SAUCE_TYPE sauce, int layout, Transform t) 
   { 
     GameObject parent = Instantiate(block); 
@@ -197,7 +218,10 @@ public class IngredientManager : MonoBehaviour {
     GameObject ingredientObj = Instantiate(center, t.position - new Vector3(0, 0, 1.5f), Quaternion.identity);
     ingredientObj.transform.SetParent(ingredientHolder.transform);
     ingredientObj.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, new Vector2(1.0f, 1.0f));
-    blockScript.AddIngredient(ingredientObj); 
+    blockScript.AddIngredient(ingredientObj);
+
+    // Center ingredient
+    PositionIngredientToCenter(ingredientHolder, layout);
 
     // Create ingredient layout 
     foreach (Vector2 vec in ObjectFactory.blockLayouts[layout]) 
@@ -218,9 +242,11 @@ public class IngredientManager : MonoBehaviour {
       newIngredient.transform.SetParent(ingredientHolder2.transform);
       newIngredient.GetComponent<IngredientScript>().InitializeIngredientScript(type, sauce, new Vector2(1.0f, 1.0f));
 
-      blockScript.AddIngredient(newIngredient); 
-    } 
- 
+      PositionIngredientToCenter(ingredientHolder2, layout);
+
+      blockScript.AddIngredient(newIngredient);
+    }
+
     return parent; 
   }
 }

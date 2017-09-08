@@ -421,6 +421,9 @@ public class GameManager : Singleton<GameManager>
 
     // Turn on lose text
     //uiMan.ToggleLoseText(true);
+    dayMan.dayState = DAY_STATE.WIN;
+    dayMan.TriggerShiftChange();
+
     dayMan.leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
     
     // Turn off monster request boxes
@@ -438,6 +441,7 @@ public class GameManager : Singleton<GameManager>
     // Lose the game is a grid is full
     if (gridMan && gridMan.IfGridFull())
     {
+      dayMan.dayState = DAY_STATE.WIN;
       SetLoseBehaviour(LOSE_REASON.OVERFLOW);
     }
   }
@@ -699,8 +703,7 @@ public class GameManager : Singleton<GameManager>
     float swingSpeed = 5.0f;
 
     int numServed = scoreMan.numServed;
-    if (numServed < 10) return;
-    if (numServed > 10)
+    if (numServed > 5)
     {
       if (gameData.pop_monsters[1] < 35.0f)
       {
@@ -708,7 +711,7 @@ public class GameManager : Singleton<GameManager>
         gameData.pop_monsters[1] += swingSpeed;
       }
     }
-    if (numServed > 15)
+    if (numServed > 10)
     {
       if (gameData.pop_monsters[2] < 35.0f)
       {

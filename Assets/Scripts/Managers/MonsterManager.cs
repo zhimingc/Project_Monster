@@ -109,6 +109,10 @@ public class MonsterManager : MonoBehaviour {
     // update random parameters
     UpdateMonsterRP();
 
+    // reset monster popularity
+    GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
+    GameManager.Instance.gameData.pop_monsters[0] = 100.0f;
+
     // Init request boxes
     foreach (MonsterRequest box in requestBoxes)
     {
@@ -274,7 +278,7 @@ public class MonsterManager : MonoBehaviour {
     {
       MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
       if (anim.isAnimating()) continue;
-      anim.InitSprite(reqBox.request.monsterType);
+      anim.InitSprite(reqBox.request);
       anim.MoveOutFrom(monsPos);
       break;
     }
@@ -440,7 +444,7 @@ public class MonsterManager : MonoBehaviour {
       }
     }
 
-    //breaker = 0;
+    breaker = 0;
     return req;
   }
 

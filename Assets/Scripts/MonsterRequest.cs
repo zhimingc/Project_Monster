@@ -57,7 +57,7 @@ public class MonsterRequest : MonoBehaviour {
       case MONSTER_TYPE.TIMED:
         if (typeParams.curTimer <= 0.0f)
         {
-          // times up
+          // times up        
           GameManager.Instance.SetLoseBehaviour(LOSE_REASON.TIME_UP);
         }
         else
@@ -100,11 +100,13 @@ public class MonsterRequest : MonoBehaviour {
 
   public void ToggleSpeechBubble(bool flag)
   {
+    LeanTween.cancel(gameObject);
+
     speechBubble.GetComponent<SpriteRenderer>().enabled = flag;
     if (flag == true)
     {
       transform.localScale = new Vector3(0, 0, 0);
-      LeanTween.delayedCall(0.5f, () => 
+      LeanTween.delayedCall(gameObject, 0.5f, () => 
       {
         LeanTween.scale(gameObject, originScale, 1.0f).setEase(LeanTweenType.easeInOutQuad);
       });
@@ -120,7 +122,7 @@ public class MonsterRequest : MonoBehaviour {
 
     // Set new monster type
     SetMonsterType(req);
-    monsterObj.GetComponent<MonsterAnimation>().InitSprite(req.monsterType);
+    monsterObj.GetComponent<MonsterAnimation>().InitSprite(req);
 
     // reset ingredient stack obj
     for (int i = 0; i < ingredientStackObjs.Count; ++i)

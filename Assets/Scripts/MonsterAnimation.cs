@@ -28,7 +28,7 @@ public class MonsterAnimation : MonoBehaviour {
     monsterStates = new Sprite[(int)MONSTER_TYPE.NUM_TYPES];
     monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
     monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
-    monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_picky2");
+    monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_rude");
     monsterStates[3] = Resources.Load<Sprite>("Sprites/monster_picky2");
     monsterStates[4] = Resources.Load<Sprite>("Sprites/monster_picky2");
     monsterStates[5] = Resources.Load<Sprite>("Sprites/monster_greedy1"); // garbage
@@ -45,12 +45,34 @@ public class MonsterAnimation : MonoBehaviour {
   }
 
   // init the monster sprite according to monster type
-  public void InitSprite(MONSTER_TYPE monType)
+  public void InitSprite(Request monReq)
   {
-    type = monType;
-    int spriteIndex = (int)monType;
+    type = monReq.monsterType;
+    int spriteIndex = (int)monReq.monsterType;
     GetComponent<SpriteRenderer>().sprite = monsterStates[spriteIndex];
     GetComponent<SpriteRenderer>().color = Color.white;
+
+    if (type == MONSTER_TYPE.NORMAL)
+    {
+      if (monReq.ingredients.Count == 3)
+      {
+        if (monReq.ingredients[2] == INGREDIENT_TYPE.BREAD)
+        {
+          GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/monster_basic_1");
+        }
+        else if (monReq.ingredients[2] == INGREDIENT_TYPE.MEAT)
+        {
+          GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/monster_basic_2");
+        }
+      }
+      else if (monReq.ingredients.Count == 2)
+      {
+        if (monReq.ingredients[1] == INGREDIENT_TYPE.MEAT)
+        {
+          GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/monster_basic_0");
+        }
+      }
+    }
 
     //if (type == MONSTER_TYPE.PICKY)
     //{
