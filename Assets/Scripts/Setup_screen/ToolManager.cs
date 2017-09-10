@@ -10,13 +10,13 @@ public class ToolManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-    int rank = GameManager.Instance.gameData.pop_rank;
+    //int rank = GameManager.Instance.gameData.pop_rank;
 
     toolBox[0].SetItemType(ITEM_TYPE.EATER);
 
     //if (rank >= (int)RANKS.BIN_TOOL) toolBox[0].SetItemType(ITEM_TYPE.BIN);
     //if (rank >= (int)RANKS.EATER_TOOL) toolBox[1].SetItemType(ITEM_TYPE.EATER);
-    if (rank >= (int)RANKS.TURNTABLE_TOOL || overwriteLocks) toolBox[1].SetItemType(ITEM_TYPE.TURNTABLE);
+    //if (rank >= (int)RANKS.TURNTABLE_TOOL || overwriteLocks) toolBox[1].SetItemType(ITEM_TYPE.TURNTABLE);
     //if (rank > (int)RANKS.BIN_TOOL) toolBox[3].SetItemType(ITEM_TYPE.BIN);
 
     //ToggleNewToolIndicator(GameManager.Instance.gameData.indicator_newTool);

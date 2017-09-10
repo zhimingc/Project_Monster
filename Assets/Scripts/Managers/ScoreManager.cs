@@ -14,12 +14,12 @@ public class ScoreManager : MonoBehaviour {
   public int numServed;
   public float scoreSpeed;  // how long it takes for the numbers to add
 
-  private GameObject scoreObj, numServedObj;
+  public GameObject scoreObj, numServedObj;
   // trueScore is the true amount, incScore is the amount to add per frame
   public int totalScore, incScore;
   public int curScore, curInstantScore;
   private Vector3 scoreOriginalScale;
-  private int[] shiftScoreAmt;
+  //private int[] shiftScoreAmt;
 
   // to track score breakdown
   private int[][] scoreBreakdown;
@@ -33,16 +33,16 @@ public class ScoreManager : MonoBehaviour {
   {
     newScoreToAdd = false;
 
-    shiftScoreAmt = new int[3]
-    {
-      10, 20, 30
-    };
+    //shiftScoreAmt = new int[3]
+    //{
+    //  10, 20, 30
+    //};
 
     // init leaderboard from player pref
     leaderboard = new List<Pair<string, int>>();
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 9; ++i)
     {
-      leaderboard.Add(new Pair<string, int>("human " + i, 0));
+      leaderboard.Add(new Pair<string, int>("-", 0));
     }
     LoadLeaderboard();
 
@@ -71,8 +71,8 @@ public class ScoreManager : MonoBehaviour {
 
   public int AddScore()
   {
-    int dayNum = (int)GameManager.Instance.dayMan.dayState;
-    int comboNum = GameManager.Instance.comboMan.GetComboCount();
+    //int dayNum = (int)GameManager.Instance.dayMan.dayState;
+    //int comboNum = GameManager.Instance.comboMan.GetComboCount();
 
     //int amt = shiftScoreAmt[(int)GameManager.Instance.dayMan.dayState];
     int amt = 10 + (numServed / 5) * 5;
@@ -162,7 +162,7 @@ public class ScoreManager : MonoBehaviour {
       scoreObj.GetComponent<TextMesh>().text = "$" + curScore.ToString();
   }
 
-  public void UpdateLeaderboard()
+  public void UpdateLocalLeaderboard()
   {
     string name = GameManager.Instance.gameData.playerName;
     string tmpName = "";
@@ -183,10 +183,13 @@ public class ScoreManager : MonoBehaviour {
         tmpScore = leaderboard[i].second;
         leaderboard[i].first = name;
         leaderboard[i].second = curInstantScore;
+
+        // trigger for new highscore
+        GameManager.Instance.leaderboardMan.TriggerNewHighScore();
       }
     }
 
-    DisplayLeaderboard();
+    //DisplayLeaderboard();
   }
 
   public void DisplayLeaderboard()
@@ -198,7 +201,7 @@ public class ScoreManager : MonoBehaviour {
     for (int i = 0; i < leaderboard.Count; ++i)
     {
       leaderNameText += (i + 1) + ". " + leaderboard[i].first + "\n";
-      leaderNumText += leaderboard[i].second.ToString() + "\n";
+      leaderNumText += "$" + leaderboard[i].second.ToString() + "\n";
     }
     leaderNames.text = leaderNameText;
     leaderNumbers.text = leaderNumText;

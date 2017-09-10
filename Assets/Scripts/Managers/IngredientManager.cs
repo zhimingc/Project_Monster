@@ -17,7 +17,7 @@ public class IngredientManager : MonoBehaviour {
   public IngredientDistribution distribution;
   public float idleScaling = 0.5f; // scale of block when in queue
 
-  private float spacing; 
+  //private float spacing; 
   private Vector2 gridBlockSize;
 
   // ingredient queue properties
@@ -33,7 +33,7 @@ public class IngredientManager : MonoBehaviour {
 
   // Use this for initialization 
   void Awake () { 
-    spacing = GameObject.Find("grid_manager").GetComponent<GridManager>().spacing;
+    //spacing = GameObject.Find("grid_manager").GetComponent<GridManager>().spacing;
     gridBlockSize = GameObject.Find("grid_manager").GetComponent<GridManager>().gridBlockSize;
 
     // Init for sequential ingredient gen.

@@ -19,7 +19,7 @@ public class PopularityManager : MonoBehaviour {
 	void Start () {
     //pop_monsters_obj = GameObject.FindGameObjectsWithTag("PopMonster");
     popTotal.text = GameManager.Instance.GetTotalPopularity().ToString();
-    UpdateDayText();
+    //UpdateDayText();
 
     InitRankTracking();
     InitPopMonsters();
@@ -27,10 +27,10 @@ public class PopularityManager : MonoBehaviour {
     CheckMonsterUnlock();
   }
 
-  public void UpdateDayText()
-  {
-    dayText.GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days).ToString();
-  }
+  //public void UpdateDayText()
+  //{
+  //  dayText.GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days).ToString();
+  //}
 
   public void TriggerPopularityUpdate()
   {
@@ -63,7 +63,7 @@ public class PopularityManager : MonoBehaviour {
     {
       curScore += incScore;
       if (curScore >= trueScore) curScore = trueScore;
-      GameManager.Instance.SetTotalPopularity(curScore);
+      //GameManager.Instance.SetTotalPopularity(curScore);
       popTotal.text = curScore.ToString();
     }
   }
@@ -112,7 +112,7 @@ public class PopularityManager : MonoBehaviour {
 
       // rank up behaviour
       toolMan.UpdateToolBox((RANKS)rankIndex);
-      GameManager.Instance.gameData.pop_rank = rankIndex;
+      //GameManager.Instance.gameData.pop_rank = rankIndex;
     }
 
     // update display

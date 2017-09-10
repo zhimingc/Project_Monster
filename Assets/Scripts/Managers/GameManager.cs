@@ -39,7 +39,7 @@ public class GameData
   public void Reset()
   {
     pop_total = 0;
-    pop_rank = 0;
+    //pop_rank = 0;
     ConsecutiveDayReset();
 
     // flags
@@ -49,16 +49,16 @@ public class GameData
   // does not clear total popularity
   public void ConsecutiveDayReset()
   {
-    count_days = 0;
+    //count_days = 0;
     pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
     pop_monsters[0] = 100.0f;
     num_ingredients = 1;
   }
 
   public int pop_total;
-  public int pop_rank, count_days;
+  public int stamp_total;
+  public List<List<bool>> monsterVars;
   public float[] pop_monsters;
-  public bool indicator_newTool;
   public bool flag_firstPlay;
 
   // gameplay stat stuff, put in another class later
@@ -88,13 +88,15 @@ public class GameManager : Singleton<GameManager>
   public ComboManager comboMan;
   public KitchenSetupManager setupMan;  // only in setup screen
   public IngredientManager ingredientMan;
+  public LeaderboardManager leaderboardMan;
 
   private LoadManager loadMan;
   private MusicManager musicMan;
   private UIManager uiMan;
-  private BackgroundManager backMan;
-  private Cursor cursorScript;
+  //private BackgroundManager backMan;
+  //private Cursor cursorScript;
   private ConsecutiveManager consecMan;
+  private StoreManager storeMan;
 
   private bool isPaused;
 
@@ -114,8 +116,8 @@ public class GameManager : Singleton<GameManager>
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
-    cursorScript = gameObject.AddComponent<Cursor>();
-    consecMan = gameObject.AddComponent<ConsecutiveManager>();
+    //cursorScript = gameObject.AddComponent<Cursor>();
+    //consecMan = gameObject.AddComponent<ConsecutiveManager>();
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
     gameData = new GameData();
 
@@ -136,10 +138,10 @@ public class GameManager : Singleton<GameManager>
     InputMan.platform = Application.platform;
   }
 
-  void ResetToDayOne()
-  {
-    gameData.count_days = 0;
-  }
+  //void ResetToDayOne()
+  //{
+  //  gameData.count_days = 0;
+  //}
 
   void ToggleSplashScreens()
   {
@@ -170,7 +172,7 @@ public class GameManager : Singleton<GameManager>
   void InitializeManagers()
   {
     // Apply consecutive changes from the day
-    consecMan.ApplyNewDayChanges(gameData.count_days);
+    //consecMan.ApplyNewDayChanges(gameData.count_days);
 
     turnCounter = 0;
     currentLevel = 0;
@@ -183,14 +185,15 @@ public class GameManager : Singleton<GameManager>
       uiMan = GameObject.Find("ui_manager").GetComponent<UIManager>();
       gridMan = GameObject.Find("grid_manager").GetComponent<GridManager>();
       monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
-      backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
+      //backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
       comboMan = GameObject.Find("combo_man").GetComponent<ComboManager>();
       ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
+      leaderboardMan = GameObject.Find("leaderboard_sign").GetComponent<LeaderboardManager>();
 
       // contract icon display
       InitContractIcons();
 
-      if (startWithHelp) ToggleHelpScreen();
+      //if (startWithHelp) ToggleHelpScreen();
     }
 
     // Manager in Setup screen
@@ -202,6 +205,11 @@ public class GameManager : Singleton<GameManager>
     if (SceneManager.GetActiveScene().name.Contains("leaderboard"))
     {
       scoreMan.TriggerUpdateLeaderboard();
+    }
+
+    if (SceneManager.GetActiveScene().name.Contains("store"))
+    {
+      storeMan = GameObject.Find("store_manager").GetComponent<StoreManager>();
     }
   }
 
@@ -273,23 +281,6 @@ public class GameManager : Singleton<GameManager>
       // Debug
       if (Input.anyKeyDown)
       {
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-          ToggleHelpScreen();
-        }
-        else if (uiMan.helpText.enabled == true)
-        {
-          if (helpToggler)
-          {
-            uiMan.ToggleHelpText(false);
-            gridMan.ToggleGrid(true);
-            helpToggler = false;
-          }
-          else
-          {
-            helpToggler = true;
-          }
-        }
       }
       if (Input.GetKeyDown(KeyCode.R))
       {
@@ -320,15 +311,15 @@ public class GameManager : Singleton<GameManager>
 
   void ToggleHelpScreen()
   {
-    if (SceneManager.GetActiveScene().name == "vertical-phone")
-    {
-      bool flag = uiMan.helpText.enabled;
-      uiMan.ToggleHelpText(!flag);
-      gridMan.ToggleGrid(flag);
+    //if (SceneManager.GetActiveScene().name == "vertical-phone")
+    //{
+    //  bool flag = uiMan.helpText.enabled;
+    //  uiMan.ToggleHelpText(!flag);
+    //  gridMan.ToggleGrid(flag);
 
-      // hack
-      helpToggler = false;
-    }
+    //  // hack
+    //  helpToggler = false;
+    //}
   }
 
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -337,7 +328,7 @@ public class GameManager : Singleton<GameManager>
     SetIsPaused(false);
 
     InitializeManagers();
-    if (startWithHelp) ToggleHelpScreen();
+    //if (startWithHelp) ToggleHelpScreen();
     helpToggler = true;
 
     // load screen
@@ -424,8 +415,9 @@ public class GameManager : Singleton<GameManager>
     dayMan.dayState = DAY_STATE.WIN;
     dayMan.TriggerShiftChange();
 
-    dayMan.leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
-    
+    dayMan.leaderboardSign.GetComponent<LeaderboardManager>().TriggerLeaderboard();
+
+
     // Turn off monster request boxes
     monsterMan.ToggleMonsterRequests(false);
 
@@ -433,7 +425,7 @@ public class GameManager : Singleton<GameManager>
     SetIsPaused(true);
 
     // reset to day 1
-    ResetToDayOne();
+    //ResetToDayOne();
   }
 
   public void CheckLevelComplete()
@@ -495,7 +487,7 @@ public class GameManager : Singleton<GameManager>
         LoadSceneWithTransition(SceneManager.GetActiveScene().name);
         break;
       case BUTTON_TYPE.HELP:
-        ToggleHelpScreen();
+        //ToggleHelpScreen();
         break;
       case BUTTON_TYPE.MUSIC:
         bool invert = !AudioListener.pause;
@@ -503,7 +495,7 @@ public class GameManager : Singleton<GameManager>
         AudioListener.volume = invert ? 0 : 1;
         break;
       case BUTTON_TYPE.START:
-        if (gameData.pop_total == 0)
+        if (gameData.flag_firstPlay == true)
         {
           gameData.flag_firstPlay = false;
           LoadSceneWithTransition("screen-first-timer");
@@ -592,9 +584,9 @@ public class GameManager : Singleton<GameManager>
         Button_ToGame();
         break;
       case BUTTON_TYPE.DEBUG_LEVELSKIP:
-        ++gameData.count_days;
-        consecMan.ApplyNewDayChanges(gameData.count_days);
-        GameObject.Find("store_stats").GetComponent<PopularityManager>().UpdateDayText();
+        //++gameData.count_days;
+        //consecMan.ApplyNewDayChanges(gameData.count_days);
+        //GameObject.Find("store_stats").GetComponent<PopularityManager>().UpdateDayText();
         GameObject.Find("store_stats").GetComponent<PopularityManager>().InitPopMonsters();
         break;
       case BUTTON_TYPE.DEBUG_GETPOP:
@@ -627,6 +619,18 @@ public class GameManager : Singleton<GameManager>
         }
         //scoreMan.TriggerUpdateLeaderboard();
         break;
+      case BUTTON_TYPE.STORE_BUYPOSTER:
+        storeMan.TriggerBuySign(true);
+        break;
+      case BUTTON_TYPE.STORE_CONFIRM:
+        storeMan.TriggerBuySign(false);
+        break;
+      case BUTTON_TYPE.STORE_CANCEL:
+        storeMan.TriggerBuySign(false);
+        break;
+      case BUTTON_TYPE.TO_STORE:
+        LoadSceneWithTransition("screen-store");
+        break;
     }
   }
 
@@ -642,15 +646,15 @@ public class GameManager : Singleton<GameManager>
     musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
   }
 
-  public void AddTotalPopularity(int amt)
-  {
-    gameData.pop_total += amt;
-  }
+  //public void AddTotalPopularity(int amt)
+  //{
+  //  //gameData.pop_total += amt;
+  //}
 
-  public void SetTotalPopularity(int amt)
-  {
-    gameData.pop_total = amt;
-  }
+  //public void SetTotalPopularity(int amt)
+  //{
+  //  //gameData.pop_total = amt;
+  //}
 
   public int GetTotalPopularity()
   {
@@ -668,10 +672,10 @@ public class GameManager : Singleton<GameManager>
     return false;
   }
 
-  public void AddToDayCount(int amt)
-  {
-    gameData.count_days += amt;
-  }
+  //public void AddToDayCount(int amt)
+  //{
+  //  gameData.count_days += amt;
+  //}
 
   void GameManagerReset()
   {
@@ -681,10 +685,10 @@ public class GameManager : Singleton<GameManager>
 
   public void EndOfDayTrigger()
   {
-    if (!dayMan.toggleTimedShiftFeature)
-    {
-      AddToDayCount(1);
-    }
+    //if (!dayMan.toggleTimedShiftFeature)
+    //{
+    //  AddToDayCount(1);
+    //}
 
     switch (gameData.eventType)
     {
@@ -693,7 +697,7 @@ public class GameManager : Singleton<GameManager>
       case MONSTER_EVENT.MAIN_EVENT:
       case MONSTER_EVENT.FRENZY_EVENT:
       case MONSTER_EVENT.FRENZY_PROGRESS:
-        scoreMan.UpdateLeaderboard();
+        scoreMan.UpdateLocalLeaderboard();
         break;
     }
   }

@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour {
   // Use this for initialization
   void Awake () {
     loseSign = GameObject.Find("lose_sign");
-    helpText = GameObject.Find("instructions_text").GetComponent<Text>();
+    //helpText = GameObject.Find("instructions_text").GetComponent<Text>();
 
   }
 

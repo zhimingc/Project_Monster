@@ -27,7 +27,7 @@ public class GridScript : MonoBehaviour {
   // feedback
   private ParticleSystem psObj;
   private GameObject exclaimObj;
-  private Vector3 originalScale;
+  //private Vector3 originalScale;
 
   // turntable variables
   private float turnSpeed;
@@ -51,7 +51,7 @@ public class GridScript : MonoBehaviour {
     maxIngredients = 5;
     scoreText.SetActive(false);
     comboSignObj.SetActive(false);
-    originalScale = comboSignObj.transform.localScale;
+    //originalScale = comboSignObj.transform.localScale;
 
     psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
     exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);

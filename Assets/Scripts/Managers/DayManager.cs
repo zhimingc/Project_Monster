@@ -49,7 +49,7 @@ public class DayManager : MonoBehaviour {
   // Use this for initialization
   void Start () {
     dayState = DAY_STATE.BREAKFAST;
-    dayFeedback = GameObject.Find("shift_text");
+    //dayFeedback = GameObject.Find("shift_text");
     monsterMan = GameObject.Find("monster_manager").GetComponent<MonsterManager>();
     backMan = GameObject.Find("Background").GetComponent<BackgroundManager>();
     sauceMan = GameObject.Find("sauce_man").GetComponent<SauceManager>();
@@ -61,7 +61,7 @@ public class DayManager : MonoBehaviour {
     //backMan.ChangeSignColors(shiftChangeObj, DAY_STATE.BREAKFAST);
 
     // update day counter
-    GameObject.Find("dayCount_text").GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
+    //GameObject.Find("dayCount_text").GetComponent<TextMesh>().text = "Day " + (GameManager.Instance.gameData.count_days + 1).ToString();
 
     // timed shifts feature
     shiftTimer = maxShiftTime;// * (2.0f / 3.0f); // start with only 2/3 timer
@@ -151,6 +151,7 @@ public class DayManager : MonoBehaviour {
         case MONSTER_EVENT.FRENZY_PROGRESS:
           dayState = DAY_STATE.WIN;
           TriggerShiftChange();
+          GameManager.Instance.SetLoseBehaviour(LOSE_REASON.OVERFLOW);
           break;
       }
     }
@@ -160,7 +161,7 @@ public class DayManager : MonoBehaviour {
   void UpdateTimerText()
   {
     shiftTimerBar.GetComponent<Image>().fillAmount = shiftTimer / maxShiftTime;
-    shiftTimerText.GetComponent<Text>().text = shiftTimer.ToString("0.0");
+    shiftTimerText.GetComponent<Text>().text = shiftTimer.ToString("0");
   }
 
   void ToggleTimer(bool flag)
@@ -196,16 +197,16 @@ public class DayManager : MonoBehaviour {
     shiftTimer = newTimeAmt;
 
     // animate added time text
-    GameObject addedText = timerAddedText[curTimeAddedIndex];
-    curTimeAddedIndex = (curTimeAddedIndex + 1) % timerAddedText.Length;
-    addedText.transform.position = shiftTimerText.transform.position;
-    addedText.GetComponent<Text>().text = "+" + amt.ToString("0.0");
-    addedText.GetComponent<Text>().enabled = true;
-    LeanTween.moveLocalY(addedText, 0.3f, 1.0f);
-    LeanTween.delayedCall(1.0f, () =>
-    {
-      addedText.GetComponent<Text>().enabled = false;
-    });
+    //GameObject addedText = timerAddedText[curTimeAddedIndex];
+    //curTimeAddedIndex = (curTimeAddedIndex + 1) % timerAddedText.Length;
+    //addedText.transform.position = shiftTimerText.transform.position;
+    //addedText.GetComponent<Text>().text = "+" + amt.ToString("0.0");
+    //addedText.GetComponent<Text>().enabled = true;
+    //LeanTween.moveLocalX(addedText, 0.3f, 1.0f);
+    //LeanTween.delayedCall(1.0f, () =>
+    //{
+    //  addedText.GetComponent<Text>().enabled = false;
+    //});
 
     return amt;
   }
@@ -224,14 +225,14 @@ public class DayManager : MonoBehaviour {
 
     // hack to count how many needed to serve
     //int toServe = 15;
-    int dayNum = GameManager.Instance.gameData.count_days;
+    //int dayNum = GameManager.Instance.gameData.count_days;
 
     switch (dayState)
     {
       case DAY_STATE.BREAKFAST:
         //backMan.ChangeSignColors(startDaySign, color);
         
-        startDaySign.GetComponentsInChildren<Text>()[0].text = "Day " + (dayNum + 1).ToString() + ":";
+        //startDaySign.GetComponentsInChildren<Text>()[0].text = "Day " + (dayNum + 1).ToString() + ":";
         //startDaySign.GetComponentsInChildren<Text>()[1].text = "Goal: " + toServe.ToString();
 
         string flavText = "No more new content";
@@ -315,7 +316,7 @@ public class DayManager : MonoBehaviour {
           case MONSTER_EVENT.FRENZY_EVENT:
           case MONSTER_EVENT.FRENZY_PROGRESS:
             //backMan.ChangeSignColors(leaderboardSign, color);
-            leaderboardSign.GetComponent<Animator>().SetTrigger("isEnter");
+            leaderboardSign.GetComponent<LeaderboardManager>().TriggerLeaderboard();
             break;
         }
 
@@ -387,8 +388,8 @@ public class DayManager : MonoBehaviour {
 
     backMan.ChangeTimeState((int)dayState); // update bg
 
-    string dayText = dayState.ToString();
-    dayFeedback.GetComponent<Text>().text = dayText;
+    //string dayText = dayState.ToString();
+    //dayFeedback.GetComponent<Text>().text = dayText;
 
     // update shift interval to it still needs X to finish
     int nextIndex = (int)dayState;
