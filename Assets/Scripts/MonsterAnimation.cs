@@ -12,7 +12,7 @@ public class MonsterAnimation : MonoBehaviour {
 
   private float[] boundaries;
   private BackgroundManager backMan;
-  private Sprite[] monsterStates;
+  //private Sprite[] monsterStates;
   //private int delayedCallID;
 
   // Use this for initialization
@@ -25,13 +25,13 @@ public class MonsterAnimation : MonoBehaviour {
     //originScale = transform.localScale;
 
     // sprites
-    monsterStates = new Sprite[(int)MONSTER_TYPE.NUM_TYPES];
-    monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
-    monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
-    monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_rude2");
-    monsterStates[3] = Resources.Load<Sprite>("Sprites/monster_picky2");
-    monsterStates[4] = Resources.Load<Sprite>("Sprites/monster_picky2");
-    monsterStates[5] = Resources.Load<Sprite>("Sprites/monster_greedy1"); // garbage
+    //monsterStates = new Sprite[(int)MONSTER_TYPE.NUM_TYPES];
+    //monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
+    //monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
+    //monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_rude2");
+    //monsterStates[3] = Resources.Load<Sprite>("Sprites/monster_picky2");
+    //monsterStates[4] = Resources.Load<Sprite>("Sprites/monster_picky2");
+    //monsterStates[5] = Resources.Load<Sprite>("Sprites/monster_greedy1"); // garbage
   }
 
   void Start()
@@ -49,35 +49,39 @@ public class MonsterAnimation : MonoBehaviour {
   {
     type = monReq.monsterType;
     int spriteIndex = (int)monReq.monsterType;
-    GetComponent<SpriteRenderer>().sprite = monsterStates[spriteIndex];
+    var varList = GameManager.Instance.gameData.monsterVars;
+
+    int variationIndex = -1;
+    // random pick of all unlocked
+    while (variationIndex == -1)
+    {
+      int randVar = Random.Range(0, 4);
+      if (varList[spriteIndex][randVar]) variationIndex = randVar;
+    }
+
     GetComponent<SpriteRenderer>().color = Color.white;
 
-    if (type == MONSTER_TYPE.NORMAL)
+    if (monReq.ingredients.Count == 3)
     {
-      if (monReq.ingredients.Count == 3)
+      if (monReq.ingredients[2] == INGREDIENT_TYPE.BREAD)
       {
-        if (monReq.ingredients[2] == INGREDIENT_TYPE.BREAD)
-        {
-          GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/monster_basic_1");
-        }
-        else if (monReq.ingredients[2] == INGREDIENT_TYPE.MEAT)
-        {
-          GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/monster_basic_2");
-        }
+        if (varList[spriteIndex][2]) variationIndex = 2;
       }
-      else if (monReq.ingredients.Count == 2)
+      else if (monReq.ingredients[2] == INGREDIENT_TYPE.MEAT)
       {
-        if (monReq.ingredients[1] == INGREDIENT_TYPE.MEAT)
-        {
-          GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/monster_basic_0");
-        }
+        if (varList[spriteIndex][3]) variationIndex = 3;
+      }
+    }
+    else if (monReq.ingredients.Count == 2)
+    {
+      if (monReq.ingredients[1] == INGREDIENT_TYPE.MEAT)
+      {
+        if (varList[spriteIndex][1]) variationIndex = 1;
       }
     }
 
-    //if (type == MONSTER_TYPE.PICKY)
-    //{
-    //  GetComponent<SpriteRenderer>().color = Color.cyan;
-    //}
+    // apply chosen sprite
+    GetComponent<SpriteRenderer>().sprite = GameManager.Instance.spriteMan.monsterSprites[spriteIndex][variationIndex];
   }
 
   public void Hide()

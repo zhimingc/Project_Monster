@@ -24,6 +24,9 @@ public class GameData
   // initialize game data with serialization later
   public GameData()
   {
+    // Init earnings
+    pop_total = PlayerPrefs.GetInt("earnings");
+
     pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
     pop_monsters[0] = 100.0f;
 
@@ -34,6 +37,19 @@ public class GameData
     if (playerName == "") playerName = "Leslie";
 
     eventType = MONSTER_EVENT.FRENZY_PROGRESS;
+
+    // init monster variations
+    monsterVars = new List<List<bool>>();
+    for (int i = 0; i < 4; ++i)
+    {
+      monsterVars.Add(new List<bool>());
+      monsterVars[i].Add(true); // first variation is default
+
+      for (int j = 0; j < 3; ++j)
+      {
+        monsterVars[i].Add(false);
+      }
+    }
   }
 
   public void Reset()
@@ -89,6 +105,7 @@ public class GameManager : Singleton<GameManager>
   public KitchenSetupManager setupMan;  // only in setup screen
   public IngredientManager ingredientMan;
   public LeaderboardManager leaderboardMan;
+  public SpriteManager spriteMan;
 
   private LoadManager loadMan;
   private MusicManager musicMan;
@@ -116,6 +133,7 @@ public class GameManager : Singleton<GameManager>
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
+    spriteMan = gameObject.AddComponent<SpriteManager>();
     //cursorScript = gameObject.AddComponent<Cursor>();
     //consecMan = gameObject.AddComponent<ConsecutiveManager>();
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
@@ -136,6 +154,9 @@ public class GameManager : Singleton<GameManager>
     Screen.SetResolution(540, 960, false);
 
     InputMan.platform = Application.platform;
+
+    // Loading
+    LoadMonsterVar();
   }
 
   //void ResetToDayOne()
@@ -415,8 +436,10 @@ public class GameManager : Singleton<GameManager>
     dayMan.dayState = DAY_STATE.WIN;
     dayMan.TriggerShiftChange();
 
+    // save earnings
     dayMan.leaderboardSign.GetComponent<LeaderboardManager>().TriggerLeaderboard();
-
+    PlayerPrefs.SetInt("earnings", gameData.pop_total);
+    SaveEarnings();
 
     // Turn off monster request boxes
     monsterMan.ToggleMonsterRequests(false);
@@ -426,6 +449,37 @@ public class GameManager : Singleton<GameManager>
 
     // reset to day 1
     //ResetToDayOne();
+  }
+
+  public void SaveMonsterVar()
+  {
+    for (int i = 0; i < gameData.monsterVars.Count; ++i)
+    {
+      for (int j = 0; j < gameData.monsterVars[i].Count; ++j)
+      {
+        string toSave = "monster_type_" + i.ToString() + "_" + j.ToString();
+        bool val = gameData.monsterVars[i][j];
+        PlayerPrefs.SetInt(toSave, val ? 1 : 0);
+      }
+    }
+  }
+
+  public void LoadMonsterVar()
+  {
+    for (int i = 0; i < gameData.monsterVars.Count; ++i)
+    {
+      for (int j = 0; j < gameData.monsterVars[i].Count; ++j)
+      {
+        string toLoad = "monster_type_" + i.ToString() + "_" + j.ToString();
+        bool val = PlayerPrefs.GetInt(toLoad) == 1;
+        gameData.monsterVars[i][j] = val;
+      }
+    }
+  }
+
+  public void SaveEarnings()
+  {
+    PlayerPrefs.SetInt("earnings", gameData.pop_total);
   }
 
   public void CheckLevelComplete()
@@ -624,6 +678,7 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.STORE_CONFIRM:
         storeMan.TriggerBuySign(false);
+        storeMan.ConfirmBuy();
         break;
       case BUTTON_TYPE.STORE_CANCEL:
         storeMan.TriggerBuySign(false);

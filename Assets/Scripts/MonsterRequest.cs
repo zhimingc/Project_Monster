@@ -7,9 +7,9 @@ public enum MONSTER_TYPE
   NORMAL,
   TIMED,
   PICKY,
+  GARBAGE,
   RUDE,
   GREEDY,
-  GARBAGE,
   NUM_TYPES
 };
 
@@ -64,6 +64,7 @@ public class MonsterRequest : MonoBehaviour {
         {
           typeParams.curTimer -= Time.deltaTime;
           float cutoff = 0.001f + (1.0f - typeParams.curTimer / typeParams.maxTimer);
+          cutoff = Mathf.Clamp(cutoff, 0.001f, 1.0f);
           stopwatch.GetComponentInChildren<MeshRenderer>().material.SetFloat("_Cutoff", cutoff);
 
           // text feedback
@@ -106,7 +107,7 @@ public class MonsterRequest : MonoBehaviour {
     if (flag == true)
     {
       transform.localScale = new Vector3(0, 0, 0);
-      LeanTween.delayedCall(gameObject, 0.5f, () => 
+      LeanTween.delayedCall(gameObject, 0.25f, () => 
       {
         LeanTween.scale(gameObject, originScale, 1.0f).setEase(LeanTweenType.easeInOutQuad);
       });

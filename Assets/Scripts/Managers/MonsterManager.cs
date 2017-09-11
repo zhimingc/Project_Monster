@@ -351,7 +351,7 @@ public class MonsterManager : MonoBehaviour {
     {
       case MONSTER_TYPE.TIMED:
         req.typeParams.maxTimer = rp.timerMax;
-        req.typeParams.curTimer = rp.timerMax;
+        req.typeParams.curTimer = rp.timerMax + 1.0f;
         break;
     }
   }
@@ -371,6 +371,8 @@ public class MonsterManager : MonoBehaviour {
 
     for (int i = 0; i < (int)MONSTER_TYPE.NUM_TYPES; ++i)
     {
+      //if ((MONSTER_TYPE)i == MONSTER_TYPE.GARBAGE) continue;
+
       odds += GameManager.Instance.gameData.pop_monsters[i];
       if (roll <= odds)
       {

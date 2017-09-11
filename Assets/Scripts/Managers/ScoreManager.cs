@@ -78,7 +78,9 @@ public class ScoreManager : MonoBehaviour {
     int amt = 10 + (numServed / 5) * 5;
 
     amt = (int) (amt * GameManager.Instance.comboMan.GetComboMultiplier());
+
     totalScore += amt;
+    GameManager.Instance.gameData.pop_total += amt;
     curInstantScore += amt;
 
     // compute the amount of be added every frame
