@@ -212,7 +212,7 @@ public class GameManager : Singleton<GameManager>
       leaderboardMan = GameObject.Find("leaderboard_sign").GetComponent<LeaderboardManager>();
 
       // contract icon display
-      InitContractIcons();
+      //InitContractIcons();
 
       //if (startWithHelp) ToggleHelpScreen();
     }
@@ -468,7 +468,7 @@ public class GameManager : Singleton<GameManager>
   {
     for (int i = 0; i < gameData.monsterVars.Count; ++i)
     {
-      for (int j = 0; j < gameData.monsterVars[i].Count; ++j)
+      for (int j = 1; j < gameData.monsterVars[i].Count; ++j)
       {
         string toLoad = "monster_type_" + i.ToString() + "_" + j.ToString();
         bool val = PlayerPrefs.GetInt(toLoad) == 1;
