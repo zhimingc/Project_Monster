@@ -111,7 +111,7 @@ public class GameManager : Singleton<GameManager>
   private MusicManager musicMan;
   private UIManager uiMan;
   //private BackgroundManager backMan;
-  //private Cursor cursorScript;
+  private Cursor cursorScript;
   private ConsecutiveManager consecMan;
   private StoreManager storeMan;
 
@@ -134,7 +134,7 @@ public class GameManager : Singleton<GameManager>
     musicMan = gameObject.AddComponent<MusicManager>();
     loadMan = gameObject.AddComponent<LoadManager>();
     spriteMan = gameObject.AddComponent<SpriteManager>();
-    //cursorScript = gameObject.AddComponent<Cursor>();
+    cursorScript = gameObject.AddComponent<Cursor>();
     //consecMan = gameObject.AddComponent<ConsecutiveManager>();
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
     gameData = new GameData();
