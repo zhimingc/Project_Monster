@@ -79,7 +79,9 @@ namespace GooglePlayGames.Editor
                 "Libraries/CustomWebViewApplication.h",
                 "Libraries/Plugins/IOS/CustomWebViewApplication.mm",
                 "Libraries/Plugins/iOS/CustomWebViewApplication.mm",
-                "Libraries/CustomWebViewApplication.mm"
+                "Libraries/CustomWebViewApplication.mm",
+                "Libraries/Plugins/ios/GPGSAppController.mm",
+                "Libraries/Plugins/ios/GPGSAppController.h",
             };
 
             string pbxprojPath = pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj";

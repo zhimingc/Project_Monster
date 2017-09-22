@@ -32,6 +32,8 @@ public class MonsterBody : MonoBehaviour
 
     GridScript gs = playerScript.hoveredGrid.GetComponent<GridScript>();
 
+    if (gs.ingredientStack.Count < 1) return;
+
     if (gs.monReq == null && 
       monReq.request.monsterType != MONSTER_TYPE.GARBAGE) return;
 

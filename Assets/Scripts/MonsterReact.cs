@@ -19,7 +19,12 @@ public class MonsterReact : MonoBehaviour {
     // Serve request if able to
     if (InputMan.OnDown())
     {
-      GetComponent<Animator>().SetTrigger("jump");
+      // debug
+      //GameManager.Instance.gameData.pop_total += 150;
+      //GameManager.Instance.socialMan.ReportScore(10 + (int)Time.time, SOCIALBOARD.EARNINGS);
+
+      if (GetComponent<SpriteRenderer>().color != Color.black)
+        GetComponent<Animator>().SetTrigger("jump");
     }
   }
 }

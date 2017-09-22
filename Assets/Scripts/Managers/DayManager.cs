@@ -111,7 +111,7 @@ public class DayManager : MonoBehaviour {
     switch (shift)
     {
       case DAY_STATE.LUNCH:
-        monsterMan.AddSauceToAllRequests();
+        //monsterMan.AddSauceToAllRequests();
         break;
       case DAY_STATE.DINNER:
         break;

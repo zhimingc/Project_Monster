@@ -106,6 +106,7 @@ public class GameManager : Singleton<GameManager>
   public IngredientManager ingredientMan;
   public LeaderboardManager leaderboardMan;
   public SpriteManager spriteMan;
+  public SocialManager socialMan;
 
   private LoadManager loadMan;
   private MusicManager musicMan;
@@ -114,6 +115,11 @@ public class GameManager : Singleton<GameManager>
   private Cursor cursorScript;
   private ConsecutiveManager consecMan;
   private StoreManager storeMan;
+  private AdsManager adsMan;
+
+#if UNITY_ANDROID
+  private GPGDemo gpgDemo;
+#endif 
 
   private bool isPaused;
 
@@ -135,6 +141,13 @@ public class GameManager : Singleton<GameManager>
     loadMan = gameObject.AddComponent<LoadManager>();
     spriteMan = gameObject.AddComponent<SpriteManager>();
     cursorScript = gameObject.AddComponent<Cursor>();
+    socialMan = gameObject.AddComponent<SocialManager>();
+    adsMan = gameObject.AddComponent<AdsManager>();
+
+    // testing for leaderboards
+    //gpgDemo = gameObject.AddComponent<GPGDemo>();
+    //
+
     //consecMan = gameObject.AddComponent<ConsecutiveManager>();
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
     gameData = new GameData();
@@ -211,6 +224,9 @@ public class GameManager : Singleton<GameManager>
       ingredientMan = GameObject.Find("ingredient_manager").GetComponent<IngredientManager>();
       leaderboardMan = GameObject.Find("leaderboard_sign").GetComponent<LeaderboardManager>();
 
+      // initialization for persistent classes
+      socialMan.InitSocial();
+
       // contract icon display
       //InitContractIcons();
 
@@ -226,6 +242,8 @@ public class GameManager : Singleton<GameManager>
     if (SceneManager.GetActiveScene().name.Contains("leaderboard"))
     {
       scoreMan.TriggerUpdateLeaderboard();
+      socialMan.InitSocial();
+      socialMan.LoadLeaderboard();
     }
 
     if (SceneManager.GetActiveScene().name.Contains("store"))
@@ -619,15 +637,17 @@ public class GameManager : Singleton<GameManager>
         //setupMan.ToggleCounter(!flipped);
         break;
       case BUTTON_TYPE.TO_FIRSTTIME:
-        if (gameData.flag_firstPlay)
-        {
-          gameData.flag_firstPlay = false;
-          LoadSceneWithTransition("screen-first-timer");
-        }
-        else
-        {
-          Button_ToGame();
-        }
+        LoadSceneWithTransition("screen-first-timer");
+
+        //if (gameData.flag_firstPlay)
+        //{
+        //  gameData.flag_firstPlay = false;
+        //  LoadSceneWithTransition("screen-first-timer");
+        //}
+        //else
+        //{
+        //  Button_ToGame();
+        //}
         break;
       case BUTTON_TYPE.RESET_DATA:
         gameData.Reset();
@@ -659,6 +679,7 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.GAME_LEADERBOARD:
         LoadSceneWithTransition("screen-leaderboard");
+        //gpgDemo.OnShowLeaderBoard();
         //scoreMan.TriggerUpdateLeaderboard();
         break;
       case BUTTON_TYPE.GAME_EVENTSELECT:
@@ -677,8 +698,8 @@ public class GameManager : Singleton<GameManager>
         storeMan.TriggerBuySign(true);
         break;
       case BUTTON_TYPE.STORE_CONFIRM:
-        storeMan.TriggerBuySign(false);
-        storeMan.ConfirmBuy();
+        // watch ad
+        adsMan.ShowRewardedAd();
         break;
       case BUTTON_TYPE.STORE_CANCEL:
         storeMan.TriggerBuySign(false);
@@ -778,6 +799,12 @@ public class GameManager : Singleton<GameManager>
         gameData.pop_monsters[2] += swingSpeed;
       }
     }
+  }
+
+  public void RewardPlayer()
+  {
+    storeMan.TriggerBuySign(false);
+    storeMan.ConfirmBuy();
   }
 }
 

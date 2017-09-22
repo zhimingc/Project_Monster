@@ -202,7 +202,7 @@ public class MonsterManager : MonoBehaviour {
         gridIngredients.RemoveAll((INGREDIENT_TYPE type) => { return type == INGREDIENT_TYPE.EATER; });
 
         // Check specific monster requirements
-        if (!SpecificMonsterCheck(req, gs)) continue;
+        if (!SpecificMonsterCheck(reqBox, gs)) continue;
 
         // Check if grid request is met
         if (req.gridType != gs.gridType) continue;
@@ -227,13 +227,17 @@ public class MonsterManager : MonoBehaviour {
   }
 
   // returns false if check fails
-  bool SpecificMonsterCheck(Request monReq, GridScript gs)
+  bool SpecificMonsterCheck(MonsterRequest monReq, GridScript gs)
   {
-    switch (monReq.monsterType)
+    switch (monReq.request.monsterType)
     {
       case MONSTER_TYPE.PICKY:
-        if (monReq.typeParams.specificGrid != gs) return false;
+        if (monReq.request.typeParams.specificGrid != gs) return false;
         break;
+      case MONSTER_TYPE.GARBAGE:
+        if (gs.ingredientStack.Count > 0)
+          monReq.monsterObj.GetComponent<MonsterBody>().ToggleFeedSign(true);
+        return false;
     }
 
     return true;
@@ -295,18 +299,18 @@ public class MonsterManager : MonoBehaviour {
     CheckRequestMetAll();
   }
 
-  public void AddSauceToAllRequests()
-  {
-    for (int i = 0; i < requestBoxes.Count; ++i)
-    {
-      Request req = requestBoxes[i].request;
-      req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
-      SwingWeights((int)req.sauce, rp.sauceDist);
+  //public void AddSauceToAllRequests()
+  //{
+  //  for (int i = 0; i < requestBoxes.Count; ++i)
+  //  {
+  //    Request req = requestBoxes[i].request;
+  //    req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
+  //    SwingWeights((int)req.sauce, rp.sauceDist);
 
-      requestBoxes[i].SetRequest(req);
-    }
+  //    requestBoxes[i].SetRequest(req);
+  //  }
 
-  }
+  //}
 
   void PlayEatingSound()
   {
@@ -417,21 +421,21 @@ public class MonsterManager : MonoBehaviour {
     int addTopBread = Random.Range(0, rp.topBreadProbability);
     if (addTopBread == 0) req.ingredients.Add(INGREDIENT_TYPE.BREAD);
 
-    // Add sauce if it is lunch or dinner time
-    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
-    {
-      //req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
-      req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
-      SwingWeights((int)req.sauce, rp.sauceDist);
-    }
+    //// Add sauce if it is lunch or dinner time
+    //if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.LUNCH))
+    //{
+    //  //req.sauce = (SAUCE_TYPE)Random.Range(0, (int)SAUCE_TYPE.NUM_SAUCE);
+    //  req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
+    //  SwingWeights((int)req.sauce, rp.sauceDist);
+    //}
 
-    // Add grid type if it is dinner time
-    if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.DINNER))
-    {
-      //req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
-      req.gridType = (GRID_TYPE)GenerateWithDist(rp.waresDist);
-      SwingWeights((int)req.gridType, rp.waresDist);
-    }
+    //// Add grid type if it is dinner time
+    //if (GameManager.Instance.dayMan.IsOrPastShift(DAY_STATE.DINNER))
+    //{
+    //  //req.gridType = (GRID_TYPE)Random.Range(0, (int)GRID_TYPE.NUM_GRID);
+    //  req.gridType = (GRID_TYPE)GenerateWithDist(rp.waresDist);
+    //  SwingWeights((int)req.gridType, rp.waresDist);
+    //}
 
     // Reroll if the request is the same as any existing request
     foreach (MonsterRequest existing in requestBoxes)

@@ -13,6 +13,7 @@ public class TouchManager : MonoBehaviour
 
   void Awake()
   {
+    GameManager.Instance.WakeUp();
     cam = Camera.main;
     hit = new RaycastHit();
   }

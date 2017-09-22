@@ -14,7 +14,7 @@ public class LeaderboardManager : MonoBehaviour {
     globalNumText.GetComponent<Text>().text = "";
     highscoreObj.SetActive(false);
   }
-	
+
   public void TriggerLeaderboard()
   {
     UpdateGameEndBoard();
@@ -23,7 +23,7 @@ public class LeaderboardManager : MonoBehaviour {
 
 	void UpdateGameEndBoard()
   {
-    earningsText.GetComponent<TextMesh>().text = "$" + GameManager.Instance.scoreMan.totalScore;
+    earningsText.GetComponent<TextMesh>().text = "$" + GameManager.Instance.scoreMan.curInstantScore;
   }
 
   public void TriggerNewHighScore()

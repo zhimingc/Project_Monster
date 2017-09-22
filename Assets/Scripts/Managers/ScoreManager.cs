@@ -187,10 +187,19 @@ public class ScoreManager : MonoBehaviour {
         leaderboard[i].second = curInstantScore;
 
         // trigger for new highscore
+        GameManager.Instance.socialMan.ReportScore(curInstantScore, SOCIALBOARD.EARNINGS);
         GameManager.Instance.leaderboardMan.TriggerNewHighScore();
       }
     }
 
+    // update player prefs
+    for (int i = 0; i < leaderboard.Count; ++i)
+    {
+      PlayerPrefs.SetInt(leaderboard[i].first, leaderboard[i].second);
+
+      // to find the leaders on load
+      PlayerPrefs.SetString(((LEADERBOARD)i).ToString(), leaderboard[i].first);
+    }
     //DisplayLeaderboard();
   }
 
@@ -207,15 +216,6 @@ public class ScoreManager : MonoBehaviour {
     }
     leaderNames.text = leaderNameText;
     leaderNumbers.text = leaderNumText;
-
-    // update player prefs
-    for (int i = 0; i < leaderboard.Count; ++i)
-    {
-      PlayerPrefs.SetInt(leaderboard[i].first, leaderboard[i].second);
-
-      // to find the leaders on load
-      PlayerPrefs.SetString(((LEADERBOARD)i).ToString(), leaderboard[i].first);
-    }
   }
 
   public void LoadLeaderboard()
