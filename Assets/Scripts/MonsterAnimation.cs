@@ -100,6 +100,7 @@ public class MonsterAnimation : MonoBehaviour {
 
   public void MoveInFrom(Vector3 from)
   {
+    GetComponent<SpriteRenderer>().enabled = true;
     GetComponent<Animator>().SetBool("isMoving", true);
     parent.transform.position = from;
 

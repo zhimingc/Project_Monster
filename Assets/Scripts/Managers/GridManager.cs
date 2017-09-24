@@ -15,17 +15,30 @@ public class GridManager : MonoBehaviour {
     ConstructLevel();
   }
 
+  void Start()
+  {
+    // init depending on starting sequence
+    GameStateSettings();
+  }
+
+  void GameStateSettings()
+  {
+    switch (GameManager.Instance.gameState)
+    {
+      case GAME_STATE.TUTORIAL:
+        grid[0][1].SetActive(false);
+        grid[1][1].SetActive(false);
+        grid[1][0].SetActive(false);
+        break;
+      case GAME_STATE.START_SEQUENCE:
+
+        break;
+    }
+  }
+
   void Update()
   {
-    ////DEBUG
-    //if (Input.GetKeyDown(KeyCode.T))
-    //{
-    //  ApplyTurntable(true);
-    //}
-    //if (Input.GetKeyUp(KeyCode.T))
-    //{
-    //  ApplyTurntable(false);
-    //}
+
   }
 
   GameObject GetGrid(int x, int y)
@@ -157,12 +170,25 @@ public class GridManager : MonoBehaviour {
 
   public void ConstructLevel()
   {
-    ConstructGrid(gridSizeX, gridSizeY);
+    //ConstructGrid(gridSizeX, gridSizeY);
+
+    // Get level by reference
+    grid = new List<List<GameObject>>();
+
+    for (int x = 0; x < 2; ++x)
+    {
+      grid.Add(new List<GameObject>());
+      for (int y = 0; y < 2; ++y)
+      {
+        string gridToFind = "grid_" + x.ToString() + "x" + y.ToString();
+        grid[x].Add(GameObject.Find(gridToFind));
+      }
+    }
   }
 
   public void ConstructGrid(int[] gridSizes)
   {
-    ConstructGrid(gridSizes[0], gridSizes[1]);
+    //ConstructGrid(gridSizes[0], gridSizes[1]);
   }
 
   public void ToggleDinnerShiftGrids(bool flag)

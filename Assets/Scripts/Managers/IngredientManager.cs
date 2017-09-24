@@ -31,10 +31,17 @@ public class IngredientManager : MonoBehaviour {
   private int maxCountdown;
   private int maxLayout;
 
+  private bool startSeqFlag;
+  private bool tutorialFlag;
+  private int tutorialIngCounter;
+
   // Use this for initialization 
   void Awake () { 
     //spacing = GameObject.Find("grid_manager").GetComponent<GridManager>().spacing;
     gridBlockSize = GameObject.Find("grid_manager").GetComponent<GridManager>().gridBlockSize;
+    startSeqFlag = true;
+    tutorialFlag = false;
+    tutorialIngCounter = 0;
 
     // Init for sequential ingredient gen.
     ingredientTracker = 0;
@@ -50,23 +57,47 @@ public class IngredientManager : MonoBehaviour {
 
   void Start()
   {
-    // Start with 3 blocks
-    while (viewableAmt-- > 0)
+    // init depending on starting sequence
+    GameStateSettings();
+
+    LeanTween.delayedCall(GameProgression.startSeqDelay, () =>
     {
-      AddToIngredientQ();
-    }
+      // Start with 3 blocks
+      while (viewableAmt-- > 0)
+      {
+        AddToIngredientQ();
+      }
+
+      startSeqFlag = false;
+    });
 
     GameManager.Instance.turnCounter = 0;
   }
-	
-	// Update is called once per frame
-	void Update () {
-		if (Input.GetKeyDown(KeyCode.Z)) 
-    { 
-      GameObject newIngredient = SequentialIngredient(); 
-      AddIngredientToList(newIngredient); 
+
+  void GameStateSettings()
+  {
+    switch (GameManager.Instance.gameState)
+    {
+      case GAME_STATE.TUTORIAL:
+        usableAmt = 1;
+        viewableAmt = 2;
+        tutorialFlag = true;
+        break;
+      case GAME_STATE.START_SEQUENCE:
+
+        break;
     }
-	}
+  }
+
+  // Update is called once per frame
+  void Update()
+  {
+    if (Input.GetKeyDown(KeyCode.Z))
+    {
+      GameObject newIngredient = SequentialIngredient();
+      AddIngredientToList(newIngredient);
+    }
+  }
 
   void UpdateQueueUsability()
   {
@@ -87,6 +118,15 @@ public class IngredientManager : MonoBehaviour {
 
   public void AddToIngredientQ()
   {
+    if (tutorialFlag && ++tutorialIngCounter > 4)
+    {
+      if (tutorialIngCounter == 5)
+      {
+        GameManager.Instance.TutorialTrigger(0);
+      }
+      return;
+    }
+
     //GameObject newIngredient = RandomizeIngredient();
     GameObject newIngredient = SequentialIngredient();
     AddIngredientToList(newIngredient);
@@ -116,6 +156,9 @@ public class IngredientManager : MonoBehaviour {
     // Get random layout 
     int layout = GenerateLayout();
 
+    // only gen single blocks for tutorial
+    if (tutorialFlag) layout = 0;
+
     // Generate ingredient 
     GameObject genIngredient = GenerateIngredient(type, sauce, layout, transform);
     BlockBehaviour genScript = genIngredient.GetComponent<BlockBehaviour>();
@@ -128,7 +171,7 @@ public class IngredientManager : MonoBehaviour {
   }
 
   void AddIngredientToList(GameObject ingredient) 
-  { 
+  {
     // Add ingredient to list 
     ingredientList.Add(ingredient);
 
@@ -140,6 +183,7 @@ public class IngredientManager : MonoBehaviour {
   void UpdateQueuePositions()
   {
     float hardSetSpacing = 0.1f;
+
     for (int i = ingredientList.Count - 1, c = 0; i >= 0; --i, ++c)
     {
       Vector3 pos = ingredientList[i].transform.position;
@@ -147,15 +191,25 @@ public class IngredientManager : MonoBehaviour {
 
       if (isSpawnHorizontal)
       {
-        pos.x = transform.position.x + 
-          swing * (c * (-maxLayout - hardSetSpacing) * maxLayout * idleScaling - (gridBlockSize.x * idleScaling) / 2.0f);
+        pos.x = transform.position.x +
+          swing * c * (-maxLayout - hardSetSpacing) * maxLayout * idleScaling;// - (gridBlockSize.x * idleScaling) / 2.0f);
       }
       else
       {
         pos.y = transform.position.y + 
           swing * (c * (-maxLayout - hardSetSpacing) * maxLayout * idleScaling - (gridBlockSize.y * idleScaling) / 2.0f);
       }
-      ingredientList[i].transform.position = pos;
+
+      if (startSeqFlag)
+      {
+        ingredientList[i].GetComponent<IngredientBlock>().SlideIngredient(pos.x, 0.1f * (c+1), 0.25f * i);
+      }
+      else
+      {
+        ingredientList[i].GetComponent<IngredientBlock>().SlideIngredient(pos.x, 0.15f);
+      }
+
+      //ingredientList[i].transform.position = pos;
       ingredientList[i].GetComponent<IngredientBlock>().oldPos = pos;
 
     }
@@ -186,6 +240,7 @@ public class IngredientManager : MonoBehaviour {
         obj.transform.localScale = new Vector3(0.75f, 0.75f, 1.0f);
         break;
       case 1: // horizontal
+        objPos.x -= 0.25f;
         objPos.y = 0.0f;
         obj.transform.localPosition = objPos;
         break;
@@ -207,7 +262,7 @@ public class IngredientManager : MonoBehaviour {
     //Vector2 newScale = (ingredientSize + new Vector2(spacing, spacing)) * maxLayout; 
     Vector2 newScale = (ingredientSize) * maxLayout;
     parent.transform.localScale = newScale; 
-    parent.transform.position = t.position + new Vector3(newScale.x, -newScale.y, 0.0f) / (maxLayout * 2.0f);
+    parent.transform.position = t.position + new Vector3(0.0f, -newScale.y, 0.0f) / (maxLayout * 2.0f);
 
     // Create core of ingredient 
     GameObject ingredientHolder = new GameObject();

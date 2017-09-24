@@ -4,12 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SocialPlatforms;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 
 public enum SOCIALBOARD
 {
   EARNINGS,
   NUM_BOARDS
 };
+
 
 public class SocialManager : MonoBehaviour {
 
@@ -19,6 +21,8 @@ public class SocialManager : MonoBehaviour {
   private GameObject earningsText;
   private GameObject debugText;
   private string toDisplay = "";
+  string earningDisplay = "";
+  List<string> userIds;
 
   // Use this for initialization
   void Start () {
@@ -31,8 +35,7 @@ public class SocialManager : MonoBehaviour {
 #endif
 
     Login();
-    CreateLeaderboard();
-    InitSocial();
+    //InitSocial();
   }
 
   // Login/authenticate local user
@@ -51,8 +54,9 @@ public class SocialManager : MonoBehaviour {
       Debug.Log("Authenticated");
       // debug
       toDisplay = "Username: " + Social.localUser.userName +
-      "\nUser ID: " + Social.localUser.id +
-      "\nIsUnderage: " + Social.localUser.underage + "\n";
+      "\nID: " + Social.localUser.id + "\n";
+
+      CreateLeaderboard();
     }
     else
     {
@@ -69,14 +73,28 @@ public class SocialManager : MonoBehaviour {
     // earnings leaderboards
     boardID = GPGLeaderboardManager.leaderboard_highest_earnings;
 
+    earningLeaderboard = PlayGamesPlatform.Instance.CreateLeaderboard();
+    earningLeaderboard.id = boardID;
+    earningLeaderboard.LoadScores(ok =>
+    {
+      if (ok)
+      {
+        //LoadUsersAndDisplay(earningLeaderboard);
+      }
+      else {
+        Debug.Log("Error retrieving leaderboardi");
+      }
+    });
+
 #elif UNITY_IOS
     // boardID = SOCIALBOARD.EARNINGS.ToString();
-
-#endif
 
     // Create leaderboard instance
     earningLeaderboard = Social.CreateLeaderboard();
     earningLeaderboard.id = boardID;
+
+#endif
+
   }
 
   // Load leaderboard
@@ -85,20 +103,68 @@ public class SocialManager : MonoBehaviour {
     if (earningLeaderboard == null) return;
     // After loading scores how are the scores stored?
 
+    //earningDisplay = "";
+    PlayGamesPlatform.Instance.LoadScores(
+        GPGLeaderboardManager.leaderboard_highest_earnings,
+        LeaderboardStart.PlayerCentered,
+        10,
+        LeaderboardCollection.Public,
+        LeaderboardTimeSpan.AllTime,
+        (data) =>
+        {
+          toDisplay += "Leaderboard data valid: " + data.Valid;
+          toDisplay += "\n approx:" + data.ApproximateCount + " have " + data.Scores.Length;
+          toDisplay += "\n";
+          DisplayLeaderboard();
+
+          //UpdateLeaderboard_Android(data);
+
+          LoadUsersAndDisplay(data);
+          DisplayLeaderboard();
+
+          foreach (IScore score in data.Scores)
+          {
+            earningDisplay += score.rank.ToString() + ". ";
+            earningDisplay += score.userID + " ";
+            earningDisplay += score.value + "\n";
+          }
+
+          DisplayLeaderboard();
+        });
+
     // Load scores
-    earningLeaderboard.LoadScores(result =>
-    {
-      toDisplay += "Received " + earningLeaderboard.scores.Length.ToString() + " scores\n";
-      Debug.Log("Received " + earningLeaderboard.scores.Length + " scores");
-      //ShowLeaderboard();
-      DisplayLeaderboard();
-    });
+    //earningLeaderboard.LoadScores(result =>
+    //{
+    //  toDisplay += "Received " + earningLeaderboard.scores.Length.ToString() + " scores\n";
+    //  Debug.Log("Received " + earningLeaderboard.scores.Length + " scores");
+    //  //ShowLeaderboard();
+    //  DisplayLeaderboard();
+    //});
   }
 
   void ShowLeaderboard()
   {
     if (Social.localUser.authenticated)
       Social.ShowLeaderboardUI();
+  }
+
+  void UpdateLeaderboard_Android(LeaderboardScoreData lb)
+  {
+    //int playerRank = lb.PlayerScore.rank;
+    int playerRank = 0;
+
+    // start from two ranks up
+    playerRank -= 2;
+    for (int i = 0; i < 5; ++i)
+    {
+      int rank = playerRank + i;
+      if (rank < 0) continue;
+
+      IScore score = lb.Scores[rank];
+      earningDisplay += score.rank.ToString() + ". ";
+      earningDisplay += userIds[rank] + " ";
+      earningDisplay += score.value + "\n";
+    }
   }
 
   // Display leaderboard
@@ -108,17 +174,6 @@ public class SocialManager : MonoBehaviour {
 
     if (earningsText)
     {
-      string earningDisplay = "";
-      earningDisplay += earningLeaderboard.userScope + "\n";
-
-      for (int i = 0; i < earningLeaderboard.scores.Length; ++i)
-      {
-        earningDisplay += earningLeaderboard.scores[i].rank.ToString() + ": ";
-        earningDisplay += earningLeaderboard.scores[i].userID + " ";
-        earningDisplay += earningLeaderboard.scores[i].value.ToString();
-        earningDisplay += "\n";
-      }
-
       earningsText.GetComponent<Text>().text = earningDisplay;
     }
 
@@ -162,6 +217,48 @@ public class SocialManager : MonoBehaviour {
   {
     earningsText = GameObject.Find("global_leader_names");
     debugText = GameObject.Find("debug_names");
+
+    CreateLeaderboard();
   }
 
+  private IUserProfile FindUser(IUserProfile[] users, string userid)
+  {
+    foreach (IUserProfile user in users)
+    {
+      if (user.id == userid)
+      {
+        return user;
+      }
+    }
+    return null;
+  }
+
+
+  internal void LoadUsersAndDisplay(LeaderboardScoreData lb)
+  {
+    // get the user ids
+    userIds = new List<string>();
+
+    foreach (IScore score in lb.Scores)
+    {
+      userIds.Add(score.userID);
+    }
+
+    // load the profiles and display (or in this case, log)
+    Social.LoadUsers(userIds.ToArray(), (users) =>
+    {
+      toDisplay += "Leaderboard loading: " + lb.Title + " count = " +
+          lb.Scores.Length + "\n";
+      foreach (IScore score in lb.Scores)
+      {
+        IUserProfile user = FindUser(users, score.userID);
+        toDisplay += score.formattedValue + " by " +
+            (string)(
+                (user != null) ? user.userName : "**unk_" + score.userID + "**");
+        toDisplay += "\n";
+
+        DisplayLeaderboard();
+      }
+    });
+  }
 }

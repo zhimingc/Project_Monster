@@ -13,6 +13,8 @@ public enum LOSE_REASON
 
 public enum GAME_STATE
 {
+  TUTORIAL,
+  START_SEQUENCE,
   PLAYING,
   LOSE,
 }
@@ -113,12 +115,12 @@ public class GameManager : Singleton<GameManager>
   private UIManager uiMan;
   //private BackgroundManager backMan;
   private Cursor cursorScript;
-  private ConsecutiveManager consecMan;
+  //private ConsecutiveManager consecMan;
   private StoreManager storeMan;
   private AdsManager adsMan;
 
 #if UNITY_ANDROID
-  private GPGDemo gpgDemo;
+  //private GPGDemo gpgDemo;
 #endif 
 
   private bool isPaused;
@@ -134,7 +136,7 @@ public class GameManager : Singleton<GameManager>
     GameFeel.GameFeelInit();
 
     isPaused = false;
-    startWithHelp = false;
+    startWithHelp = true;
     scoreMan = gameObject.AddComponent<ScoreManager>();
     sfxMan = gameObject.AddComponent<SFXManager>();
     musicMan = gameObject.AddComponent<MusicManager>();
@@ -170,12 +172,10 @@ public class GameManager : Singleton<GameManager>
 
     // Loading
     LoadMonsterVar();
-  }
 
-  //void ResetToDayOne()
-  //{
-  //  gameData.count_days = 0;
-  //}
+    SetGameState(GAME_STATE.TUTORIAL);
+    SetGameState(GAME_STATE.START_SEQUENCE);
+  }
 
   void ToggleSplashScreens()
   {
@@ -229,8 +229,6 @@ public class GameManager : Singleton<GameManager>
 
       // contract icon display
       //InitContractIcons();
-
-      //if (startWithHelp) ToggleHelpScreen();
     }
 
     // Manager in Setup screen
@@ -348,19 +346,6 @@ public class GameManager : Singleton<GameManager>
     }
   }
 
-  void ToggleHelpScreen()
-  {
-    //if (SceneManager.GetActiveScene().name == "vertical-phone")
-    //{
-    //  bool flag = uiMan.helpText.enabled;
-    //  uiMan.ToggleHelpText(!flag);
-    //  gridMan.ToggleGrid(flag);
-
-    //  // hack
-    //  helpToggler = false;
-    //}
-  }
-
   private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
   {
     // start the scene with pause off
@@ -380,7 +365,13 @@ public class GameManager : Singleton<GameManager>
         GameObject.FindWithTag("PopularityMan").GetComponent<PopularityManager>().TriggerPopularityUpdate();
 
       // animate day sign
-      if (dayMan) dayMan.PlayShiftSign(DAY_STATE.BREAKFAST);
+      if (dayMan)
+      {
+        LeanTween.delayedCall(GameProgression.startSeqDelay, () =>
+        {
+          dayMan.PlayShiftSign(DAY_STATE.BREAKFAST);
+        });
+      }
     });
 
     // splash screen behaviour
@@ -414,7 +405,7 @@ public class GameManager : Singleton<GameManager>
 
     // Check for day change
     //dayMan.UpdateProgressBar();
-    dayMan.CheckForShiftChange();
+    //dayMan.CheckForShiftChange();
   }
 
   public void SetGameState(GAME_STATE state)
@@ -588,14 +579,7 @@ public class GameManager : Singleton<GameManager>
         musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
         break;
       case BUTTON_TYPE.START_HELP_BASIC:
-        if (SceneManager.GetActiveScene().name == "screen-howtoplay-tips")
-        {
-          LoadSceneVanilla("screen-howtoplay-basic");
-        }
-        else
-        {
-          LoadSceneWithTransition("screen-howtoplay-basic");
-        }
+        Button_ToGame(GAME_STATE.TUTORIAL);
         break;
       case BUTTON_TYPE.START_HELP_TIPS:
         LoadSceneVanilla("screen-howtoplay-tips");
@@ -655,7 +639,15 @@ public class GameManager : Singleton<GameManager>
         GameManagerReset();
         break;
       case BUTTON_TYPE.TO_GAME:
-        Button_ToGame();
+        if (startWithHelp)
+        {
+          startWithHelp = false;
+          Button_ToGame(GAME_STATE.TUTORIAL);
+        }
+        else
+        {
+          Button_ToGame();
+        }
         break;
       case BUTTON_TYPE.DEBUG_LEVELSKIP:
         //++gameData.count_days;
@@ -692,7 +684,6 @@ public class GameManager : Singleton<GameManager>
         {
           LoadSceneWithTransition("screen-setup-tools");
         }
-        //scoreMan.TriggerUpdateLeaderboard();
         break;
       case BUTTON_TYPE.STORE_BUYPOSTER:
         storeMan.TriggerBuySign(true);
@@ -705,13 +696,15 @@ public class GameManager : Singleton<GameManager>
         storeMan.TriggerBuySign(false);
         break;
       case BUTTON_TYPE.TO_STORE:
+        musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
         LoadSceneWithTransition("screen-store");
         break;
     }
   }
 
-  void Button_ToGame()
+  void Button_ToGame(GAME_STATE state = GAME_STATE.START_SEQUENCE)
   {
+    SetGameState(state);
     LoadSceneWithTransition("vertical-phone");
     musicMan.ToggleBGM(BGM_CLIPS.LEVEL);
   }
@@ -736,22 +729,6 @@ public class GameManager : Singleton<GameManager>
   {
     return gameData.pop_total;
   }
-
-  // to check for days ending early for day 1/2
-  public bool CheckIfDayEnds(DAY_STATE state)
-  {
-    //if ((DAYS)gameData.count_days == DAYS.BREAKFAST 
-    //  && state == DAY_STATE.LUNCH) return true;
-    //if ((DAYS)gameData.count_days == DAYS.LUNCH
-    //  && state == DAY_STATE.DINNER) return true;
-
-    return false;
-  }
-
-  //public void AddToDayCount(int amt)
-  //{
-  //  gameData.count_days += amt;
-  //}
 
   void GameManagerReset()
   {
@@ -805,6 +782,22 @@ public class GameManager : Singleton<GameManager>
   {
     storeMan.TriggerBuySign(false);
     storeMan.ConfirmBuy();
+  }
+
+  public void TutorialTrigger(int step)
+  {
+    // step 0 triggers monster
+    // step 1 triggers end of tutorial
+
+    switch (step)
+    {
+      case 0:
+        monsterMan.TriggerMiddleMonster();
+        break;
+      case 1:
+        Button_ToGame();
+        break;
+    }
   }
 }
 

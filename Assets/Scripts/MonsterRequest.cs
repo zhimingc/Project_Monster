@@ -39,7 +39,7 @@ public class MonsterRequest : MonoBehaviour {
   public GameObject pickyIndicator;
 
   // Use this for initialization
-  void Start () {
+  void Awake () {
     originScale = transform.localScale;
   }
 	
@@ -104,9 +104,9 @@ public class MonsterRequest : MonoBehaviour {
     LeanTween.cancel(gameObject);
 
     speechBubble.GetComponent<SpriteRenderer>().enabled = flag;
+
     if (flag == true)
     {
-      transform.localScale = new Vector3(0, 0, 0);
       LeanTween.delayedCall(gameObject, 0.25f, () => 
       {
         LeanTween.scale(gameObject, originScale, 1.0f).setEase(LeanTweenType.easeInOutQuad);

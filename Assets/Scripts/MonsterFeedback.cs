@@ -16,9 +16,14 @@ public class MonsterFeedback : MonoBehaviour {
     origin = transform.localPosition;
   }
 
-  public void PlayServedFeedback(int score, float time)
+  public void PlayParticles()
   {
     particlesObj.GetComponent<ParticleSystem>().Stop();
+    particlesObj.GetComponent<ParticleSystem>().Play();
+  }
+
+  public void PlayServedFeedback(int score, float time)
+  {
     LeanTween.cancel(gameObject);
     transform.localPosition = origin;
     scoreText.SetActive(true);
@@ -27,7 +32,6 @@ public class MonsterFeedback : MonoBehaviour {
     scoreText.GetComponent<TextMesh>().text = "$" + score.ToString();
     timeText.GetComponent<TextMesh>().text = "+" + time.ToString("0.0");
 
-    particlesObj.GetComponent<ParticleSystem>().Play();
     LeanTween.moveLocalY(gameObject, 0.0f, 1.5f);
     LeanTween.delayedCall(gameObject, 1.25f, () =>
     {

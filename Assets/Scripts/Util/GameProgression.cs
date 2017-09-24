@@ -44,6 +44,7 @@ public static class GameProgression {
     //1500, // picky 
   };
 
+  public static float startSeqDelay = 0.25f;
 
   public static string[] dayFlavText = new string[(int)CONSEC_DAYS.NUM_CONSEC]
   {
@@ -55,10 +56,10 @@ public static class GameProgression {
 
   public static string[] eventFlavText = new string[(int)MONSTER_EVENT.NUM_EVENTS]
 {
-    "First day on the job",
+    "Kitchen open!",
     "feed 30 monsters!",
     "Main event",
     "feed monsters to add time",
-    "Monsters are here!",
+    "Monster kitchen open!",
 };
 }

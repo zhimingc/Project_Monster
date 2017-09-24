@@ -16,7 +16,7 @@ public class GridScript : MonoBehaviour {
   public bool canServe;         // flag to indicate if this grid meets any requests
   public MonsterRequest monReq;   // request this grid meets
 
-  private List<GameObject> stackObjs;
+  public List<GameObject> stackObjs;
   private PlayerScript playerScript;
   private GridManager gridMan;
   private INGREDIENT_TYPE tmpHold; // Holds ingredient for eater
@@ -25,8 +25,8 @@ public class GridScript : MonoBehaviour {
   private bool isPickedUp;
 
   // feedback
-  private ParticleSystem psObj;
-  private GameObject exclaimObj;
+  public ParticleSystem psObj;
+  public GameObject exclaimObj;
   //private Vector3 originalScale;
 
   // turntable variables
@@ -53,10 +53,10 @@ public class GridScript : MonoBehaviour {
     comboSignObj.SetActive(false);
     //originalScale = comboSignObj.transform.localScale;
 
-    psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
-    exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);
-    monsterServeObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/monster_serve"), transform);
-    monsterServeObj.transform.localPosition -= new Vector3(0, 0.25f, 0);
+    //psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
+    //exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);
+    //monsterServeObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/monster_serve"), transform);
+    //monsterServeObj.transform.localPosition -= new Vector3(0, 0.25f, 0);
 
     // Init can serve variables
     SetCanServe(false);
@@ -74,7 +74,7 @@ public class GridScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
     // Generate ingredient stack game objs
-    GenerateIngredientMold();
+    //GenerateIngredientMold();
 
     UpdateStackDisplay();
 
@@ -105,29 +105,29 @@ public class GridScript : MonoBehaviour {
 
   void GenerateIngredientMold()
   {
-    stackObjs = new List<GameObject>();
-    ingredientSidePos = new List<Vector3>();
-    rotateFromPos = new Vector3[maxIngredients];
+  //  stackObjs = new List<GameObject>();
+  //  ingredientSidePos = new List<Vector3>();
+  //  rotateFromPos = new Vector3[maxIngredients];
 
-    for (int i = 0; i < maxIngredients; ++i)
-    {
-      GameObject ingredient = Instantiate(ingredientSide);
-      Vector3 localScale = transform.localScale;
-      localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.5f, 1.0f));
-      ingredient.transform.localScale = localScale;
+  //  for (int i = 0; i < maxIngredients; ++i)
+  //  {
+  //    GameObject ingredient = Instantiate(ingredientSide);
+  //    Vector3 localScale = transform.localScale;
+  //    localScale = Vector3.Scale(localScale, new Vector3(0.4f, 0.5f, 1.0f));
+  //    ingredient.transform.localScale = localScale;
 
-      ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.25f + i * localScale.y / 2.5f, -1.0f);
-      ingredient.transform.SetParent(transform);
-      //ingredient.transform.localPosition = new Vector3(0, -transform.localScale.y / 10.0f + i * localScale.y / 5.0f, 0);
-      //ingredient.transform.localPosition = new Vector3(0, i * localScale.y / 5.0f, 0);
+  //    ingredient.transform.position = transform.position + new Vector3(0, -transform.localScale.y / 3.25f + i * localScale.y / 2.5f, -1.0f);
+  //    ingredient.transform.SetParent(transform);
+  //    //ingredient.transform.localPosition = new Vector3(0, -transform.localScale.y / 10.0f + i * localScale.y / 5.0f, 0);
+  //    //ingredient.transform.localPosition = new Vector3(0, i * localScale.y / 5.0f, 0);
 
-      stackObjs.Add(ingredient);
-      rotateFromPos[i] = ingredient.transform.position;
-      ingredientSidePos.Add(ingredient.transform.position - transform.position);
-    }
+  //    stackObjs.Add(ingredient);
+  //    rotateFromPos[i] = ingredient.transform.position;
+  //    ingredientSidePos.Add(ingredient.transform.position - transform.position);
+  //  }
 
-    // Deactivate the top ingredient
-    stackObjs[stackObjs.Count - 1].GetComponent<SpriteRenderer>().enabled = false;
+  //  // Deactivate the top ingredient
+  //  stackObjs[stackObjs.Count - 1].GetComponent<SpriteRenderer>().enabled = false;
   }
 
   void GridMouseUp()

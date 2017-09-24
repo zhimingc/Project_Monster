@@ -33,6 +33,8 @@ public class Request
 {
   public Request()
   {
+    monsterType = MONSTER_TYPE.NORMAL;
+    typeParams.curTimer = typeParams.maxTimer;
     ingredients = new List<INGREDIENT_TYPE>();
     sauce = SAUCE_TYPE.EMPTY;
   }
@@ -113,23 +115,51 @@ public class MonsterManager : MonoBehaviour {
     GameManager.Instance.gameData.pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
     GameManager.Instance.gameData.pop_monsters[0] = 100.0f;
 
-    // Init request boxes
-    foreach (MonsterRequest box in requestBoxes)
-    {
-      Request req = GenerateRandomRequest();
-
-      box.InitStack();
-      box.SetRequest(req);
-
-      // apply any grid effects
-      GameManager.Instance.gridMan.MonsterAffectGrid(box.request);
-    }
+    // settings for tutorial or start sequence
+    GameStateSettings();
 
     monsterSpawnCounter = 0;
   }
-	
-	// Update is called once per frame
-	void Update () {
+
+  void GameStateSettings()
+  {
+    switch (GameManager.Instance.gameState)
+    {
+      case GAME_STATE.TUTORIAL:
+        // Init request boxes
+        foreach (MonsterRequest box in requestBoxes)
+        {
+          box.InitStack();
+          box.transform.localScale = new Vector3(0, 0, 0);
+          box.monsterObj.GetComponent<SpriteRenderer>().enabled = false;
+        }
+        break;
+      case GAME_STATE.START_SEQUENCE:
+        // Init request boxes
+        float delay = 1.5f;
+        foreach (MonsterRequest box in requestBoxes)
+        {
+          Request req = GenerateRandomRequest();
+
+          box.InitStack();
+          box.SetRequest(req);
+          box.transform.localScale = new Vector3(0, 0, 0);
+          box.monsterObj.GetComponent<SpriteRenderer>().enabled = false;
+
+          Vector3 moveIn = box.transform.position;
+          moveIn.x = -7;
+          LeanTween.delayedCall(delay, () =>
+          {
+            box.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
+          });
+          delay -= 0.5f;
+        }
+        break;
+    }
+  }
+
+  // Update is called once per frame
+  void Update () {
     // debug testing
     if (Input.GetKeyDown(KeyCode.T))
     {
@@ -245,6 +275,23 @@ public class MonsterManager : MonoBehaviour {
 
   public void ServeMonsterRequest(GridScript gs, MonsterRequest reqBox)
   {
+    // end tutorial after serving
+    if (GameManager.Instance.gameState == GAME_STATE.TUTORIAL)
+    {
+      MonsterMoveOut(reqBox);
+      RequestMetFeedback(reqBox);
+      reqBox.monsterObj.SetActive(false);
+      reqBox.gameObject.SetActive(false);
+      gs.TriggerServed(reqBox);
+
+      LeanTween.delayedCall(1.0f, () =>
+      {
+        GameManager.Instance.TutorialTrigger(1);
+      });
+
+      return;
+    }
+
     // update combo man with another combo
     GameManager.Instance.comboMan.AddComboCount();
 
@@ -261,7 +308,7 @@ public class MonsterManager : MonoBehaviour {
     // update popularity of monsters
     GameManager.Instance.UpdateMonsterPopularity();
 
-    // // request has been met
+    // request has been met
     if (gs != null)
     {
       gs.TriggerServed(reqBox);
@@ -272,20 +319,11 @@ public class MonsterManager : MonoBehaviour {
 
     // feedback for request met
     reqBox.monsterFbScript.PlayServedFeedback(scoreAdded, timeAdded);
-    GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
-    PlayEatingSound();
+    RequestMetFeedback(reqBox);
 
     // Animate monsters in/out
-    reqBox.monsterObj.GetComponent<MonsterAnimation>().ForceMoveComplete();
     Vector3 monsPos = reqBox.monsterObj.GetComponent<MonsterAnimation>().origin;
-    foreach (GameObject reserve in reserveMonsters)
-    {
-      MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
-      if (anim.isAnimating()) continue;
-      anim.InitSprite(reqBox.request);
-      anim.MoveOutFrom(monsPos);
-      break;
-    }
+    MonsterMoveOut(reqBox);
 
     //Vector3 moveIn = reqBox.transform.position;
     Vector3 moveIn = monsPos;
@@ -299,18 +337,27 @@ public class MonsterManager : MonoBehaviour {
     CheckRequestMetAll();
   }
 
-  //public void AddSauceToAllRequests()
-  //{
-  //  for (int i = 0; i < requestBoxes.Count; ++i)
-  //  {
-  //    Request req = requestBoxes[i].request;
-  //    req.sauce = (SAUCE_TYPE)GenerateWithDist(rp.sauceDist);
-  //    SwingWeights((int)req.sauce, rp.sauceDist);
+  void RequestMetFeedback(MonsterRequest reqBox)
+  {
+    // feedback for request met
+    reqBox.monsterFbScript.PlayParticles();
+    GameFeel.ShakeCameraRandom(new Vector3(0.05f, 0.05f, 0.0f), new Vector3(-0.05f, -0.05f, 0.0f), 4, 0.2f);
+    PlayEatingSound();
+  }
 
-  //    requestBoxes[i].SetRequest(req);
-  //  }
-
-  //}
+  void MonsterMoveOut(MonsterRequest reqBox)
+  {
+    reqBox.monsterObj.GetComponent<MonsterAnimation>().ForceMoveComplete();
+    Vector3 monsPos = reqBox.monsterObj.GetComponent<MonsterAnimation>().origin;
+    foreach (GameObject reserve in reserveMonsters)
+    {
+      MonsterAnimation anim = reserve.GetComponentInChildren<MonsterAnimation>();
+      if (anim.isAnimating()) continue;
+      anim.InitSprite(reqBox.request);
+      anim.MoveOutFrom(monsPos);
+      break;
+    }
+  }
 
   void PlayEatingSound()
   {
@@ -505,5 +552,23 @@ public class MonsterManager : MonoBehaviour {
     {
       req.UpdateRequest();
     }
+  }
+
+  // for tutorial
+  public void TriggerMiddleMonster()
+  {
+    MonsterRequest box = requestBoxes[1];
+    Request req = new Request();
+    req.ingredients = new List<INGREDIENT_TYPE>();
+    req.ingredients.Add(INGREDIENT_TYPE.BREAD);
+    req.ingredients.Add(INGREDIENT_TYPE.MEAT);
+    req.ingredients.Add(INGREDIENT_TYPE.BREAD);
+
+    box.SetRequest(req);
+    box.monsterObj.GetComponent<SpriteRenderer>().enabled = false;
+
+    Vector3 moveIn = box.monsterObj.transform.position;
+    moveIn.x = -7;
+    box.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
   }
 }

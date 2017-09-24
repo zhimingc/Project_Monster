@@ -26,6 +26,6 @@ public static class GPGLeaderboardManager
 {
   public const string leaderboard_highest_spending = "CgkIxrXZu7UHEAIQAg"; // <GPGSID>
   public const string leaderboard_highest_earnings = "CgkIxrXZu7UHEAIQAQ"; // <GPGSID>
-
+ 
 }
 

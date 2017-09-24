@@ -132,4 +132,20 @@ public class IngredientBlock : BlockBehaviour
       transform.localScale = idleScale * 0.75f;
     }
   }
+
+  public void SlideIngredient(float amt, float speed, float delay = 0.0f)
+  {
+    LeanTween.cancel(gameObject);
+    if (delay == 0.0f)
+    {
+      LeanTween.moveX(gameObject, amt, speed);
+    }
+    else
+    {
+      LeanTween.delayedCall(gameObject, delay, () =>
+      {
+        LeanTween.moveX(gameObject, amt, speed);
+      });
+    }
+  }
 }
