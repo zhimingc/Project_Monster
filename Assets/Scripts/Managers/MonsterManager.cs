@@ -146,7 +146,7 @@ public class MonsterManager : MonoBehaviour {
           box.transform.localScale = new Vector3(0, 0, 0);
           box.monsterObj.GetComponent<SpriteRenderer>().enabled = false;
 
-          Vector3 moveIn = box.transform.position;
+          Vector3 moveIn = box.monsterObj.transform.position;
           moveIn.x = -7;
           LeanTween.delayedCall(delay, () =>
           {
@@ -329,6 +329,7 @@ public class MonsterManager : MonoBehaviour {
     Vector3 moveIn = monsPos;
     moveIn.x = -7;
     reqBox.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
+
 
     // get the next request
     UpdateRequestMet(reqBox);

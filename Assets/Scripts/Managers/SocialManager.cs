@@ -103,6 +103,7 @@ public class SocialManager : MonoBehaviour {
     if (earningLeaderboard == null) return;
     // After loading scores how are the scores stored?
 
+#if UNITY_ANDROID
     //earningDisplay = "";
     PlayGamesPlatform.Instance.LoadScores(
         GPGLeaderboardManager.leaderboard_highest_earnings,
@@ -131,7 +132,9 @@ public class SocialManager : MonoBehaviour {
 
           DisplayLeaderboard();
         });
+#elif UNITY_IOS
 
+#endif
     // Load scores
     //earningLeaderboard.LoadScores(result =>
     //{
@@ -148,6 +151,7 @@ public class SocialManager : MonoBehaviour {
       Social.ShowLeaderboardUI();
   }
 
+#if UNITY_ANDROID
   void UpdateLeaderboard_Android(LeaderboardScoreData lb)
   {
     //int playerRank = lb.PlayerScore.rank;
@@ -166,6 +170,7 @@ public class SocialManager : MonoBehaviour {
       earningDisplay += score.value + "\n";
     }
   }
+#endif
 
   // Display leaderboard
   void DisplayLeaderboard()
@@ -174,12 +179,12 @@ public class SocialManager : MonoBehaviour {
 
     if (earningsText)
     {
-      earningsText.GetComponent<Text>().text = earningDisplay;
+      //earningsText.GetComponent<Text>().text = earningDisplay;
     }
 
     if (debugText)
     {
-      debugText.GetComponent<Text>().text = toDisplay;
+      //debugText.GetComponent<Text>().text = toDisplay;
     }
   }
 
@@ -233,7 +238,7 @@ public class SocialManager : MonoBehaviour {
     return null;
   }
 
-
+#if UNITY_ANDROID
   internal void LoadUsersAndDisplay(LeaderboardScoreData lb)
   {
     // get the user ids
@@ -261,4 +266,6 @@ public class SocialManager : MonoBehaviour {
       }
     });
   }
+#endif
+
 }

@@ -60,6 +60,6 @@ public static class GameProgression {
     "feed 30 monsters!",
     "Main event",
     "feed monsters to add time",
-    "Monster kitchen open!",
+    "kitchen open!",
 };
 }

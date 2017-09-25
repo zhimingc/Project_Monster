@@ -367,7 +367,7 @@ public class GameManager : Singleton<GameManager>
       // animate day sign
       if (dayMan)
       {
-        LeanTween.delayedCall(GameProgression.startSeqDelay, () =>
+        LeanTween.delayedCall(GameProgression.startSeqDelay + 1.5f, () =>
         {
           dayMan.PlayShiftSign(DAY_STATE.BREAKFAST);
         });
@@ -641,7 +641,6 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.TO_GAME:
         if (startWithHelp)
         {
-          startWithHelp = false;
           Button_ToGame(GAME_STATE.TUTORIAL);
         }
         else
@@ -672,7 +671,7 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.GAME_LEADERBOARD:
         LoadSceneWithTransition("screen-leaderboard");
         //gpgDemo.OnShowLeaderBoard();
-        //scoreMan.TriggerUpdateLeaderboard();
+        scoreMan.TriggerUpdateLeaderboard();
         break;
       case BUTTON_TYPE.GAME_EVENTSELECT:
         MonsterEventManager eventMan = GameObject.Find("event_parent").GetComponent<MonsterEventManager>();
@@ -795,6 +794,7 @@ public class GameManager : Singleton<GameManager>
         monsterMan.TriggerMiddleMonster();
         break;
       case 1:
+        startWithHelp = false;
         Button_ToGame();
         break;
     }

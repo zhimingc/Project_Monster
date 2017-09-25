@@ -104,7 +104,6 @@ public class MonsterRequest : MonoBehaviour {
     LeanTween.cancel(gameObject);
 
     speechBubble.GetComponent<SpriteRenderer>().enabled = flag;
-
     if (flag == true)
     {
       LeanTween.delayedCall(gameObject, 0.25f, () => 

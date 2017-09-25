@@ -101,20 +101,27 @@ public class MonsterAnimation : MonoBehaviour {
   public void MoveInFrom(Vector3 from)
   {
     GetComponent<SpriteRenderer>().enabled = true;
-    GetComponent<Animator>().SetBool("isMoving", true);
     parent.transform.position = from;
 
-    LeanTween.move(parent, origin, animTime).setEase(LeanTweenType.easeInOutQuad);
-    LeanTween.delayedCall(gameObject, animTime, () =>
+    MonsterRequest req = requestObj.GetComponent<MonsterRequest>();
+    req.transform.localScale = new Vector3(0, 0, 0);
+
+    LeanTween.delayedCall(0.5f, () =>
     {
-      GetComponent<Animator>().SetBool("isMoving", false);
+      GetComponent<Animator>().SetBool("isMoving", true);
+
+      LeanTween.move(parent, origin, animTime).setEase(LeanTweenType.easeInOutQuad);
+      LeanTween.delayedCall(gameObject, animTime, () =>
+      {
+        GetComponent<Animator>().SetBool("isMoving", false);
+      });
+
+      if (req != null)
+      {
+        req.ToggleSpeechBubble(true);
+      }
     });
 
-    MonsterRequest req = requestObj.GetComponent<MonsterRequest>();
-    if (req != null)
-    {
-      req.ToggleSpeechBubble(true);
-    }
   }
 
   public void MoveOutFrom(Vector3 from)

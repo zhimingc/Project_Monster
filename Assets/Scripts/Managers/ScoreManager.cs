@@ -228,7 +228,8 @@ public class ScoreManager : MonoBehaviour {
       if (name == "") continue;
 
       leaderboard[i].first = name;
-      leaderboard[i].second = PlayerPrefs.GetInt(name); }
+      leaderboard[i].second = PlayerPrefs.GetInt(name);
+    }
   }
 
 }
