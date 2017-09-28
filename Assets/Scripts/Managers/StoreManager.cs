@@ -5,6 +5,7 @@ using UnityEngine;
 public class StoreManager : MonoBehaviour {
 
   public GameObject buySignObj, notEnoughText;
+  public GameObject[] buySignButtons;
   public GameObject earningsText, stampText;
   public GameObject unlockParticles;
   public int buyCost;
@@ -67,6 +68,7 @@ public class StoreManager : MonoBehaviour {
     }
     if (Input.GetKeyDown(KeyCode.U))
     {
+      earnings += 1000;
       ConfirmBuy();
     }
   }
@@ -116,8 +118,33 @@ public class StoreManager : MonoBehaviour {
     }
   }
 
+  void ToggleMonsterCols(bool flag)
+  {
+    for (int i = 0; i < monsterVarObjs.Count; ++i)
+    {
+      for (int j = 0; j < monsterVarObjs[i].Count; ++j)
+      {
+        monsterVarObjs[i][j].GetComponent<BoxCollider2D>().enabled = flag;
+      }
+    }
+  }
+
+  public void ToggleButtonCols(bool flag)
+  {
+    foreach (GameObject button in buySignButtons)
+    {
+      button.GetComponent<BoxCollider2D>().enabled = flag;
+    }
+  }
+
   public void TriggerBuySign(bool flag)
   {
+    // turn off monster cols
+    ToggleMonsterCols(!flag);
+
+    // activate button cols when lowering sign else turn off
+    ToggleButtonCols(flag);
+
     // check if player has enough earnings
     if (earnings < buyCost)
     {

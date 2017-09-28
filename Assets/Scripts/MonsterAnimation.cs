@@ -106,7 +106,7 @@ public class MonsterAnimation : MonoBehaviour {
     MonsterRequest req = requestObj.GetComponent<MonsterRequest>();
     req.transform.localScale = new Vector3(0, 0, 0);
 
-    LeanTween.delayedCall(0.5f, () =>
+    LeanTween.delayedCall(0.25f, () =>
     {
       GetComponent<Animator>().SetBool("isMoving", true);
 

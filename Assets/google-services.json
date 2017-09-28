@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "144578276112",
+    "firebase_url": "https://monster-kitchen-67a1f.firebaseio.com",
+    "project_id": "monster-kitchen-67a1f",
+    "storage_bucket": "monster-kitchen-67a1f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144578276112:android:3c75b9a8979379be",
+        "android_client_info": {
+          "package_name": "com.NoMoss.MonsterKitchen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144578276112-ls6nalg945b24u2cldllln4g75djhk9d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvpym88e-IBU_rIBX9q6Zv8WkjLp96hgI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

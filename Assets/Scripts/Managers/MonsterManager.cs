@@ -136,7 +136,7 @@ public class MonsterManager : MonoBehaviour {
         break;
       case GAME_STATE.START_SEQUENCE:
         // Init request boxes
-        float delay = 1.5f;
+        float delay = 0.75f;
         foreach (MonsterRequest box in requestBoxes)
         {
           Request req = GenerateRandomRequest();
@@ -152,7 +152,7 @@ public class MonsterManager : MonoBehaviour {
           {
             box.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
           });
-          delay -= 0.5f;
+          delay -= 0.25f;
         }
         break;
     }

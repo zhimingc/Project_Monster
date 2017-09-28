@@ -95,12 +95,14 @@ public class SocialManager : MonoBehaviour {
 
 #endif
 
+    LoadLeaderboard();
   }
 
   // Load leaderboard
   public void LoadLeaderboard()
   {
-    if (earningLeaderboard == null) return;
+    if (!Social.localUser.authenticated || 
+      earningLeaderboard == null) return;
     // After loading scores how are the scores stored?
 
 #if UNITY_ANDROID

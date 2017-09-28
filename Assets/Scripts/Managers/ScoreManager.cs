@@ -39,14 +39,17 @@ public class ScoreManager : MonoBehaviour {
     //};
 
     // init leaderboard from player pref
+    Reset();
+    LoadLeaderboard();
+  }
+
+  void InitLeaderboard()
+  {
     leaderboard = new List<Pair<string, int>>();
     for (int i = 0; i < 9; ++i)
     {
       leaderboard.Add(new Pair<string, int>("-", 0));
     }
-    LoadLeaderboard();
-
-    Reset();
   }
 
   public void TriggerUpdateLeaderboard()
@@ -61,6 +64,7 @@ public class ScoreManager : MonoBehaviour {
     curScore = 0;
     curInstantScore = 0;
     totalScore = 0;
+    InitLeaderboard();
 
     scoreBreakdown = new int[3][];
     for (int i = 0; i < scoreBreakdown.Length; ++i)
@@ -193,13 +197,8 @@ public class ScoreManager : MonoBehaviour {
     }
 
     // update player prefs
-    for (int i = 0; i < leaderboard.Count; ++i)
-    {
-      PlayerPrefs.SetInt(leaderboard[i].first, leaderboard[i].second);
+    SaveLeaderboard();
 
-      // to find the leaders on load
-      PlayerPrefs.SetString(((LEADERBOARD)i).ToString(), leaderboard[i].first);
-    }
     //DisplayLeaderboard();
   }
 
@@ -211,8 +210,11 @@ public class ScoreManager : MonoBehaviour {
     string leaderNameText = "", leaderNumText = "";
     for (int i = 0; i < leaderboard.Count; ++i)
     {
-      leaderNameText += (i + 1) + ". " + leaderboard[i].first + "\n";
-      leaderNumText += "$" + leaderboard[i].second.ToString() + "\n";
+      string scoreText = "-";
+      if (leaderboard[i].second > 0) scoreText = "$" + leaderboard[i].second.ToString();
+
+      leaderNameText += (i + 1) + ": " + scoreText + "\n";
+      //leaderNumText += "$" + leaderboard[i].second.ToString() + "\n";
     }
     leaderNames.text = leaderNameText;
     leaderNumbers.text = leaderNumText;
@@ -223,13 +225,24 @@ public class ScoreManager : MonoBehaviour {
     // update player prefs
     for (int i = 0; i < leaderboard.Count; ++i)
     {
-      string name = PlayerPrefs.GetString(((LEADERBOARD)i).ToString());
-      // skip if entry could not be found
-      if (name == "") continue;
+      //string name = PlayerPrefs.GetString(((LEADERBOARD)i).ToString());
+      //// skip if entry could not be found
+      //if (name == "") continue;
 
-      leaderboard[i].first = name;
-      leaderboard[i].second = PlayerPrefs.GetInt(name);
+      //leaderboard[i].first = name;
+      leaderboard[i].second = PlayerPrefs.GetInt("rank" + i.ToString());
     }
+  }
+
+  public void SaveLeaderboard()
+  {
+    // update player prefs
+    for (int i = 0; i < leaderboard.Count; ++i)
+    {
+      PlayerPrefs.SetInt("rank" + i.ToString(), leaderboard[i].second);
+    }
+
+    PlayerPrefs.Save();
   }
 
 }

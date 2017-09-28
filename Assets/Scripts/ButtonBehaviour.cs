@@ -32,20 +32,42 @@ public enum BUTTON_TYPE
   STORE_CONFIRM,
   STORE_CANCEL,
   STORE_PUTPOSTER,
-  TO_STORE
+  TO_STORE,
+  RESET_CONFIRM,
+  RESET_CANCEL,
+  QUIT_CONFIRM,
+  QUIT_CANCEL,
+  QUIT_LEVEL
 }
 
 public class ButtonBehaviour : MonoBehaviour {
 
   public BUTTON_TYPE type;
+  private Vector3 originScale;
 
   void Start()
   {
+    originScale = transform.localScale;
+
     GameManager.Instance.ButtonInit(type, this);
+  }
+
+  void Update()
+  {
+    if (InputMan.OnUp())
+    {
+      //Color curCol = GetComponent<SpriteRenderer>().color;
+      //curCol.a = 1.0f;
+      //GetComponent<SpriteRenderer>().color = curCol;
+
+      //transform.localScale = originScale;
+      LeanTween.scale(gameObject, originScale, 0.1f);
+    }
   }
 
   void OnMouseOver()
   {
+    OnTouchUp();
     OnTouchDown();
   }
 
@@ -57,9 +79,23 @@ public class ButtonBehaviour : MonoBehaviour {
     renders[2].color = Utility.GetColorFromHex(skyColors[state]);
   }
 
-	public void OnTouchDown()
+	public void OnTouchUp()
   {
-    if (InputMan.OnDown())
+    if (InputMan.OnUp())
+    {
       GameManager.Instance.ButtonBehaviour(type, this);
+    }
+  }
+
+  public void OnTouchDown()
+  {
+    //LeanTween.cancel(gameObject);
+
+    if (InputMan.OnDown())
+    {
+      //GameManager.Instance.ButtonBehaviour(type, this);
+      LeanTween.scale(gameObject, originScale * 1.15f, 0.1f);
+      //GetComponent<SpriteRenderer>().color -= new Color(0, 0, 0, 0.5f);
+    }
   }
 }

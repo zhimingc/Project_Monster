@@ -5,7 +5,7 @@ public class AdsManager : MonoBehaviour
 {
   public void ShowRewardedAd()
   {
-    if (Advertisement.IsReady("rewardedVideo"))
+    if (!Advertisement.isShowing && Advertisement.IsReady("rewardedVideo"))
     {
       var options = new ShowOptions { resultCallback = HandleShowResult };
       Advertisement.Show("rewardedVideo", options);

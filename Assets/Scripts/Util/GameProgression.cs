@@ -44,7 +44,7 @@ public static class GameProgression {
     //1500, // picky 
   };
 
-  public static float startSeqDelay = 0.25f;
+  public static float startSeqDelay = 0.0f;
 
   public static string[] dayFlavText = new string[(int)CONSEC_DAYS.NUM_CONSEC]
   {

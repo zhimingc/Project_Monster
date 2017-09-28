@@ -231,7 +231,7 @@ public class DayManager : MonoBehaviour {
 
     // timed shift behaviour
     ToggleTimer(true);  // pause timer
-    float timerDelay = 1.5f;
+    float timerDelay = 1.0f;
 
     if (dayState != DAY_STATE.BREAKFAST)
     {
@@ -249,10 +249,9 @@ public class DayManager : MonoBehaviour {
         startDaySign.GetComponentsInChildren<Text>()[1].text = flavText;
 
         startDaySign.GetComponent<Animator>().SetTrigger("isEnter");
-        //GameManager.Instance.SetIsPaused(true);
-        LeanTween.delayedCall(1.5f, () =>
+        LeanTween.delayedCall(0.5f, () =>
         {
-          //GameManager.Instance.SetIsPaused(false);
+          GameManager.Instance.SetIsPaused(false);
           startDaySign.GetComponent<Animator>().SetTrigger("isExit");
 
           LeanTween.delayedCall(timerDelay, () =>

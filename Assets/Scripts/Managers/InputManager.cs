@@ -29,6 +29,8 @@ static public class InputMan {
     {
       case RuntimePlatform.Android:
       case RuntimePlatform.IPhonePlayer:
+        if (Input.touchCount <= 0) return false;
+
         res = Input.GetTouch(0).phase == TouchPhase.Began;
         break;
       default:
@@ -48,6 +50,8 @@ static public class InputMan {
     {
       case RuntimePlatform.Android:
       case RuntimePlatform.IPhonePlayer:
+        if (Input.touchCount <= 0) return false;
+
         res = Input.GetTouch(0).phase == TouchPhase.Ended;
         break;
       default:

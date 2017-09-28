@@ -20,8 +20,8 @@ public class MonsterReact : MonoBehaviour {
     if (InputMan.OnDown())
     {
       // debug
-      GameManager.Instance.gameData.pop_total += 150;
-      GameManager.Instance.socialMan.ReportScore(10 + (int)Time.time, SOCIALBOARD.EARNINGS);
+      //GameManager.Instance.gameData.pop_total += 150;
+      //GameManager.Instance.socialMan.ReportScore(10 + (int)Time.time, SOCIALBOARD.EARNINGS);
 
       if (GetComponent<SpriteRenderer>().color != Color.black)
         GetComponent<Animator>().SetTrigger("jump");

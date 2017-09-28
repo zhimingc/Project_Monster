@@ -24,7 +24,7 @@ public enum GAME_STATE
 public class GameData
 {
   // initialize game data with serialization later
-  public GameData()
+  public void InitGameData()
   {
     // Init earnings
     pop_total = PlayerPrefs.GetInt("earnings");
@@ -33,12 +33,41 @@ public class GameData
     pop_monsters[0] = 100.0f;
 
     // flags
-    flag_firstPlay = true;
+    if (PlayerPrefs.HasKey("firstPlay"))
+    {
+      flag_firstPlay = false;
+    }
+    else
+    {
+      flag_firstPlay = true;
+    }
 
-    playerName = PlayerPrefs.GetString("name");
-    if (playerName == "") playerName = "Leslie";
+    //playerName = PlayerPrefs.GetString("name");
+    //if (playerName == "") playerName = "Leslie";
 
     eventType = MONSTER_EVENT.FRENZY_PROGRESS;
+
+    // init monster variations
+    monsterVars = new List<List<bool>>();
+    for (int i = 0; i < 4; ++i)
+    {
+      monsterVars.Add(new List<bool>());
+      monsterVars[i].Add(true); // first variation is default
+
+      for (int j = 1; j < 4; ++j)
+      {
+        int isUnlocked = PlayerPrefs.GetInt("monster_type_" + i.ToString() + "_" + j.ToString());
+
+        monsterVars[i].Add(isUnlocked == 1);
+      }
+    }
+  }
+
+  public void Reset()
+  {
+    pop_total = 0;
+    //pop_rank = 0;
+    ConsecutiveDayReset();
 
     // init monster variations
     monsterVars = new List<List<bool>>();
@@ -52,13 +81,6 @@ public class GameData
         monsterVars[i].Add(false);
       }
     }
-  }
-
-  public void Reset()
-  {
-    pop_total = 0;
-    //pop_rank = 0;
-    ConsecutiveDayReset();
 
     // flags
     flag_firstPlay = true;
@@ -134,6 +156,8 @@ public class GameManager : Singleton<GameManager>
   void Awake()
   {
     GameFeel.GameFeelInit();
+    gameData = new GameData();
+    gameData.InitGameData();
 
     isPaused = false;
     startWithHelp = true;
@@ -152,9 +176,7 @@ public class GameManager : Singleton<GameManager>
 
     //consecMan = gameObject.AddComponent<ConsecutiveManager>();
     contracts = new Dictionary<CONTRACT_TYPE, ContractInfo>();
-    gameData = new GameData();
-
-    GameManagerReset();
+    //GameManagerReset();
 
     // DEBUG HACK TO ADD CONTRACTS
     //contracts.Add(CONTRACT_TYPE.TIMER, new ContractInfo(CONTRACT_TYPE.TIMER));
@@ -358,21 +380,22 @@ public class GameManager : Singleton<GameManager>
     // load screen
     loadMan.LoadIn();
 
-    // behaviour once scene is loaded
-    LeanTween.delayedCall(loadMan.loadSpeed, () =>
+    if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
-      if (GameObject.FindWithTag("PopularityMan"))
-        GameObject.FindWithTag("PopularityMan").GetComponent<PopularityManager>().TriggerPopularityUpdate();
-
-      // animate day sign
-      if (dayMan)
+      // behaviour once scene is loaded
+      LeanTween.delayedCall(loadMan.loadSpeed, () =>
       {
-        LeanTween.delayedCall(GameProgression.startSeqDelay + 1.5f, () =>
+        // animate day sign
+        if (gameState == GAME_STATE.START_SEQUENCE)
         {
-          dayMan.PlayShiftSign(DAY_STATE.BREAKFAST);
-        });
-      }
-    });
+          SetIsPaused(true);
+          LeanTween.delayedCall(GameProgression.startSeqDelay + 1.0f, () =>
+          {
+            dayMan.PlayShiftSign(DAY_STATE.BREAKFAST);
+          });
+        }
+      });
+    }
 
     // splash screen behaviour
     if (SceneManager.GetActiveScene().name == "screen-splash")
@@ -447,7 +470,6 @@ public class GameManager : Singleton<GameManager>
 
     // save earnings
     dayMan.leaderboardSign.GetComponent<LeaderboardManager>().TriggerLeaderboard();
-    PlayerPrefs.SetInt("earnings", gameData.pop_total);
     SaveEarnings();
 
     // Turn off monster request boxes
@@ -458,6 +480,9 @@ public class GameManager : Singleton<GameManager>
 
     // reset to day 1
     //ResetToDayOne();
+
+    // update leaderboard
+    scoreMan.UpdateLocalLeaderboard();
   }
 
   public void SaveMonsterVar()
@@ -471,6 +496,8 @@ public class GameManager : Singleton<GameManager>
         PlayerPrefs.SetInt(toSave, val ? 1 : 0);
       }
     }
+
+    PlayerPrefs.Save();
   }
 
   public void LoadMonsterVar()
@@ -633,13 +660,8 @@ public class GameManager : Singleton<GameManager>
         //  Button_ToGame();
         //}
         break;
-      case BUTTON_TYPE.RESET_DATA:
-        gameData.Reset();
-        scoreMan.Reset();
-        GameManagerReset();
-        break;
       case BUTTON_TYPE.TO_GAME:
-        if (startWithHelp)
+        if (gameData.flag_firstPlay)
         {
           Button_ToGame(GAME_STATE.TUTORIAL);
         }
@@ -671,7 +693,7 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.GAME_LEADERBOARD:
         LoadSceneWithTransition("screen-leaderboard");
         //gpgDemo.OnShowLeaderBoard();
-        scoreMan.TriggerUpdateLeaderboard();
+        //scoreMan.TriggerUpdateLeaderboard();
         break;
       case BUTTON_TYPE.GAME_EVENTSELECT:
         MonsterEventManager eventMan = GameObject.Find("event_parent").GetComponent<MonsterEventManager>();
@@ -688,6 +710,9 @@ public class GameManager : Singleton<GameManager>
         storeMan.TriggerBuySign(true);
         break;
       case BUTTON_TYPE.STORE_CONFIRM:
+        //storeMan.ToggleButtonCols(false);
+        storeMan.TriggerBuySign(false);
+
         // watch ad
         adsMan.ShowRewardedAd();
         break;
@@ -697,6 +722,29 @@ public class GameManager : Singleton<GameManager>
       case BUTTON_TYPE.TO_STORE:
         musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
         LoadSceneWithTransition("screen-store");
+        break;
+      case BUTTON_TYPE.RESET_DATA:
+        GameObject.Find("reset_sign").GetComponent<Animator>().SetTrigger("enter");
+        break;
+      case BUTTON_TYPE.RESET_CONFIRM:
+        gameData.Reset();
+        scoreMan.Reset();
+        GameManagerReset();
+        GameObject.Find("reset_sign").GetComponent<Animator>().SetTrigger("exit");
+        break;
+      case BUTTON_TYPE.RESET_CANCEL:
+        GameObject.Find("reset_sign").GetComponent<Animator>().SetTrigger("exit");
+        break;
+      case BUTTON_TYPE.QUIT_LEVEL:
+        GameObject.Find("quit_sign").GetComponent<Animator>().SetTrigger("enter");
+        break;
+      case BUTTON_TYPE.QUIT_CONFIRM:
+        musicMan.ToggleBGM(BGM_CLIPS.MAIN_MENU);
+        LoadSceneWithTransition("screen-store");
+        GameObject.Find("quit_sign").GetComponent<Animator>().SetTrigger("exit");
+        break;
+      case BUTTON_TYPE.QUIT_CANCEL:
+        GameObject.Find("quit_sign").GetComponent<Animator>().SetTrigger("exit");
         break;
     }
   }
@@ -733,6 +781,7 @@ public class GameManager : Singleton<GameManager>
   {
     itemSlots = new ItemInfo[2] { new ItemInfo(ITEM_TYPE.EATER), new ItemInfo(ITEM_TYPE.EATER) };
 
+    PlayerPrefs.DeleteAll();
   }
 
   public void EndOfDayTrigger()
@@ -749,7 +798,7 @@ public class GameManager : Singleton<GameManager>
       case MONSTER_EVENT.MAIN_EVENT:
       case MONSTER_EVENT.FRENZY_EVENT:
       case MONSTER_EVENT.FRENZY_PROGRESS:
-        scoreMan.UpdateLocalLeaderboard();
+        //scoreMan.UpdateLocalLeaderboard();
         break;
     }
   }
@@ -779,7 +828,6 @@ public class GameManager : Singleton<GameManager>
 
   public void RewardPlayer()
   {
-    storeMan.TriggerBuySign(false);
     storeMan.ConfirmBuy();
   }
 
@@ -795,10 +843,33 @@ public class GameManager : Singleton<GameManager>
         break;
       case 1:
         startWithHelp = false;
+        gameData.flag_firstPlay = false;
+        PlayerPrefs.SetInt("firstPlay", 1);
         Button_ToGame();
+
+        PlayerPrefs.Save();
         break;
     }
   }
+
+  void FullSave()
+  {
+    SaveEarnings();
+    SaveMonsterVar();
+    int firstPlay = gameData.flag_firstPlay ? 0 : 1;
+    PlayerPrefs.SetInt("firstPlay", firstPlay);
+    scoreMan.SaveLeaderboard();
+  }
+
+  //void OnApplicationPause()
+  //{
+  //  FullSave();
+  //}
+
+  //void OnApplicationQuit()
+  //{
+  //  FullSave();
+  //}
 }
 
 
