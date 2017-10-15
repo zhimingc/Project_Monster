@@ -32,8 +32,8 @@ public class MonsterFeedback : MonoBehaviour {
     scoreText.GetComponent<TextMesh>().text = "$" + score.ToString();
     timeText.GetComponent<TextMesh>().text = "+" + time.ToString("0.0");
 
-    LeanTween.moveLocalY(gameObject, 0.0f, 1.5f);
-    LeanTween.delayedCall(gameObject, 1.25f, () =>
+    LeanTween.moveLocalY(gameObject, origin.y + 0.5f, 1.5f);
+    LeanTween.delayedCall(gameObject, 1.5f, () =>
     {
       timeText.SetActive(false);
     });

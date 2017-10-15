@@ -18,7 +18,7 @@ public class MonsterBody : MonoBehaviour
 
   public void ToggleFeedSign(bool flag)
   {
-    feedSign.SetActive(flag);
+    //feedSign.SetActive(flag);
   }
 
   void OnMouseOver()

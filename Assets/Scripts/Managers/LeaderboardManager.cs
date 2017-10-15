@@ -10,7 +10,7 @@ public class LeaderboardManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-    globalNamesText.GetComponent<Text>().text = "Global leaderboards coming soon...";
+    //globalNamesText.GetComponent<Text>().text = "Global leaderboards coming soon...";
     globalNumText.GetComponent<Text>().text = "";
     highscoreObj.SetActive(false);
   }

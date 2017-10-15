@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using SimpleJSON;
 
 public enum LEADERBOARD
 {
@@ -28,9 +29,16 @@ public class ScoreManager : MonoBehaviour {
 
   // to track leaderboard
   private List<Pair<string, int>> leaderboard;
+  private int leaderboardCount;
+
+  // url for posting scores
+  static string url = "http://nomossgames.com/monsterkitchenscore/score.php?secret=sdhfiuaef89shdf";
+
 
   void Start()
   {
+    leaderboardCount = 5;
+
     newScoreToAdd = false;
 
     //shiftScoreAmt = new int[3]
@@ -41,12 +49,14 @@ public class ScoreManager : MonoBehaviour {
     // init leaderboard from player pref
     Reset();
     LoadLeaderboard();
+
+    //DisplayLeaderboard();
   }
 
   void InitLeaderboard()
   {
     leaderboard = new List<Pair<string, int>>();
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 15; ++i)
     {
       leaderboard.Add(new Pair<string, int>("-", 0));
     }
@@ -175,7 +185,7 @@ public class ScoreManager : MonoBehaviour {
     int tmpScore = 0;
     bool replaced = false;
 
-    for (int i = 0; i < leaderboard.Count; ++i)
+    for (int i = 0; i < leaderboardCount; ++i)
     {
       if (replaced)
       {
@@ -191,13 +201,18 @@ public class ScoreManager : MonoBehaviour {
         leaderboard[i].second = curInstantScore;
 
         // trigger for new highscore
-        GameManager.Instance.socialMan.ReportScore(curInstantScore, SOCIALBOARD.EARNINGS);
+        //GameManager.Instance.socialMan.ReportScore(curInstantScore, SOCIALBOARD.EARNINGS);
         GameManager.Instance.leaderboardMan.TriggerNewHighScore();
       }
     }
 
     // update player prefs
     SaveLeaderboard();
+
+    //FindObjectOfType<highscore>().GetScoresWrapper(5);
+    //FindObjectOfType<highscore>().PostAndGetWrapper(GameManager.Instance.socialMan.playerName, curInstantScore, 5);
+    // Post scores
+    StartCoroutine(PostScores(GameManager.Instance.socialMan.playerName, curInstantScore));
 
     //DisplayLeaderboard();
   }
@@ -208,12 +223,12 @@ public class ScoreManager : MonoBehaviour {
     Text leaderNames = GameObject.Find("leader_names").GetComponent<Text>();
     Text leaderNumbers = GameObject.Find("leader_numbers").GetComponent<Text>();
     string leaderNameText = "", leaderNumText = "";
-    for (int i = 0; i < leaderboard.Count; ++i)
+    for (int i = 0; i < leaderboardCount; ++i)
     {
       string scoreText = "-";
       if (leaderboard[i].second > 0) scoreText = "$" + leaderboard[i].second.ToString();
 
-      leaderNameText += (i + 1) + ": " + scoreText + "\n";
+      leaderNameText += (i + 1) + ". " + scoreText + "\n";
       //leaderNumText += "$" + leaderboard[i].second.ToString() + "\n";
     }
     leaderNames.text = leaderNameText;
@@ -237,12 +252,93 @@ public class ScoreManager : MonoBehaviour {
   public void SaveLeaderboard()
   {
     // update player prefs
-    for (int i = 0; i < leaderboard.Count; ++i)
+    for (int i = 0; i < leaderboardCount; ++i)
     {
       PlayerPrefs.SetInt("rank" + i.ToString(), leaderboard[i].second);
     }
 
     PlayerPrefs.Save();
+
+    // post scores online
+    //StartCoroutine(PostScores(GameManager.Instance.socialMan.playerName, curInstantScore));
   }
 
+  public IEnumerator PostScores(string name, float score)
+  {
+    if (name == null)    {
+      name = "Anon";
+    }
+
+    // Create a form object for sending high score data to the server
+    WWWForm form = new WWWForm();
+    // Assuming the perl script manages high scores for different games
+
+    // The name of the player submitting the scores
+    form.AddField("name", name);
+    // The score
+    form.AddField("score", score.ToString());
+
+    form.AddField("secret", "sdhfiuaef89shdf");
+
+    // Create a download object
+    WWW download = new WWW(url, form);
+
+    // Wait until the download is done
+    yield return download;
+
+    if (!string.IsNullOrEmpty(download.error))
+    {
+      print("Error downloading: " + download.error);
+    }
+    else {
+
+      // show the highscores
+      string[] nameArr = new string[10];
+      float[] scoreArr = new float[10];
+      ParseGetJSON(download, out nameArr, out scoreArr);
+      DownloadedLeaderboard(nameArr, scoreArr, leaderboardCount);
+
+      //Debug.Log(download.text);
+    }
+  }
+
+  void ParseGetJSON(WWW www, out string[] nameArr, out float[] scoreArr)
+  {
+    //var outputstring = "";
+    var json = JSON.Parse(www.text);
+
+    nameArr = new string[10];
+    scoreArr = new float[10];
+
+    for (var i = 0; i < 10; i++)
+    {
+      nameArr[i] = json[i]["name"];
+      scoreArr[i] = json[i]["bestscore"];
+    }
+  }
+
+  public void DownloadedLeaderboard(string[] nameArr, float[] scoreArr, int num)
+  {
+    // update global leaderboard
+    Text globalLeaders = GameObject.Find("global_leader_names").GetComponent<Text>();
+    Text globalScores = GameObject.Find("global_leader_numbers").GetComponent<Text>();
+    string leaderText = "", leaderScores = "";
+    for (int i = 0; i < num; ++i)
+    {
+      leaderText += (i + 1).ToString() + ". " + nameArr[i] + "\n";
+      leaderScores += "$" + scoreArr[i] + "\n";
+    }
+    globalLeaders.text = leaderText;
+    globalScores.text = leaderScores;
+  }
+
+  public void DisplayGetError(string error)
+  {
+    Text globalLeaders = GameObject.Find("global_leader_names").GetComponent<Text>();
+
+    if (globalLeaders != null)
+    {
+      globalLeaders.text = error;
+    }
+  }
 }

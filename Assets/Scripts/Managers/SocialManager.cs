@@ -17,6 +17,7 @@ public class SocialManager : MonoBehaviour {
 
   // Social API stuff
   public ILeaderboard earningLeaderboard;
+  public string playerName;
 
   private GameObject earningsText;
   private GameObject debugText;
@@ -52,6 +53,8 @@ public class SocialManager : MonoBehaviour {
     if (success)
     {
       Debug.Log("Authenticated");
+      playerName = Social.localUser.userName;
+
       // debug
       toDisplay = "Username: " + Social.localUser.userName +
       "\nID: " + Social.localUser.id + "\n";

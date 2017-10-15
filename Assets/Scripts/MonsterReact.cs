@@ -22,6 +22,12 @@ public class MonsterReact : MonoBehaviour {
       // debug
       //GameManager.Instance.gameData.pop_total += 150;
       //GameManager.Instance.socialMan.ReportScore(10 + (int)Time.time, SOCIALBOARD.EARNINGS);
+      //StoreManager storeMan = FindObjectOfType<StoreManager>();
+      //if (storeMan != null)
+      //{
+      //  storeMan.AddEarnings(200);
+      //  storeMan.ConfirmBuy();
+      //}
 
       if (GetComponent<SpriteRenderer>().color != Color.black)
         GetComponent<Animator>().SetTrigger("jump");

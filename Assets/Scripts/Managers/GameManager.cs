@@ -95,6 +95,21 @@ public class GameData
     num_ingredients = 1;
   }
 
+  public int GetNumUnlocked()
+  {
+    int unlocked = 0;
+    foreach (var list in monsterVars)
+    {
+      foreach(bool mon in list)
+      {
+        if (mon) ++unlocked;
+      }
+    }
+    // remove initial monsters
+    unlocked -= 4;
+    return unlocked;
+  }
+
   public int pop_total;
   public int stamp_total;
   public List<List<bool>> monsterVars;
@@ -140,6 +155,7 @@ public class GameManager : Singleton<GameManager>
   //private ConsecutiveManager consecMan;
   private StoreManager storeMan;
   private AdsManager adsMan;
+  public AnalyticsManager analyticMan;
 
 #if UNITY_ANDROID
   //private GPGDemo gpgDemo;
@@ -169,6 +185,7 @@ public class GameManager : Singleton<GameManager>
     cursorScript = gameObject.AddComponent<Cursor>();
     socialMan = gameObject.AddComponent<SocialManager>();
     adsMan = gameObject.AddComponent<AdsManager>();
+    analyticMan = gameObject.AddComponent<AnalyticsManager>();
 
     // testing for leaderboards
     //gpgDemo = gameObject.AddComponent<GPGDemo>();
@@ -261,6 +278,7 @@ public class GameManager : Singleton<GameManager>
 
     if (SceneManager.GetActiveScene().name.Contains("leaderboard"))
     {
+      FindObjectOfType<highscore>().GetScoresWrapper(9);
       scoreMan.TriggerUpdateLeaderboard();
       socialMan.InitSocial();
       socialMan.LoadLeaderboard();
@@ -335,6 +353,14 @@ public class GameManager : Singleton<GameManager>
 
   void Update()
   {
+    // debug event logging
+    //if (Input.GetKeyDown(KeyCode.L))
+    //{
+    //  // Log an event with a float parameter
+    //  Firebase.Analytics.FirebaseAnalytics
+    //    .LogEvent("game_time", "single", 0.4f);
+    //}
+
     if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
       // Debug
@@ -483,6 +509,10 @@ public class GameManager : Singleton<GameManager>
 
     // update leaderboard
     scoreMan.UpdateLocalLeaderboard();
+
+    analyticMan.UpdateAnalytics(ANALYTICS.NUM_PLAY, analyticMan.num_play + 1);
+    analyticMan.ToggleAnalysis(false, ANALYTICS.AVG_PLAYLENGTH);
+    analyticMan.UpdateAnalytics(ANALYTICS.AVG_RESULT, scoreMan.curInstantScore);
   }
 
   public void SaveMonsterVar()
@@ -649,18 +679,11 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.TO_FIRSTTIME:
         LoadSceneWithTransition("screen-first-timer");
-
-        //if (gameData.flag_firstPlay)
-        //{
-        //  gameData.flag_firstPlay = false;
-        //  LoadSceneWithTransition("screen-first-timer");
-        //}
-        //else
-        //{
-        //  Button_ToGame();
-        //}
         break;
       case BUTTON_TYPE.TO_GAME:
+        // Start tracking play length
+        analyticMan.ToggleAnalysis(true, ANALYTICS.AVG_PLAYLENGTH);
+
         if (gameData.flag_firstPlay)
         {
           Button_ToGame(GAME_STATE.TUTORIAL);
@@ -861,15 +884,12 @@ public class GameManager : Singleton<GameManager>
     scoreMan.SaveLeaderboard();
   }
 
-  //void OnApplicationPause()
-  //{
-  //  FullSave();
-  //}
-
-  //void OnApplicationQuit()
-  //{
-  //  FullSave();
-  //}
+  void OnApplicationFocus(bool hasFocus)
+  {
+    if (hasFocus == false)
+    {
+      analyticMan.PostAnalytics(ANALYTICS_EVENT.SESSION_END);
+    }
+  }
 }
-
 

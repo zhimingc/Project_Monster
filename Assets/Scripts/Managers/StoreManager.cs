@@ -160,8 +160,12 @@ public class StoreManager : MonoBehaviour {
       return;
     }
 
-    if (flag) buySignObj.GetComponent<Animator>().SetTrigger("enter");
-    else buySignObj.GetComponent<Animator>().SetTrigger("exit");
+    Animator buySignAnim = buySignObj.GetComponent<Animator>();
+    buySignAnim.ResetTrigger("enter");
+    buySignAnim.ResetTrigger("exit");
+
+    if (flag) buySignAnim.SetTrigger("enter");
+    else buySignAnim.SetTrigger("exit");
   }
 
   public void ConfirmBuy()
@@ -195,5 +199,15 @@ public class StoreManager : MonoBehaviour {
     UpdateDisplays();
     GameManager.Instance.SaveEarnings();
     GameManager.Instance.SaveMonsterVar();
+
+    // analytics
+    int numUnlocked = GameManager.Instance.gameData.GetNumUnlocked();
+    GameManager.Instance.analyticMan.UpdateAnalytics(ANALYTICS.NUM_UNLOCKS, numUnlocked);
+    GameManager.Instance.analyticMan.PostAnalytics(ANALYTICS_EVENT.PLAYER_UNLOCK);
+  }
+
+  public void AddEarnings(int add)
+  {
+    earnings += add;
   }
 }

@@ -27,6 +27,7 @@ public class MonsterRequest : MonoBehaviour {
   public GameObject ingredientObj, speechBubble, monsterObj;
   public GameObject requestText; // i.e. garbage monster text
   public GameObject chairObj;
+  public GameObject comboObj; // combo feedback obj
   public Request request;
   public MonsterFeedback monsterFbScript;
 
@@ -188,6 +189,12 @@ public class MonsterRequest : MonoBehaviour {
   public void UpdateRequest()
   {
     SetRequest(request);
+  }
+
+  public void TriggerComboObj()
+  {
+    // get combo number
+
   }
 
 }

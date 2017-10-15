@@ -37,7 +37,9 @@ public enum BUTTON_TYPE
   RESET_CANCEL,
   QUIT_CONFIRM,
   QUIT_CANCEL,
-  QUIT_LEVEL
+  QUIT_LEVEL,
+  LEADER_FORWARD,
+  LEADER_BACK
 }
 
 public class ButtonBehaviour : MonoBehaviour {

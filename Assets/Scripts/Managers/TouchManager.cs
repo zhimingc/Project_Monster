@@ -29,26 +29,33 @@ public class TouchManager : MonoBehaviour
 
       //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
       Vector2 origin = cam.ScreenToWorldPoint(Input.mousePosition);
-      RaycastHit2D hit2D = Physics2D.Raycast(origin, Vector2.zero, Mathf.Infinity, touchInputMask);
+      //RaycastHit2D hit2D = Physics2D.Raycast(origin, Vector2.zero, Mathf.Infinity, touchInputMask);
+      RaycastHit2D[] hits = new RaycastHit2D[5];
+      ContactFilter2D filter = new ContactFilter2D();
+      filter.NoFilter();
+      Physics2D.Raycast(origin, Vector2.zero, filter, hits);
 
-      if (hit2D.collider != null)
+      foreach(RaycastHit2D hit2D in hits)
       {
-        GameObject recipient = hit2D.transform.gameObject;
-        touchList.Add(recipient);
-
-        if (Input.GetMouseButton(0))
+        if (hit2D.collider != null)
         {
-          recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
-        }
+          GameObject recipient = hit2D.transform.gameObject;
+          touchList.Add(recipient);
 
-        if (Input.GetMouseButtonDown(0))
-        {
-          recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
-        }
+          if (Input.GetMouseButton(0))
+          {
+            recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
+          }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-          recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
+          if (Input.GetMouseButtonDown(0))
+          {
+            recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
+          }
+
+          if (Input.GetMouseButtonUp(0))
+          {
+            recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
+          }
         }
       }
 
@@ -70,31 +77,39 @@ public class TouchManager : MonoBehaviour
       foreach (Touch touch in Input.touches)
       {
         Ray ray = cam.ScreenPointToRay(touch.position);
-        RaycastHit2D hit2D = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, touchInputMask);
+        //RaycastHit2D hit2D = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, touchInputMask);
 
-        if (hit2D.collider != null)
+        RaycastHit2D[] hits = new RaycastHit2D[5];
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.NoFilter();
+        Physics2D.Raycast(ray.origin, ray.direction, filter, hits);
+
+        foreach (RaycastHit2D hit2D in hits)
         {
-          GameObject recipient = hit2D.transform.gameObject;
-          touchList.Add(recipient);
-
-          switch (touch.phase)
+          if (hit2D.collider != null)
           {
-            case TouchPhase.Began:
-              recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
-              break;
+            GameObject recipient = hit2D.transform.gameObject;
+            touchList.Add(recipient);
 
-            case TouchPhase.Ended:
-              recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
-              break;
-             
-            case TouchPhase.Stationary:
-              recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
-              break;
-              
-            case TouchPhase.Canceled:
-              recipient.SendMessage("OnTouchExit", hit.point, SendMessageOptions.DontRequireReceiver);
+            switch (touch.phase)
+            {
+              case TouchPhase.Began:
+                recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
+                break;
 
-              break;
+              case TouchPhase.Ended:
+                recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
+                break;
+
+              case TouchPhase.Stationary:
+                recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
+                break;
+
+              case TouchPhase.Canceled:
+                recipient.SendMessage("OnTouchExit", hit.point, SendMessageOptions.DontRequireReceiver);
+
+                break;
+            }
           }
         }
       }

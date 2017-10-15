@@ -13,20 +13,20 @@ public enum COMBO_TYPE
 
 public class ComboManager : MonoBehaviour {
 
-  public GameObject comboObj;
+  //public GameObject comboObj;
   public TextMesh combo_text, combo_inner, multi_text, multi_inner;
   public float openSpeed, openDuration, closeSpeed;
   public float[] comboMultiplier;
 
-  private Vector3 originalScale;
+  //private Vector3 originalScale;
   private int comboCount, i = 0;
 
 	// Use this for initialization
 	void Start () {
     comboCount = 0;
-    originalScale = comboObj.transform.localScale;
-    comboObj.SetActive(true);
-    comboObj.transform.localScale = new Vector3(0, 0, 0);
+    //originalScale = comboObj.transform.localScale;
+    //comboObj.SetActive(true);
+    //comboObj.transform.localScale = new Vector3(0, 0, 0);
   }
 
   // Update is called once per frame
@@ -35,7 +35,7 @@ public class ComboManager : MonoBehaviour {
     if (Input.GetKeyDown(KeyCode.Space))
     {
       i = ++i % 3;
-      TriggerCombo((COMBO_TYPE)i);
+      //TriggerCombo((COMBO_TYPE)i);
     }
   }
 
@@ -66,69 +66,50 @@ public class ComboManager : MonoBehaviour {
     comboCount = 0;
   }
 
-  public void SetComboText(COMBO_TYPE type, GameObject obj, int score)
+  public void TriggerCombo(GameObject comboObj)
   {
-    TextMesh[] texts = obj.GetComponentsInChildren<TextMesh>();
+    if (comboCount < 2) return;
 
-    switch (type)
-    {
-      case COMBO_TYPE.SINGLE:
-        texts[0].text = "";
-        texts[1].text = "";
-        break;
-      case COMBO_TYPE.DOUBLE:
-        texts[0].text = "double!";
-        texts[1].text = "double!";
-        break;
-      case COMBO_TYPE.TRIPLE:
-        texts[0].text = "triple!";
-        texts[1].text = "triple!";
-        break;
-      case COMBO_TYPE.QUAD:
-        texts[0].text = "quad!";
-        texts[1].text = "quad!";
-        break;
-    }
+    TextMesh[] texts = comboObj.GetComponentsInChildren<TextMesh>();
 
-    texts[2].text = score.ToString("0");
-    texts[3].text = score.ToString("0");
-  }
-
-  void TriggerCombo(COMBO_TYPE type)
-  {
+    COMBO_TYPE type = (COMBO_TYPE)(comboCount - 1);
     switch (type)
     {
       case COMBO_TYPE.DOUBLE:
-        combo_text.text = "double!";
-        combo_inner.text = "double!";
-        multi_text.text = "x1.5";
-        multi_inner.text = "x1.5";
+        texts[0].text = "double";
+        texts[1].text = "double";
+        texts[2].text = "x" + comboMultiplier[0].ToString("0.0");
+        multi_inner.text = "x" + comboMultiplier[0].ToString();
         break;
       case COMBO_TYPE.TRIPLE:
-        combo_text.text = "triple!";
-        combo_inner.text = "triple!";
-        multi_text.text = "x2.0";
-        multi_inner.text = "x2.0";
+        texts[0].text = "triple";
+        texts[1].text = "triple";
+        texts[2].text = "x" + comboMultiplier[1].ToString("0.0");
+        multi_inner.text = "x" + comboMultiplier[1].ToString();
         break;
       case COMBO_TYPE.QUAD:
-        combo_text.text = "quad!";
-        combo_inner.text = "quad!";
-        multi_text.text = "x3.0";
-        multi_inner.text = "x3.0";
+        texts[0].text = "quad";
+        texts[1].text = "quad";
+        texts[2].text = "x" + comboMultiplier[2].ToString("0.0");
+        multi_inner.text = "x" + comboMultiplier[2].ToString();
         break;
     }
 
     LeanTween.cancel(comboObj);
-    LeanTween.cancel(gameObject);
+    //LeanTween.cancel(gameObject);
 
     // animate cam
     GameFeel.ZoomCamera(gameObject, -0.1f, 0.05f, 0.25f, 0.25f);
     GameFeel.ShakeCameraRandom(0.1f, -0.1f, 12, 0.25f);
 
     // animate combo sign
+    Vector3 originalScale = comboObj.transform.localScale;
+    originalScale.y = originalScale.x + 0.01f;
+    comboObj.gameObject.SetActive(true);
+
     comboObj.transform.localScale = originalScale - new Vector3(0, originalScale.y, 0);
     LeanTween.scaleY(comboObj, originalScale.y, openSpeed).setEase(LeanTweenType.easeInOutQuad);
-    comboObj.GetComponentInChildren<ParticleSystem>().Play();
+    //comboObj.GetComponentInChildren<ParticleSystem>().Play();
 
     LeanTween.delayedCall(gameObject, openSpeed + openDuration, () =>
     {

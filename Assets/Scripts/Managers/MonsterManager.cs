@@ -292,8 +292,9 @@ public class MonsterManager : MonoBehaviour {
       return;
     }
 
-    // update combo man with another combo
+    // update combo count and trigger combo
     GameManager.Instance.comboMan.AddComboCount();
+    GameManager.Instance.comboMan.TriggerCombo(reqBox.comboObj);
 
     // apply any effects onto timer
     float timeAdded = 0.0f;
@@ -329,7 +330,6 @@ public class MonsterManager : MonoBehaviour {
     Vector3 moveIn = monsPos;
     moveIn.x = -7;
     reqBox.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
-
 
     // get the next request
     UpdateRequestMet(reqBox);
