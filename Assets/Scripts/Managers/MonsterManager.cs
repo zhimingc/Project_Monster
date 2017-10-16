@@ -213,6 +213,7 @@ public class MonsterManager : MonoBehaviour {
 
     foreach (MonsterRequest obj in requestBoxes)
     {
+      if (obj.gameObject.activeSelf == false) continue;
       CheckRequestMet(grid, obj);
     }
   }
@@ -281,12 +282,20 @@ public class MonsterManager : MonoBehaviour {
       MonsterMoveOut(reqBox);
       RequestMetFeedback(reqBox);
       reqBox.monsterObj.SetActive(false);
+      reqBox.monsterObj.GetComponent<SpriteRenderer>().enabled = false;
       reqBox.gameObject.SetActive(false);
       gs.TriggerServed(reqBox);
 
+      // don't step the tutorial is there are any active monsters
+      foreach(MonsterRequest req in requestBoxes)
+      {
+        if (req.monsterObj.GetComponent<SpriteRenderer>().enabled == true)
+          return;
+      }
+
       LeanTween.delayedCall(1.0f, () =>
       {
-        GameManager.Instance.TutorialTrigger(1);
+        GameManager.Instance.TutorialTrigger();
       });
 
       return;
@@ -315,7 +324,7 @@ public class MonsterManager : MonoBehaviour {
       gs.TriggerServed(reqBox);
 
       // update score text in grid
-      gs.TriggerScoreText(scoreAdded);
+      //gs.TriggerScoreText(scoreAdded);
     }
 
     // feedback for request met
@@ -556,14 +565,49 @@ public class MonsterManager : MonoBehaviour {
   }
 
   // for tutorial
-  public void TriggerMiddleMonster()
+  public void TriggerTutorialMonster(int stage)
   {
-    MonsterRequest box = requestBoxes[1];
+    List<INGREDIENT_TYPE> req = new List<INGREDIENT_TYPE>();
+
+    switch (stage)
+    {
+      case 0:
+        req.Add(INGREDIENT_TYPE.BREAD);
+        req.Add(INGREDIENT_TYPE.MEAT);
+        req.Add(INGREDIENT_TYPE.BREAD);
+
+        SetAndMoveInMonster(1, req);
+        break;
+      case 1:
+        req.Add(INGREDIENT_TYPE.BREAD);
+        req.Add(INGREDIENT_TYPE.MEAT);
+        req.Add(INGREDIENT_TYPE.BREAD);
+        SetAndMoveInMonster(0, req);
+
+        //req.Clear();
+        //req.Add(INGREDIENT_TYPE.BREAD);
+        //req.Add(INGREDIENT_TYPE.MEAT);
+        //req.Add(INGREDIENT_TYPE.MEAT);
+        //SetAndMoveInMonster(1, req);
+
+        req.Clear();
+        req.Add(INGREDIENT_TYPE.BREAD);
+        req.Add(INGREDIENT_TYPE.MEAT);
+        req.Add(INGREDIENT_TYPE.MEAT);
+        req.Add(INGREDIENT_TYPE.BREAD);
+        SetAndMoveInMonster(2, req);
+        break;
+    }
+  }
+  
+  void SetAndMoveInMonster(int index, List<INGREDIENT_TYPE> ing)
+  {
+    MonsterRequest box = requestBoxes[index];
+    box.monsterObj.SetActive(true);
+    box.gameObject.SetActive(true);
+
     Request req = new Request();
-    req.ingredients = new List<INGREDIENT_TYPE>();
-    req.ingredients.Add(INGREDIENT_TYPE.BREAD);
-    req.ingredients.Add(INGREDIENT_TYPE.MEAT);
-    req.ingredients.Add(INGREDIENT_TYPE.BREAD);
+    req.ingredients = new List<INGREDIENT_TYPE>(ing);
 
     box.SetRequest(req);
     box.monsterObj.GetComponent<SpriteRenderer>().enabled = false;
@@ -573,3 +617,4 @@ public class MonsterManager : MonoBehaviour {
     box.monsterObj.GetComponent<MonsterAnimation>().MoveInFrom(moveIn);
   }
 }
+

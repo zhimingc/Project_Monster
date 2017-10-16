@@ -41,12 +41,39 @@ public class MonsterBody : MonoBehaviour
     if (monReq.request.monsterType == MONSTER_TYPE.GARBAGE ||
       gs.monReq.request.IsSameAs(monReq.request))
     {
+      if (gs.isBeingServed == false)
+      {
+        gs.isBeingServed = true;
+        Vector3 servePos = GetComponent<MonsterAnimation>().origin;
+        servePos.y -= 1.0f;
+        LeanTween.move(gs.gameObject, servePos, 0.1f);
+        LeanTween.scale(gs.gameObject, new Vector3(1.5f, 1.5f, 1.5f), 0.1f);
+      }
+
       if (InputMan.OnUp())
-      {        
+      { 
+        LeanTween.cancel(gs.gameObject);
         gs.SetCanServe(false);
 
         GameManager.Instance.monsterMan.ServeMonsterRequest(gs, monReq);
       }
+    }
+  }
+
+  void OnMouseExit()
+  {
+    OnTouchExit();
+  }
+
+  public void OnTouchExit()
+  {
+    if (playerScript.hoveredGrid == null) return;
+
+    GridScript gs = playerScript.hoveredGrid.GetComponent<GridScript>();
+
+    if (gs.isBeingServed == true)
+    {
+      gs.isBeingServed = false;
     }
   }
 }

@@ -134,6 +134,7 @@ public class GameManager : Singleton<GameManager>
   public int currentLevel;
   public int turnCounter;
   public GameData gameData;
+  public int tutorialStep;
 
   public ScoreManager scoreMan;
   public DayManager dayMan;
@@ -213,7 +214,7 @@ public class GameManager : Singleton<GameManager>
     LoadMonsterVar();
 
     SetGameState(GAME_STATE.TUTORIAL);
-    SetGameState(GAME_STATE.START_SEQUENCE);
+    //SetGameState(GAME_STATE.START_SEQUENCE);
   }
 
   void ToggleSplashScreens()
@@ -252,6 +253,12 @@ public class GameManager : Singleton<GameManager>
     helpToggler = true;
     if (SceneManager.GetActiveScene().name.Contains("vertical-phone"))
     {
+      if (gameState != GAME_STATE.TUTORIAL)
+      {
+        GameObject.Find("finger_hand_filled").SetActive(false);
+        GameObject.Find("tutorial_backing").SetActive(false);
+      }
+
       scoreMan.InitScore();
 
       dayMan = GameObject.Find("day_manager").GetComponent<DayManager>();
@@ -854,19 +861,38 @@ public class GameManager : Singleton<GameManager>
     storeMan.ConfirmBuy();
   }
 
-  public void TutorialTrigger(int step)
+  public void TutorialTrigger(int step = -1)
   {
     // step 0 triggers monster
     // step 1 triggers end of tutorial
+    GameObject tutorialHand = GameObject.Find("finger_hand_filled");
+    if (step < 0) ++tutorialStep;
+    else tutorialStep = step;
 
-    switch (step)
+    switch (tutorialStep)
     {
-      case 0:
-        monsterMan.TriggerMiddleMonster();
+      case 0: // first monster request
+        monsterMan.TriggerTutorialMonster(0);
+        tutorialHand.GetComponent<Animator>().SetTrigger("serve");
         break;
-      case 1:
+      case 1: // load layout tutorial
+        loadMan.LoadFull(()=>
+        {
+          monsterMan.TriggerTutorialMonster(1);
+          gridMan.TutorialGridStates(1);
+          // make ingredientMan output laid out ingredients
+          ingredientMan.IngredientLayoutTutorial(1);
+          // gotta make ingredient man spawn a new ingredient for step 2
+          ingredientMan.AddToIngredientQ();
+
+          tutorialHand.SetActive(false);
+        });
+        break;
+      case 2: // start game
         startWithHelp = false;
         gameData.flag_firstPlay = false;
+        ingredientMan.IngredientLayoutTutorial(-1);
+
         PlayerPrefs.SetInt("firstPlay", 1);
         Button_ToGame();
 

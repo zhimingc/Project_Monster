@@ -26,9 +26,7 @@ public class GridManager : MonoBehaviour {
     switch (GameManager.Instance.gameState)
     {
       case GAME_STATE.TUTORIAL:
-        grid[0][1].SetActive(false);
-        grid[1][1].SetActive(false);
-        grid[1][0].SetActive(false);
+        TutorialGridStates(0);
         break;
       case GAME_STATE.START_SEQUENCE:
 
@@ -296,5 +294,30 @@ public class GridManager : MonoBehaviour {
     }
 
     return false;
+  }
+
+  public void TutorialGridStates(int stage)
+  {
+    switch (stage)
+    {
+      case 0:
+        grid[0][1].SetActive(false);
+        grid[1][1].SetActive(false);
+        grid[1][0].SetActive(false);
+        break;
+      case 1:
+        grid[0][1].SetActive(true);
+        grid[1][1].SetActive(true);
+        grid[1][0].SetActive(true);
+
+        List<INGREDIENT_TYPE> ing = new List<INGREDIENT_TYPE>();
+        ing.Add(INGREDIENT_TYPE.BREAD);
+        ing.Add(INGREDIENT_TYPE.MEAT);
+        grid[0][0].GetComponent<GridScript>().SetGridIngredients(ing); ;
+        grid[0][1].GetComponent<GridScript>().SetGridIngredients(ing);;
+        grid[1][1].GetComponent<GridScript>().SetGridIngredients(ing);;
+        grid[1][0].GetComponent<GridScript>().SetGridIngredients(ing);;
+        break;
+    }
   }
 }

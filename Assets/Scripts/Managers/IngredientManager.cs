@@ -32,7 +32,7 @@ public class IngredientManager : MonoBehaviour {
   private int maxLayout;
 
   private bool startSeqFlag;
-  private bool tutorialFlag;
+  private int tutorialFlag;
   private int tutorialIngCounter;
 
   // Use this for initialization 
@@ -40,7 +40,7 @@ public class IngredientManager : MonoBehaviour {
     //spacing = GameObject.Find("grid_manager").GetComponent<GridManager>().spacing;
     gridBlockSize = GameObject.Find("grid_manager").GetComponent<GridManager>().gridBlockSize;
     startSeqFlag = true;
-    tutorialFlag = false;
+    tutorialFlag = -1;
     tutorialIngCounter = 0;
 
     // Init for sequential ingredient gen.
@@ -81,7 +81,7 @@ public class IngredientManager : MonoBehaviour {
       case GAME_STATE.TUTORIAL:
         usableAmt = 1;
         viewableAmt = 2;
-        tutorialFlag = true;
+        tutorialFlag = 0;
         break;
       case GAME_STATE.START_SEQUENCE:
 
@@ -118,13 +118,18 @@ public class IngredientManager : MonoBehaviour {
 
   public void AddToIngredientQ()
   {
-    if (tutorialFlag && ++tutorialIngCounter > 4)
+    if (tutorialFlag >= 0)
     {
-      if (tutorialIngCounter == 5)
+      ++tutorialIngCounter;
+      if (tutorialFlag == 0 && tutorialIngCounter == 5)
       {
         GameManager.Instance.TutorialTrigger(0);
+        return;
       }
-      return;
+      else if (tutorialIngCounter == 8)
+      {
+        return;
+      }
     }
 
     //GameObject newIngredient = RandomizeIngredient();
@@ -157,7 +162,23 @@ public class IngredientManager : MonoBehaviour {
     int layout = GenerateLayout();
 
     // only gen single blocks for tutorial
-    if (tutorialFlag) layout = 0;
+    if (tutorialFlag >= 0)
+    {
+      if (tutorialIngCounter < 4) layout = 0;
+      else
+      {
+        if (tutorialIngCounter < 6)
+        {
+          type = INGREDIENT_TYPE.MEAT;
+          layout = 1;
+        }
+        else
+        {
+          type = INGREDIENT_TYPE.BREAD;
+          layout = 2;
+        }
+      }
+    }
 
     // Generate ingredient 
     GameObject genIngredient = GenerateIngredient(type, sauce, layout, transform);
@@ -303,5 +324,10 @@ public class IngredientManager : MonoBehaviour {
     }
 
     return parent; 
+  }
+
+  public void IngredientLayoutTutorial(int step)
+  {
+    tutorialFlag = step;
   }
 }

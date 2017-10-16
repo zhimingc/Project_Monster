@@ -59,6 +59,18 @@ public class LoadManager : MonoBehaviour {
 
   }
 
+  public delegate void PostLoadFunc();
+  // executes the full loading sequence
+  public void LoadFull(PostLoadFunc postLoad)
+  {
+    LoadOut();
+    LeanTween.delayedCall(gameObject, loadSpeed, () =>
+    {
+      postLoad();
+      LoadIn();
+    });
+  }
+
   // Update is called once per frame
   void Update () {
 		

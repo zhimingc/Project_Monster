@@ -15,6 +15,7 @@ public class GridScript : MonoBehaviour {
   public GameObject comboSignObj;
   public bool canServe;         // flag to indicate if this grid meets any requests
   public MonsterRequest monReq;   // request this grid meets
+  public bool isBeingServed; // toggle for when the grid is about to be served
 
   public List<GameObject> stackObjs;
   private PlayerScript playerScript;
@@ -41,6 +42,7 @@ public class GridScript : MonoBehaviour {
   // follow player
   private List<Vector3> ingredientSidePos;
   private Vector3 origin;
+  private Vector3 originScale;
 
   void Awake()
   {
@@ -51,24 +53,17 @@ public class GridScript : MonoBehaviour {
     maxIngredients = 5;
     scoreText.SetActive(false);
     comboSignObj.SetActive(false);
-    //originalScale = comboSignObj.transform.localScale;
+    origin = transform.position;
+    originScale = transform.localScale;
 
-    //psObj = Instantiate(Resources.Load<GameObject>("Prefabs/Particles/eaten_particles")).GetComponent<ParticleSystem>();
-    //exclaimObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/exclaimation"), transform);
-    //monsterServeObj = Instantiate(Resources.Load<GameObject>("Prefabs/Util/monster_serve"), transform);
-    //monsterServeObj.transform.localPosition -= new Vector3(0, 0.25f, 0);
+    // turntable variables
+    turnSpeed = 0.25f;
+    isPickedUp = false;
+    pickedBy = null;
 
     // Init can serve variables
     SetCanServe(false);
     pickyIndicator.SetActive(false);
-
-    // turntable variables
-    turnSpeed = 0.25f;
-
-    isPickedUp = false;
-    origin = transform.position;
-
-    pickedBy = null;
   }
 
 	// Use this for initialization
@@ -84,7 +79,7 @@ public class GridScript : MonoBehaviour {
 
   void Update()
   {
-    if (isPickedUp)
+    if (isPickedUp && !isBeingServed)
     {
       UpdatePickedUp();
     }
@@ -100,6 +95,7 @@ public class GridScript : MonoBehaviour {
       //stackObjs[i].transform.position = mousePos + ingredientSidePos[i];
     }
 
+    transform.localScale = originScale;
     transform.position = mousePos;
   }
 
@@ -414,9 +410,6 @@ public class GridScript : MonoBehaviour {
         TogglePickUp(true);
 
         //GameManager.Instance.monsterMan.ServeMonsterRequest(this, monReq);
-
-        //// reset serve
-        //SetCanServe(false);
       }
     }
   }
@@ -430,8 +423,6 @@ public class GridScript : MonoBehaviour {
   void PlateDragMouseUp()
   {
     TogglePickUp(false);
-
-
 
     // moving back to origin
     LeanTween.move(gameObject, origin, 0.25f);
@@ -472,6 +463,7 @@ public class GridScript : MonoBehaviour {
   public void SetCanServe(bool flag, MonsterRequest setReq = null, Color chairColor = new Color())
   {
     canServe = flag;
+    isBeingServed = false;
 
     if (setReq != null &&
       setReq.request.monsterType == MONSTER_TYPE.GARBAGE) return;
@@ -490,42 +482,8 @@ public class GridScript : MonoBehaviour {
       monsterServeObj.GetComponentsInChildren<SpriteRenderer>()[1].color = newCol;
     }
     monReq = setReq;
-  }
 
-  public void TriggerScoreText(int amt)
-  {
-    //// set text display
-    //TextMesh[] texts = scoreText.GetComponentsInChildren<TextMesh>();
-    //foreach (TextMesh txt in texts) txt.text = amt.ToString();
-
-    //// animate text
-    //scoreText.SetActive(true);
-    //scoreText.transform.localPosition = new Vector3(0, 0, 0);
-    //LeanTween.moveLocalY(scoreText, 0.5f, 2.0f);
-    //LeanTween.delayedCall(2.0f, () =>
-    //{
-    //  scoreText.SetActive(false);
-    //});
-
-    //int comboCount = GameManager.Instance.comboMan.GetComboCount();
-    //GameManager.Instance.comboMan.SetComboText((COMBO_TYPE)comboCount - 1, comboSignObj, amt);
-    //// animate combo sign
-    //comboSignObj.SetActive(true);
-    //comboSignObj.transform.localPosition = new Vector3(0, 0, 0);
-    //LeanTween.moveLocalY(comboSignObj, 0.75f, 2.0f);
-    //// animate combo sign
-    //comboSignObj.transform.localScale = originalScale - new Vector3(0, originalScale.y, 0);
-    //LeanTween.scaleY(comboSignObj, originalScale.y, 0.25f).setEase(LeanTweenType.easeInOutQuad);
-
-    //LeanTween.delayedCall(gameObject, 1.5f, () =>
-    //{
-    //  LeanTween.scaleY(comboSignObj, 0.0f, 0.5f).setEase(LeanTweenType.easeInOutQuad);
-    //});
-    //LeanTween.delayedCall(2.0f, () =>
-    //{
-    //  comboSignObj.SetActive(false);
-    //});
-
+    transform.localScale = originScale;
   }
 
   public void MoveStackTo(GameObject toObj)
@@ -589,5 +547,11 @@ public class GridScript : MonoBehaviour {
     }
 
     return true;
+  }
+
+  public void SetGridIngredients(List<INGREDIENT_TYPE> ing)
+  {
+    ingredientStack = new List<INGREDIENT_TYPE>(ing);
+    UpdateStackDisplay();
   }
 }
