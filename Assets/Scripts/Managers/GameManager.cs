@@ -27,7 +27,15 @@ public class GameData
   public void InitGameData()
   {
     // Init earnings
-    pop_total = PlayerPrefs.GetInt("earnings");
+    if (PlayerPrefs.HasKey("earnings"))
+    {
+      pop_total = PlayerPrefs.GetInt("earnings");
+    }
+
+    if (PlayerPrefs.HasKey("support_total"))
+    {
+      support_total = PlayerPrefs.GetInt("support_total");
+    }
 
     pop_monsters = new float[(int)MONSTER_TYPE.NUM_TYPES];
     pop_monsters[0] = 100.0f;
@@ -58,6 +66,8 @@ public class GameData
       {
         int isUnlocked = PlayerPrefs.GetInt("monster_type_" + i.ToString() + "_" + j.ToString());
 
+        if (GameManager.Instance.EXHIBIT_BUILD) isUnlocked = 1;
+
         monsterVars[i].Add(isUnlocked == 1);
       }
     }
@@ -66,6 +76,7 @@ public class GameData
   public void Reset()
   {
     pop_total = 0;
+    //support_total = 0;
     //pop_rank = 0;
     ConsecutiveDayReset();
 
@@ -112,6 +123,7 @@ public class GameData
 
   public int pop_total;
   public int stamp_total;
+  public int support_total;
   public List<List<bool>> monsterVars;
   public float[] pop_monsters;
   public bool flag_firstPlay;
@@ -148,6 +160,9 @@ public class GameManager : Singleton<GameManager>
   public SpriteManager spriteMan;
   public SocialManager socialMan;
 
+  // build flag
+  public bool EXHIBIT_BUILD;
+
   private LoadManager loadMan;
   private MusicManager musicMan;
   private UIManager uiMan;
@@ -172,6 +187,10 @@ public class GameManager : Singleton<GameManager>
 
   void Awake()
   {
+    // BUILD FLAGS
+    EXHIBIT_BUILD = true;
+    //EXHIBIT_BUILD = false;
+
     GameFeel.GameFeelInit();
     gameData = new GameData();
     gameData.InitGameData();
@@ -211,9 +230,9 @@ public class GameManager : Singleton<GameManager>
     InputMan.platform = Application.platform;
 
     // Loading
-    LoadMonsterVar();
+    //LoadMonsterVar();
 
-    SetGameState(GAME_STATE.TUTORIAL);
+    //SetGameState(GAME_STATE.TUTORIAL);
     //SetGameState(GAME_STATE.START_SEQUENCE);
   }
 
@@ -518,8 +537,11 @@ public class GameManager : Singleton<GameManager>
     scoreMan.UpdateLocalLeaderboard();
 
     analyticMan.UpdateAnalytics(ANALYTICS.NUM_PLAY, analyticMan.num_play + 1);
-    analyticMan.ToggleAnalysis(false, ANALYTICS.AVG_PLAYLENGTH);
-    analyticMan.UpdateAnalytics(ANALYTICS.AVG_RESULT, scoreMan.curInstantScore);
+    analyticMan.ToggleAnalysis(false, ANALYTICS.LENGTH_PLAY);
+    analyticMan.UpdateAnalytics(ANALYTICS.NUM_PLAYRESULT, scoreMan.curInstantScore);
+
+    // post result after every play
+    analyticMan.PostAnalytics(ANALYTICS_EVENT.PLAY_END);
   }
 
   public void SaveMonsterVar()
@@ -553,6 +575,7 @@ public class GameManager : Singleton<GameManager>
   public void SaveEarnings()
   {
     PlayerPrefs.SetInt("earnings", gameData.pop_total);
+    PlayerPrefs.SetInt("support_total", gameData.support_total);
   }
 
   public void CheckLevelComplete()
@@ -689,9 +712,22 @@ public class GameManager : Singleton<GameManager>
         break;
       case BUTTON_TYPE.TO_GAME:
         // Start tracking play length
-        analyticMan.ToggleAnalysis(true, ANALYTICS.AVG_PLAYLENGTH);
+        analyticMan.ToggleAnalysis(true, ANALYTICS.LENGTH_PLAY);
 
         if (gameData.flag_firstPlay)
+        {
+          Button_ToGame(GAME_STATE.TUTORIAL);
+        }
+        else
+        {
+          Button_ToGame();
+        }
+        break;
+      case BUTTON_TYPE.TO_TUTORIAL:
+        // Start tracking play length
+        analyticMan.ToggleAnalysis(true, ANALYTICS.LENGTH_PLAY);
+
+        if (EXHIBIT_BUILD)
         {
           Button_ToGame(GAME_STATE.TUTORIAL);
         }
@@ -744,7 +780,14 @@ public class GameManager : Singleton<GameManager>
         storeMan.TriggerBuySign(false);
 
         // watch ad
-        adsMan.ShowRewardedAd();
+        if (EXHIBIT_BUILD)
+        {
+          RewardPlayer(); // only for exhibition build
+        }
+        else
+        {
+          adsMan.ShowRewardedAd();
+        }
         break;
       case BUTTON_TYPE.STORE_CANCEL:
         storeMan.TriggerBuySign(false);

@@ -6,7 +6,7 @@ public class StoreManager : MonoBehaviour {
 
   public GameObject buySignObj, notEnoughText;
   public GameObject[] buySignButtons;
-  public GameObject earningsText, stampText;
+  public GameObject earningsText, stampText, supportNum;
   public GameObject unlockParticles;
   public int buyCost;
   public List<List<GameObject>> monsterVarObjs;
@@ -19,6 +19,7 @@ public class StoreManager : MonoBehaviour {
     // Get earnings and stamp numbers from game man
     earnings = GameManager.Instance.gameData.pop_total;
     stamps = GameManager.Instance.gameData.stamp_total;
+    supportNum = GameObject.Find("support_num");
 
     UpdateDisplays();
 
@@ -52,6 +53,7 @@ public class StoreManager : MonoBehaviour {
 
   void UpdateDisplays()
   {
+    supportNum.GetComponent<TextMesh>().text = "\n$" + GameManager.Instance.gameData.support_total.ToString();
     earningsText.GetComponent<TextMesh>().text = "$" + earnings.ToString();
     stampText.GetComponent<TextMesh>().text = stamps.ToString();
   }
@@ -129,6 +131,12 @@ public class StoreManager : MonoBehaviour {
     }
   }
 
+  void SpendEarnings(int amt)
+  {
+    earnings -= amt;
+    GameManager.Instance.gameData.support_total += amt;
+  }
+
   public void ToggleButtonCols(bool flag)
   {
     foreach (GameObject button in buySignButtons)
@@ -171,7 +179,7 @@ public class StoreManager : MonoBehaviour {
   public void ConfirmBuy()
   {
     // decrease earnings
-    earnings -= buyCost;
+    SpendEarnings(buyCost);
 
     // unlock variation if it exists
     if (CheckForMonsterToUnlock())

@@ -141,6 +141,11 @@ public class PlayerScript : MonoBehaviour {
         }
       }
 
+      if (hoveredGrid != null)
+      {
+        LeanTween.cancel(hoveredGrid.gameObject);
+      }
+
 
       foreach (var del in mouseUpDelegates)
       {

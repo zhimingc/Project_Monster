@@ -338,7 +338,8 @@ public class ScoreManager : MonoBehaviour {
 
     if (globalLeaders != null)
     {
-      globalLeaders.text = error;
+      //globalLeaders.text = error;
+      globalLeaders.text = "Could not load leaderboards";
     }
   }
 }

@@ -71,6 +71,7 @@ public class MonsterBody : MonoBehaviour
 
     GridScript gs = playerScript.hoveredGrid.GetComponent<GridScript>();
 
+    LeanTween.cancel(gs.gameObject);
     if (gs.isBeingServed == true)
     {
       gs.isBeingServed = false;

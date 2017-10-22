@@ -7,7 +7,7 @@ public class SpriteManager : MonoBehaviour {
   public List<List<Sprite>> monsterSprites;
 
   // Use this for initialization
-  void Start () {
+  void Awake () {
     monsterSprites = new List<List<Sprite>>();
 
     // basic

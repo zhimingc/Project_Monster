@@ -20,17 +20,20 @@ public enum ANALYTICS
   AVG_PLAYLENGTH,
   AVG_RESULT,
   NUM_UNLOCKS,
+  NUM_PLAYRESULT,
+  LENGTH_PLAY
 }
 
 public enum ANALYTICS_EVENT
 {
+  PLAY_END,
   SESSION_END,
   PLAYER_UNLOCK
 }
 
 public class AnalyticsManager : MonoBehaviour {
 
-  public float length_session, avg_result, avg_playLength;
+  public float length_session, num_playResult, length_play;
   public int num_unlocks, num_play;
 
   private bool trackPlayLength;
@@ -39,8 +42,8 @@ public class AnalyticsManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
     length_session = 0.0f;
-    avg_result = 0.0f;
-    avg_playLength = 0.0f;
+    num_playResult = 0.0f;
+    length_play = 0.0f;
     num_unlocks = 0;
     num_play = 0;
 
@@ -52,7 +55,7 @@ public class AnalyticsManager : MonoBehaviour {
   {
     switch (a_type)
     {
-      case ANALYTICS.AVG_PLAYLENGTH:
+      case ANALYTICS.LENGTH_PLAY:
         if (toggle)
         {
           trackPlayLength = true;
@@ -71,17 +74,23 @@ public class AnalyticsManager : MonoBehaviour {
   {
     switch (a_type)
     {
-      case ANALYTICS.AVG_PLAYLENGTH:
-        totalPlayLength += data;
-        break;
-      case ANALYTICS.AVG_RESULT:
-        totalResult += data;
-        break;
+      //case ANALYTICS.AVG_PLAYLENGTH:
+      //  totalPlayLength += data;
+      //  break;
+      //case ANALYTICS.AVG_RESULT:
+      //  totalResult += data;
+      //  break;
       case ANALYTICS.NUM_PLAY:
         num_play = (int)data;
         break;
       case ANALYTICS.NUM_UNLOCKS:
         num_unlocks = (int)data;
+        break;
+      case ANALYTICS.NUM_PLAYRESULT:
+        num_playResult = data;
+        break;
+      case ANALYTICS.LENGTH_PLAY:
+        length_play = data;
         break;
     }
   }
@@ -90,11 +99,18 @@ public class AnalyticsManager : MonoBehaviour {
   {
     switch (eventType)
     {
+      case ANALYTICS_EVENT.PLAY_END:
+        Analytics.CustomEvent("Play end", new Dictionary<string, object>
+        {
+          { "Play length", length_play },
+          { "Play result", num_playResult },
+        });
+        break;
       case ANALYTICS_EVENT.SESSION_END:
         Analytics.CustomEvent("Session end", new Dictionary<string, object>
         {
-          { "Avg play length", num_play == 0 ? 0 : totalPlayLength / num_play },
-          { "Avg play result", num_play == 0 ? 0 : totalResult / num_play },
+          //{ "Avg play length", num_play == 0 ? 0 : totalPlayLength / num_play },
+          //{ "Avg play result", num_play == 0 ? 0 : totalResult / num_play },
           { "Session minutes", length_session },
           { "Number of plays", num_play },
         });
@@ -104,7 +120,7 @@ public class AnalyticsManager : MonoBehaviour {
       case ANALYTICS_EVENT.PLAYER_UNLOCK:
         Analytics.CustomEvent("Player unlock", new Dictionary<string, object>
         {
-          { "Number of unlocks", avg_playLength },
+          { "Number of unlocks", num_unlocks },
         });
         break;
     }
@@ -114,8 +130,8 @@ public class AnalyticsManager : MonoBehaviour {
   void ResetSession()
   {
     length_session = 0.0f;
-    avg_result = 0.0f;
-    avg_playLength = 0.0f;
+    num_playResult = 0.0f;
+    length_play = 0.0f;
     num_unlocks = 0;
     num_play = 0;
 

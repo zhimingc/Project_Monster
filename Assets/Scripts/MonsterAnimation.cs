@@ -23,15 +23,6 @@ public class MonsterAnimation : MonoBehaviour {
     boundaries = backMan.cloudPosLimits;
     origin = transform.position;
     //originScale = transform.localScale;
-
-    // sprites
-    //monsterStates = new Sprite[(int)MONSTER_TYPE.NUM_TYPES];
-    //monsterStates[0] = Resources.Load<Sprite>("Sprites/monster_basic");
-    //monsterStates[1] = Resources.Load<Sprite>("Sprites/monster_impatient");
-    //monsterStates[2] = Resources.Load<Sprite>("Sprites/monster_rude2");
-    //monsterStates[3] = Resources.Load<Sprite>("Sprites/monster_picky2");
-    //monsterStates[4] = Resources.Load<Sprite>("Sprites/monster_picky2");
-    //monsterStates[5] = Resources.Load<Sprite>("Sprites/monster_greedy1"); // garbage
   }
 
   void Start()
@@ -78,6 +69,10 @@ public class MonsterAnimation : MonoBehaviour {
       {
         if (varList[spriteIndex][1]) variationIndex = 1;
       }
+    }
+    else if (monReq.ingredients.Count == 4)
+    {
+      variationIndex = 0;
     }
 
     // apply chosen sprite

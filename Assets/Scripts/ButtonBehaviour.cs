@@ -39,7 +39,8 @@ public enum BUTTON_TYPE
   QUIT_CANCEL,
   QUIT_LEVEL,
   LEADER_FORWARD,
-  LEADER_BACK
+  LEADER_BACK,
+  TO_TUTORIAL
 }
 
 public class ButtonBehaviour : MonoBehaviour {
